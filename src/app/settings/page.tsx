@@ -1,6 +1,7 @@
 import ThemeToggle from "@/components/ThemeToggle";
 import MotionToggle from "@/components/MotionToggle";
 import AccountPanel from "@/components/AccountPanel";
+import DeviceManager from "@/components/DeviceManager";
 
 function Section({ title, note, children }: { title: string; note: string; children: React.ReactNode }) {
   return (
@@ -29,6 +30,10 @@ export default function SettingsPage() {
 
         <Section title="Account" note="Google sign-in, for saving quiz history and purchases.">
           <AccountPanel />
+        </Section>
+
+        <Section title="Devices" note="Manage which devices are signed in.">
+          <DeviceManager />
         </Section>
       </div>
     </main>

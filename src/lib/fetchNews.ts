@@ -7,8 +7,34 @@ const SOURCES: [string, string][] = [
   ["Google AI Blog", "https://blog.google/technology/ai/rss/"],
 ];
 
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  nbsp: " ",
+  rsquo: "’",
+  lsquo: "‘",
+  rdquo: "”",
+  ldquo: "“",
+  ndash: "–",
+  mdash: "—",
+  hellip: "…",
+};
+
+// RSS titles/descriptions are HTML-entity-encoded (e.g. "&#8217;" for a
+// curly apostrophe). Without decoding these, headlines render as literal
+// entity codes on the page instead of the punctuation they represent.
+export function decodeEntities(text: string): string {
+  return text
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)))
+    .replace(/&([a-zA-Z]+);/g, (match, name) => NAMED_ENTITIES[name.toLowerCase()] ?? match);
+}
+
 export function stripHtml(text: string): string {
-  return text.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  return decodeEntities(text.replace(/<[^>]+>/g, "")).replace(/\s+/g, " ").trim();
 }
 
 export function extractTag(block: string, tag: string): string {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { stripHtml, extractTag, parseItems } from "./fetchNews";
+import { stripHtml, extractTag, parseItems, decodeEntities } from "./fetchNews";
 
 describe("stripHtml", () => {
   it("removes tags and collapses whitespace", () => {
@@ -8,6 +8,29 @@ describe("stripHtml", () => {
 
   it("returns an empty string unchanged", () => {
     expect(stripHtml("")).toBe("");
+  });
+
+  it("decodes HTML entities so headlines don't show literal entity codes", () => {
+    expect(stripHtml("Sam Altman&#8217;s plan")).toBe("Sam Altman’s plan");
+  });
+});
+
+describe("decodeEntities", () => {
+  it("decodes decimal numeric entities", () => {
+    expect(decodeEntities("&#8216;quoted&#8217;")).toBe("‘quoted’");
+  });
+
+  it("decodes hex numeric entities", () => {
+    expect(decodeEntities("&#x2019;")).toBe("’");
+  });
+
+  it("decodes common named entities", () => {
+    expect(decodeEntities("Tom &amp; Jerry")).toBe("Tom & Jerry");
+    expect(decodeEntities("&quot;quoted&quot;")).toBe('"quoted"');
+  });
+
+  it("leaves unrecognized named entities untouched rather than corrupting them", () => {
+    expect(decodeEntities("&notarealentity;")).toBe("&notarealentity;");
   });
 });
 

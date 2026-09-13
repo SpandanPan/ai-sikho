@@ -4,16 +4,26 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+const DEVICE_LIMIT_MESSAGE =
+  "This account is already signed in on 2 devices — that's the limit. Sign out one from Settings on the other device first.";
+
 export default function SignInForm() {
   const router = useRouter();
   const params = useSearchParams();
   const callbackUrl = params.get("callbackUrl") ?? "/";
+  // NextAuth redirects OAuth errors back here as ?error=CODE (see pages.signIn
+  // in src/lib/auth.ts) rather than resolving inline like signIn(..., {
+  // redirect: false }) does for the OTP form below — same AccessDenied
+  // coupling noted in auth.ts applies here too.
+  const oauthError = params.get("error");
 
   const [step, setStep] = useState<"identifier" | "code">("identifier");
   const [identifier, setIdentifier] = useState("");
   const [code, setCode] = useState("");
   const [devCode, setDevCode] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    oauthError === "AccessDenied" ? DEVICE_LIMIT_MESSAGE : oauthError ? "Sign-in failed. Try again." : null
+  );
   const [loading, setLoading] = useState(false);
 
   async function requestCode(e: React.FormEvent) {
@@ -44,6 +54,10 @@ export default function SignInForm() {
     setLoading(true);
     try {
       const res = await signIn("otp", { identifier, code, redirect: false });
+      if (res?.error === "AccessDenied") {
+        setError(DEVICE_LIMIT_MESSAGE);
+        return;
+      }
       if (res?.error) {
         setError("That code didn't match, or it's expired. Request a new one.");
         return;

@@ -30,6 +30,8 @@ model User {
   purchases       Purchase[]
   courseProgress  CourseProgress[]
   courseRatings   CourseRating[]
+  deviceSessions  DeviceSession[]
+  mentorBookings  MentorBooking[]
 
   createdAt     DateTime  @default(now())
 }
@@ -81,6 +83,22 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// Enforces the "max 2 signed-in devices" rule. Separate from NextAuth's own
+// Session model because that one is only populated under the "database"
+// session strategy, which NextAuth does not support alongside a Credentials
+// provider (our OTP flow) — see src/lib/auth.ts. This table is managed by
+// hand in the jwt callback instead.
+model DeviceSession {
+  id        String   @id @default(cuid())
+  userId    String
+  deviceId  String   @unique
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ---- Product content -------------------------------------------------
@@ -209,6 +227,62 @@ model Purchase {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
+}
+
+// ---- Mentoring ------------------------------------------------------------
+// Placeholder for a real mentor roster — you (the site owner) onboard
+// mentors and their availability by hand via the admin routes (gated by
+// ADMIN_EMAILS in .env, see src/lib/admin.ts). No self-service mentor
+// signup on purpose, per the "only I can onboard mentors" requirement.
+
+model Mentor {
+  id                String  @id @default(cuid())
+  name              String
+  credentials       String // e.g. "Senior AI Engineer, 8 yrs, ex-Google"
+  bio               String
+  photoUrl          String?
+  pricePerSessionInPaise Int
+  active            Boolean @default(true)
+  createdAt         DateTime @default(now())
+
+  slots    MentorSlot[]
+}
+
+model MentorSlot {
+  id        String   @id @default(cuid())
+  mentorId  String
+  startTime DateTime
+  durationMinutes Int @default(30)
+  booked    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  mentor   Mentor          @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  booking  MentorBooking?
+
+  @@index([mentorId, startTime])
+}
+
+enum BookingStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+model MentorBooking {
+  id                String        @id @default(cuid())
+  userId            String
+  mentorId          String
+  slotId            String        @unique
+  amountInPaise     Int
+  status            BookingStatus @default(PENDING)
+  razorpayOrderId   String?       @unique
+  razorpayPaymentId String?       @unique
+  createdAt         DateTime      @default(now())
+
+  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slot MentorSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ---- AI Pulse news feed --------------------------------------------------
