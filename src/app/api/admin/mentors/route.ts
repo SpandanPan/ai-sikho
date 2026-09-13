@@ -36,6 +36,12 @@ export async function GET() {
   if (!isAdminEmail(session?.user?.email)) {
     return NextResponse.json({ error: "Admin only" }, { status: 403 });
   }
-  const mentors = await prisma.mentor.findMany({ orderBy: { createdAt: "desc" } });
-  return NextResponse.json({ mentors });
+  try {
+    const mentors = await prisma.mentor.findMany({ orderBy: { createdAt: "desc" } });
+    return NextResponse.json({ mentors });
+  } catch {
+    // Admin-facing: a real 500 here so it's obviously a DB problem, not
+    // silently reported as "no mentors exist" the way the public route does.
+    return NextResponse.json({ error: "Database unavailable" }, { status: 500 });
+  }
 }
