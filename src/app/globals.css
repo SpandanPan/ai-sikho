@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+/* Color tokens as RGB triplets so Tailwind's opacity modifiers (e.g. bg-accent2/15)
+   keep working, and every existing color utility (bg, text, border) responds
+   to the .dark class below with zero per-component changes. Default follows
+   system preference; the .dark class, toggled from the Settings page, wins
+   either way once a viewer has picked one explicitly. */
+:root {
+  --color-ink: 24 36 32;
+  --color-ink-soft: 60 74 68;
+  --color-paper: 238 240 234;
+  --color-paper-raised: 227 230 220;
+  --color-paper-line: 201 207 194;
+  --color-accent: 150 112 31;
+  --color-accent-ink: 111 84 23;
+  --color-accent2: 47 111 106;
+  --color-rust: 168 72 47;
+  --color-spark: 255 90 60;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --color-ink: 233 237 231;
+    --color-ink-soft: 170 181 172;
+    --color-paper: 20 28 25;
+    --color-paper-raised: 28 38 34;
+    --color-paper-line: 51 65 59;
+    --color-accent: 211 167 72;
+    --color-accent-ink: 230 195 117;
+    --color-accent2: 99 168 159;
+    --color-rust: 217 116 86;
+    --color-spark: 255 130 100;
+  }
+}
+
+.dark {
+  --color-ink: 233 237 231;
+  --color-ink-soft: 170 181 172;
+  --color-paper: 20 28 25;
+  --color-paper-raised: 28 38 34;
+  --color-paper-line: 51 65 59;
+  --color-accent: 211 167 72;
+  --color-accent-ink: 230 195 117;
+  --color-accent2: 99 168 159;
+  --color-rust: 217 116 86;
+  --color-spark: 255 130 100;
+}
+
+body {
+  background-color: rgb(var(--color-paper));
+  color: rgb(var(--color-ink));
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes loaderbar {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+.animate-loaderbar {
+  animation: loaderbar 1.3s linear forwards;
+}

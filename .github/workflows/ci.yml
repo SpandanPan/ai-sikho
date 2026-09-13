@@ -1,0 +1,39 @@
+name: CI
+
+# Runs on every PR into main and on pushes to main (post-merge sanity check).
+# This is the required status check that branch protection gates merging on
+# — see CONTRIBUTING.md for how that's wired up.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Type-check and lint
+        run: npm run build
+        env:
+          # A dummy value is enough — build-time Prisma generation needs the
+          # var to exist, but no route in this app queries the DB at build
+          # time (see the try/catch in src/app/api/news/route.ts).
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db"
+          DIRECT_URL: "postgresql://user:pass@localhost:5432/db"
+          NEXTAUTH_SECRET: "ci-only-placeholder"
+
+      - name: Unit + integration tests
+        run: npm run test
