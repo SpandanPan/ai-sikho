@@ -56,61 +56,6 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="border-b border-paper-line py-8">
-        <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">Who this is for</p>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {personas.map((p) => (
-            <div key={p.label} className="flex items-center gap-3">
-              <Image
-                src={p.photo}
-                alt=""
-                width={52}
-                height={52}
-                className="rounded-full object-cover w-[52px] h-[52px]"
-              />
-              <div>
-                <p className="text-sm font-semibold">{p.label}</p>
-                <p className="text-xs text-ink-soft">{p.detail}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <PulseFeed />
-
-      <section id="costs" className="border-b border-paper-line py-9">
-        <h2 className="font-display text-xl font-semibold mb-1">What It Costs</h2>
-        <p className="text-sm text-ink-soft mb-5">List price per 1M tokens, input / output.</p>
-        <div className="grid gap-3.5 sm:grid-cols-3">
-          {costs.map((c) => (
-            <div key={c.provider} className="border border-paper-line rounded p-4">
-              <div className="font-mono text-[11px] uppercase tracking-wide text-accent2 mb-2">{c.provider}</div>
-              {c.rows.map(([model, price]) => (
-                <div key={model} className="flex justify-between text-sm py-1.5 border-t border-paper-line first:border-t-0">
-                  <span>{model}</span>
-                  <span className="font-mono text-xs text-accent-ink">{price}</span>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section id="free" className="border-b border-paper-line py-9">
-        <h2 className="font-display text-xl font-semibold mb-1">Run It Free</h2>
-        <p className="text-sm text-ink-soft mb-5">No API key charges — good enough to learn and prototype on.</p>
-        <div className="grid gap-3.5 sm:grid-cols-3">
-          {freeTools.map((t) => (
-            <div key={t.name} className="border border-paper-line rounded p-4">
-              <h3 className="font-semibold text-sm mb-1.5">{t.name}</h3>
-              <p className="text-sm text-ink-soft">{t.desc}</p>
-              <span className="mt-2 inline-block font-mono text-[10.5px] uppercase text-rust">Best for: {t.best}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <section id="pack" className="border-b border-paper-line py-9">
         <h2 className="font-display text-xl font-semibold mb-2 flex items-center gap-2">
           Interview Pack <span title="Paid" aria-label="Paid">🔒</span>
@@ -138,6 +83,61 @@ export default function Home() {
         <p className="text-sm mt-4">
           Want a deeper dive on one topic instead? <a href="/courses" className="text-accent-ink underline">See the ₹149–199 courses →</a>
         </p>
+      </section>
+
+      <section className="border-b border-paper-line py-8">
+        <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">Who this is for</p>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {personas.map((p) => (
+            <div key={p.label} className="flex items-center gap-3">
+              <Image
+                src={p.photo}
+                alt=""
+                width={52}
+                height={52}
+                className="rounded-full object-cover w-[52px] h-[52px]"
+              />
+              <div>
+                <p className="text-sm font-semibold">{p.label}</p>
+                <p className="text-xs text-ink-soft">{p.detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="free" className="border-b border-paper-line py-9">
+        <h2 className="font-display text-xl font-semibold mb-1">Run It Free</h2>
+        <p className="text-sm text-ink-soft mb-5">No API key charges — good enough to learn and prototype on.</p>
+        <div className="grid gap-3.5 sm:grid-cols-3">
+          {freeTools.map((t) => (
+            <div key={t.name} className="border border-paper-line rounded p-4">
+              <h3 className="font-semibold text-sm mb-1.5">{t.name}</h3>
+              <p className="text-sm text-ink-soft">{t.desc}</p>
+              <span className="mt-2 inline-block font-mono text-[10.5px] uppercase text-rust">Best for: {t.best}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <PulseFeed />
+
+      <section id="costs" className="border-b border-paper-line py-9">
+        <h2 className="font-display text-xl font-semibold mb-1">What It Costs</h2>
+        <p className="text-sm text-ink-soft mb-5">List price per 1M tokens, input / output.</p>
+        <div className="grid gap-3.5 sm:grid-cols-3">
+          {costs.map((c) => (
+            <div key={c.provider} className="border border-paper-line rounded p-4">
+              <div className="font-mono text-[11px] uppercase tracking-wide text-accent2 mb-2">{c.provider}</div>
+              {c.rows.map(([model, price]) => (
+                <div key={model} className="flex justify-between text-sm py-1.5 border-t border-paper-line first:border-t-0">
+                  <span>{model}</span>
+                  <span className="font-mono text-xs text-accent-ink">{price}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </section>
 
       <footer id="work" className="py-10">
