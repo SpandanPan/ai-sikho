@@ -1,27 +1,50 @@
 # Working on this repo
 
-## Branch protection (set this up once, right after the repo exists on GitHub)
+## Current state: private, protection NOT yet enforced
 
-`gh` (the GitHub CLI) isn't available in the environment this was built in, so
-this couldn't be applied automatically. Do it once, by hand:
+The repo (`github.com/SpandanPan/the-model-desk`) is private. GitHub only
+enforces branch protection rules on a private repo with a **paid** plan
+(GitHub Pro, $4/mo) — on the Free plan it's available only if the repo is
+public. Since staying private mattered more right now, protection is
+documented below but not turned on: **nothing technically stops a direct
+push to `main` yet.** Treat the PR workflow below as the convention until
+one of these changes:
 
-**GitHub → your repo → Settings → Branches → Add branch protection rule**
+- **Upgrade to GitHub Pro** → I (or you) can flip on the rule below in under
+  a minute, same day.
+- **Make the repo public** → unlocks it for free, but the pricing, product
+  content, and business logic become visible to anyone.
+
+## The rule to apply, once either is true
+
+**GitHub → repo → Settings → Branches → Add branch protection rule**
 
 - Branch name pattern: `main`
-- ✅ Require a pull request before merging
-  - Required approvals: **1**
-- ✅ Require status checks to pass before merging
-  - Search for and select **CI / test** (appears after the first CI run)
+- ✅ Require a pull request before merging — required approvals: **1**
+- ✅ Require status checks to pass before merging → select **CI / test**
+  (only selectable after the first CI run, which has already happened)
 - ✅ Require branches to be up to date before merging
-- ✅ Do not allow bypassing the above settings — leave **unchecked** for now
-  (see the note below on why)
-- ❌ Do NOT enable "Restrict who can push" unless you're adding collaborators
-  — with a solo account this would lock you out
+- ❌ Leave "Do not allow bypassing" / "include administrators" **off** (see
+  below)
+- ❌ Do NOT enable "Restrict who can push" — with a solo account this locks
+  you out
 
-Save. From then on, `git push origin main` directly is rejected — every
-change has to go through a pull request.
+Or, once it's a paid plan, I can apply it via:
 
-## Why "include administrators" is left off
+```bash
+gh api repos/SpandanPan/the-model-desk/branches/main/protection -X PUT \
+  -H "Accept: application/vnd.github+json" \
+  -f 'required_status_checks[strict]=true' \
+  -f 'required_status_checks[contexts][]=test' \
+  -F 'enforce_admins=false' \
+  -F 'required_pull_request_reviews[required_approving_review_count]=1' \
+  -F 'required_pull_request_reviews[require_code_owner_reviews]=false' \
+  -F 'restrictions=null' \
+  -F 'allow_force_pushes=false' \
+  -F 'allow_deletions=false'
+```
+
+## Why "include administrators" is left off even then
 
 GitHub does not allow you to approve your own pull request. If you're the
 only account on this repo and you turn on "Require approval" *for
@@ -33,7 +56,7 @@ everyone, including you, but as the repo admin you can merge your own PR once
 CI is green without waiting on a second reviewer. If you add a collaborator
 later, turn "include administrators" on and real review becomes the norm.
 
-## Day-to-day workflow
+## Day-to-day workflow (follow this now, enforced or not)
 
 ```bash
 git checkout -b feature/whatever
@@ -44,13 +67,15 @@ git push origin feature/whatever
 gh pr create    # or open the PR on github.com
 ```
 
-CI runs automatically on the PR. Once it's green (and approved, if you have a
-reviewer), merge — don't use "Update branch" + direct push as a workaround.
+CI runs automatically on the PR (`.github/workflows/ci.yml`) — check it's
+green before merging even though nothing forces you to wait for it yet.
 
 ## Deploying changes
 
-This repo deploys through Vercel's GitHub integration, not a GitHub Actions
-deploy step — connecting the repo in the Vercel dashboard is enough. Every
-merge to `main` triggers a new production deployment automatically; every
-open PR gets its own preview URL. Don't add a second, competing deploy
-workflow here — it would race with Vercel's own.
+This repo is meant to deploy through Vercel's GitHub integration, not a
+GitHub Actions deploy step — connecting the repo in the Vercel dashboard is
+enough. Every merge to `main` would then trigger a new production
+deployment automatically, and every open PR gets its own preview URL. This
+hasn't been connected yet (no deployment today, per plan) — don't add a
+second, competing deploy workflow here when it is, it would race with
+Vercel's own.
