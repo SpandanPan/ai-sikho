@@ -19,16 +19,33 @@ model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
+  phone         String?   @unique
   emailVerified DateTime?
   image         String?
 
-  accounts      Account[]
-  sessions      Session[]
-  quizAttempts  QuizAttempt[]
-  progress      PathwayProgress[]
-  purchases     Purchase[]
+  accounts        Account[]
+  sessions        Session[]
+  quizAttempts    QuizAttempt[]
+  progress        PathwayProgress[]
+  purchases       Purchase[]
+  courseProgress  CourseProgress[]
+  courseRatings   CourseRating[]
 
   createdAt     DateTime  @default(now())
+}
+
+// One-time codes for the email/phone OTP sign-in flow (src/lib/otp.ts).
+// Never stores the plaintext code — only a SHA-256 hash of it.
+model OtpCode {
+  id         String   @id @default(cuid())
+  identifier String // normalized email or phone
+  codeHash   String
+  expiresAt  DateTime
+  consumed   Boolean  @default(false)
+  attempts   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([identifier])
 }
 
 model Account {
@@ -129,6 +146,35 @@ model Course {
   active        Boolean @default(true)
 
   createdAt DateTime @default(now())
+}
+
+// Progress and ratings apply to every course, free or paid — tracking is a
+// signed-in feature regardless of price (see CONTRIBUTING.md / README on
+// which parts of the site require sign-in).
+model CourseProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  courseSlug  String
+  percent     Int       @default(0) // 0-100
+  completedAt DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseSlug])
+}
+
+model CourseRating {
+  id         String   @id @default(cuid())
+  userId     String
+  courseSlug String
+  rating     Int // 1-5
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseSlug])
 }
 
 // ---- Commerce ----------------------------------------------------------

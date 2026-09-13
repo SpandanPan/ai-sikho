@@ -1,3 +1,7 @@
+"use client";
+
+import { useSession } from "next-auth/react";
+
 const links = [
   { href: "/quiz", label: "Quiz" },
   { href: "/#pulse", label: "Pulse" },
@@ -10,6 +14,8 @@ const links = [
 ];
 
 export default function Nav() {
+  const { status } = useSession();
+
   return (
     <nav className="sticky top-0 z-40 bg-paper border-b border-paper-line">
       <div className="mx-auto max-w-5xl px-5 py-3.5 flex items-center justify-between gap-4 flex-wrap">
@@ -30,6 +36,11 @@ export default function Nav() {
               )}
             </a>
           ))}
+          {status !== "authenticated" && (
+            <a href="/signin" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
+              Sign in
+            </a>
+          )}
           <a href="/#work" className="font-mono text-xs bg-ink text-paper rounded px-3 py-1.5">
             Work With Me
           </a>

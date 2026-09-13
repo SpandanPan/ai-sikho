@@ -33,6 +33,34 @@ Postgres is connected (see `.env.example`).
 Deploy to **Vercel** (not a generic static host) — the cron job and API routes
 need it.
 
+## Sign-in, and what requires it
+
+**Where everything lives**: one Postgres database (Neon or Supabase — just a
+connection string), read and written entirely through Prisma
+(`prisma/schema.prisma`). Users, OTP codes, quiz attempts, course progress,
+ratings, and purchases are all tables in that same database — there's no
+separate store per feature.
+
+**How sign-in works**: email or phone number + a 6-digit OTP
+(`src/app/api/auth/otp/*`, wired into NextAuth as a Credentials provider in
+`src/lib/auth.ts`), plus Google as a fallback. The OTP is generated
+server-side, only its SHA-256 hash is stored (`OtpCode.codeHash`), and it
+expires after 10 minutes with a 5-attempt cap. **No SMS or email provider is
+connected yet** — until you wire up MSG91/Twilio (phone) or Resend (email),
+the code is only logged server-side and returned to the client in
+development only (`devCode` in the API response, never in production).
+
+**What's free without signing in**: the homepage (news, model costs, free
+tools), the quiz, the articles list, and browsing the course catalog
+(titles, summaries, prices) — including trying the RAG demo.
+
+**What requires signing in**: tracking progress on any course (free or
+paid — it's per-user state, so there's nothing to show an anonymous
+visitor), rating a course, and anything involving a purchase. These are
+enforced server-side in the relevant API routes
+(`src/app/api/courses/[slug]/progress`, `.../ratings`) — never only in the
+UI.
+
 ## Content & copyright
 
 Read this before adding real content, not after something goes wrong.

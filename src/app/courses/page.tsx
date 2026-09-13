@@ -1,5 +1,6 @@
 import { courses, formatPrice } from "@/data/courses";
 import RagDemo from "@/components/RagDemo";
+import CourseTracker from "@/components/CourseTracker";
 
 export default function CoursesPage() {
   return (
@@ -39,6 +40,7 @@ export default function CoursesPage() {
                 <RagDemo />
               </div>
             )}
+            <CourseTracker slug={c.slug} />
           </div>
         ))}
       </div>
