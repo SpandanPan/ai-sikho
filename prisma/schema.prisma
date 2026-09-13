@@ -32,6 +32,9 @@ model User {
   courseRatings   CourseRating[]
   deviceSessions  DeviceSession[]
   mentorBookings  MentorBooking[]
+  ledgerEntries   LedgerEntry[]
+  analyticsEvents AnalyticsEvent[]
+  mockAnswerSubmissions MockAnswerSubmission[]
 
   createdAt     DateTime  @default(now())
 }
@@ -229,6 +232,112 @@ model Purchase {
   updatedAt         DateTime       @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ledgerEntries LedgerEntry[]
+
+  @@index([userId, status])
+}
+
+// ---- Accounting ledger -----------------------------------------------------
+// The single source of truth for the CA report (src/lib/ledger.ts,
+// /api/admin/reports/accounting). Every entry is a signed line item:
+// REVENUE and money in general are positive amounts, REFUND/PLATFORM_FEE/
+// EXPENSE reduce profit — the report does the signing, this table just
+// records raw amounts with a type so nothing is ambiguous.
+
+enum LedgerEntryType {
+  REVENUE // a sale, mirrors a Purchase or MentorBooking going PAID
+  REFUND // money paid back out
+  PLATFORM_FEE // Razorpay's cut of a transaction
+  EXPENSE // hosting, SMS, AI generation cost, mentor payouts, anything else
+}
+
+model LedgerEntry {
+  id              String          @id @default(cuid())
+  type            LedgerEntryType
+  amountInPaise   Int // always a positive magnitude; `type` gives it meaning
+  category        String // e.g. "razorpay_fee", "hosting", "sms_otp", "mentor_payout", "ai_generation", "course_sale"
+  description     String
+  userId          String?
+  purchaseId      String?
+  occurredAt      DateTime        @default(now())
+  createdAt       DateTime        @default(now())
+
+  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  purchase Purchase? @relation(fields: [purchaseId], references: [id], onDelete: SetNull)
+
+  @@index([type, occurredAt])
+  @@index([userId])
+}
+
+// ---- AI content-generation agents -----------------------------------------
+// Admin-triggered drafts, never auto-published — see src/lib/contentAgent.ts.
+// Requires ANTHROPIC_API_KEY; without it, generation fails cleanly rather
+// than silently producing nothing.
+
+enum GenerationType {
+  QUIZ
+  ARTICLE
+  ROADMAP
+}
+
+enum GenerationStatus {
+  PENDING
+  DONE
+  FAILED
+}
+
+model ContentGenerationJob {
+  id                     String           @id @default(cuid())
+  type                   GenerationType
+  topic                  String
+  provider               String? // "anthropic" | "openai" — see src/lib/agentPricing.ts
+  status                 GenerationStatus @default(PENDING)
+  resultJson             Json?
+  errorMessage           String?
+  inputTokens            Int?
+  outputTokens           Int?
+  costInPaise            Int? // actual API spend for this job, auto-logged to LedgerEntry too
+  suggestedPriceInPaise  Int? // cost * margin, see src/lib/agentPricing.ts
+  requestedBy            String // admin's user id
+  approvedAt             DateTime? // set once a human has reviewed and accepted the draft
+  createdAt              DateTime         @default(now())
+
+  @@index([type, status])
+}
+
+// ---- Mock-interview answer grading (a genuinely agent-native service) ----
+// Unlike QUIZ/ARTICLE/ROADMAP drafts (admin-reviewed before publishing),
+// this is a live, paid, customer-facing feature: someone submits a written
+// answer, pays, and an LLM grades it against a rubric — the flagship "ML
+// question with feedback" idea from the original plan. Fixed price below
+// cost-justified: grading a few hundred words of input/output costs low
+// single-digit rupees (see COSTS.md); ₹149 leaves a wide margin while still
+// reading as an impulse price.
+
+enum FeedbackStatus {
+  PENDING // submitted, awaiting payment
+  PAID // payment confirmed, grading not run yet (should be near-instant in practice)
+  GRADED
+  FAILED // payment succeeded but grading errored — see errorMessage
+}
+
+model MockAnswerSubmission {
+  id             String         @id @default(cuid())
+  userId         String
+  category       String // e.g. "system-design", "behavioral", "rag"
+  question       String
+  answerText     String
+  priceInPaise   Int            @default(14900) // ₹149
+  status         FeedbackStatus @default(PENDING)
+  provider       String? // which LLM graded it
+  feedbackJson   Json? // {score, strengths[], gaps[], suggestion}
+  errorMessage   String?
+  costInPaise    Int? // actual grading API spend, auto-logged to LedgerEntry
+  razorpayOrderId   String?     @unique
+  razorpayPaymentId String?     @unique
+  createdAt      DateTime       @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
 }
@@ -287,6 +396,38 @@ model MentorBooking {
   slot MentorSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// ---- Analytics --------------------------------------------------------
+// Self-hosted, minimal-PII traffic tracking — one table, one public write
+// endpoint (src/app/api/analytics/event). anonId is a random UUID a
+// visitor's browser generates and keeps in localStorage, not tied to their
+// identity; userId is filled in only when they happen to be signed in.
+// Not a replacement for a real analytics product at scale, but real and
+// queryable — see /admin/reports.
+
+enum AnalyticsEventType {
+  PAGE_VIEW
+  CLICK
+  TIME_ON_PAGE
+}
+
+model AnalyticsEvent {
+  id        String             @id @default(cuid())
+  type      AnalyticsEventType
+  path      String
+  referrer  String?
+  anonId    String // random per-browser id, not personally identifying on its own
+  userId    String? // set only if the visitor was signed in at the time
+  label     String? // e.g. which button was clicked, for CLICK events
+  valueMs   Int? // duration, for TIME_ON_PAGE events
+  createdAt DateTime           @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([type, createdAt])
+  @@index([path])
+  @@index([anonId])
 }
 
 // ---- AI Pulse news feed --------------------------------------------------

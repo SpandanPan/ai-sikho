@@ -1,40 +1,31 @@
 # Working on this repo
 
-## Current state: private, protection NOT yet enforced
+## Current state: public, protection enforced
 
-The repo (`github.com/SpandanPan/the-model-desk`) is private. GitHub only
-enforces branch protection rules on a private repo with a **paid** plan
-(GitHub Pro, $4/mo) — on the Free plan it's available only if the repo is
-public. Since staying private mattered more right now, protection is
-documented below but not turned on: **nothing technically stops a direct
-push to `main` yet.** Treat the PR workflow below as the convention until
-one of these changes:
+The repo (`github.com/SpandanPan/the-model-desk`) is **public** and branch
+protection on `main` is **live** — applied and verified working (see below).
+Before flipping to public, the entire git history was scanned for secrets
+(`git log --all -p` against the known credential strings) and came back
+clean; nothing sensitive was ever committed.
 
-- **Upgrade to GitHub Pro** → I (or you) can flip on the rule below in under
-  a minute, same day.
-- **Make the repo public** → unlocks it for free, but the pricing, product
-  content, and business logic become visible to anyone.
+What's enforced on `main`:
+- Pull request required before merging (1 approval)
+- The `test` CI check must pass and be up to date
+- No force-pushes, no branch deletion
 
-## The rule to apply, once either is true
+**Verified by actually testing it** (not just applying the API call and
+assuming): a direct `git push origin main` was attempted and GitHub flagged
+both rule violations. It went through anyway because the pushing account is
+the repo owner/admin and `enforce_admins` is deliberately `false` — see the
+reasoning below. A non-admin collaborator's direct push would be hard-blocked.
 
-**GitHub → repo → Settings → Branches → Add branch protection rule**
-
-- Branch name pattern: `main`
-- ✅ Require a pull request before merging — required approvals: **1**
-- ✅ Require status checks to pass before merging → select **CI / test**
-  (only selectable after the first CI run, which has already happened)
-- ✅ Require branches to be up to date before merging
-- ❌ Leave "Do not allow bypassing" / "include administrators" **off** (see
-  below)
-- ❌ Do NOT enable "Restrict who can push" — with a solo account this locks
-  you out
-
-Or, once it's a paid plan, I can apply it via:
+The command that applied this, kept here in case it ever needs re-applying
+(e.g. after transferring ownership):
 
 ```bash
 gh api repos/SpandanPan/the-model-desk/branches/main/protection -X PUT \
   -H "Accept: application/vnd.github+json" \
-  -f 'required_status_checks[strict]=true' \
+  -F 'required_status_checks[strict]=true' \
   -f 'required_status_checks[contexts][]=test' \
   -F 'enforce_admins=false' \
   -F 'required_pull_request_reviews[required_approving_review_count]=1' \
@@ -44,7 +35,11 @@ gh api repos/SpandanPan/the-model-desk/branches/main/protection -X PUT \
   -F 'allow_deletions=false'
 ```
 
-## Why "include administrators" is left off even then
+Note the boolean fields need `-F` (typed), not `-f` (string) — `-f` for
+`required_status_checks[strict]` was tried first and GitHub's API rejected
+it with a schema error before this version worked.
+
+## Why "include administrators" is left off
 
 GitHub does not allow you to approve your own pull request. If you're the
 only account on this repo and you turn on "Require approval" *for

@@ -1,8 +1,9 @@
 # The Model Desk
 
 Free AI news + explainers, a ₹100→₹999 interview-prep ladder, paid short courses,
-1:1 mentoring, and a business-automation contact page. Next.js 14 (App Router) +
-TypeScript + Tailwind + Prisma + NextAuth + Postgres (Supabase).
+1:1 mentoring, paid AI-graded mock-interview feedback, and a business-automation
+contact page. Next.js 14 (App Router) + TypeScript + Tailwind + Prisma + NextAuth
++ Postgres (Supabase).
 
 ## Requirements
 
@@ -94,6 +95,23 @@ npx prisma migrate dev    # apply schema changes to the database (asks for a mig
 npx prisma studio         # browse every table at http://localhost:5555
 npm run fetch-news        # manually pull today's AI news into NewsItem right now
 ```
+
+**If `migrate dev` hangs indefinitely**: it happened repeatedly building this
+project, and the root cause turned out to be that `migrate dev` requires an
+interactive terminal — in a non-interactive shell it just hangs instead of
+failing with a clear error (it errors immediately once it gets far enough to
+detect this, but a flaky connection can make it hang on an earlier step
+first, silently, for a long time). If it's stuck: kill it, then use
+`npx prisma db push` instead — no shadow database, no interactivity, applies
+the schema directly. The cost is that `db push` doesn't write a migration
+file, so periodically reconcile history with:
+```bash
+npx prisma migrate diff --from-empty --to-schema-datamodel ./prisma/schema.prisma --script > prisma/migrations/<timestamp>_baseline/migration.sql
+npx prisma migrate resolve --applied <timestamp>_baseline
+```
+This is the actual recovery this project's migration history went through —
+`prisma/migrations/` is a single rebaselined migration for exactly that
+reason, not a step-by-step history of every schema change made along the way.
 
 You can also browse the data directly in the Supabase dashboard → **Table
 Editor**, or run raw SQL in Supabase → **SQL Editor**.
@@ -220,6 +238,57 @@ signup.
 - **Payment**: bookings land as `PENDING`, same flow as course purchases —
   flip to `PAID` via the Razorpay webhook once wired up.
 
+## Analytics & reporting (`/admin/reports`)
+
+Self-hosted, minimal-PII traffic tracking — one table (`AnalyticsEvent`),
+one public write endpoint (`/api/analytics/event`), no third-party
+analytics service. `AnalyticsBeacon` (mounted once in the root layout)
+fires a page view on every route change and a time-on-page beacon
+(`navigator.sendBeacon`, so it actually delivers on tab close) right before
+leaving each page; `trackClick()` is wired into a couple of real CTAs
+(the homepage's quiz button, the "Work With Me" email link) as the pattern
+to follow for tracking more. Visitors are identified by a random
+`anonId` in `localStorage`, not tied to their account unless they happen
+to be signed in — `src/lib/analytics.ts` (unit-tested) does the actual
+aggregation (page views, unique visitors, top pages, top clicks, average
+time on page) separately from the database query, so the math is testable
+without a database.
+
+The same admin page also shows the accounting summary (see below) —
+traffic and money, one screen.
+
+## Content-generation agents
+
+Two kinds, deliberately different shapes because they're different jobs:
+
+**Drafting agents** (`/admin/generate`, admin-only) — QUIZ, ARTICLE, or
+ROADMAP drafts, either Claude or GPT (`src/lib/contentAgent.ts`). Never
+auto-published: a human reviews `resultJson` and copies what's good into
+the real content files by hand, same standard as everything else here
+("written fresh, not copied," now applying to AI-written drafts too).
+
+**Grading agent** (`/mock-feedback`, ₹149, paid) — the one genuinely
+agent-native paid feature: someone submits a real written interview
+answer, and an LLM grades it against what a strong answer to *that
+specific question* would cover — not a generic rubric. Deliberately did
+**not** add an agent to summarize/rewrite the AI Pulse news feed — that
+would edge back toward the "republishing third-party content" risk the
+headline+excerpt+link design was specifically built to avoid (see
+Content & copyright below).
+
+Both cost real money per call — every successful generation or grading run
+auto-logs its exact API spend (real token counts, not an estimate) to the
+accounting ledger under category `ai_generation`, visible in
+`/admin/reports`. `src/lib/agentPricing.ts` (unit-tested) computes cost
+from the actual token usage each provider returns, and a suggested retail
+price at 3x cost, rounded to a clean ₹10. See `COSTS.md` for the worked
+example, current per-token rates, and how to get API keys for either
+provider — neither is set in this environment, so this is real plumbing
+against each provider's documented API contract, unverified end-to-end.
+
+Grading only runs after payment (same webhook pattern as everything else
+that costs money) — nobody gets free grading by submitting without paying.
+
 ## Refunds
 
 `src/lib/refunds.ts` (unit-tested) enforces exactly the two rules stated in
@@ -232,6 +301,31 @@ refunds (admin-only — the refund policy tells buyers to email support, so
 this is the check-then-act step once you've read that email). Razorpay's
 actual refund API call is a TODO in that route, marked clearly, until real
 payments are live.
+
+## Accounting ledger (for your CA)
+
+One table, `LedgerEntry`, is the single source of truth — every sale,
+refund, Razorpay fee, and expense (AI generation cost, mentor payouts,
+hosting, whatever you log manually) is a signed line item in it. Auto-logged
+by the Razorpay webhook on every payment (revenue + platform fee, together,
+in one transaction) and by the content agents on every generation (the real
+API cost). `src/lib/ledger.ts` (unit-tested) does the actual profit math —
+revenue minus refunds, fees, and expenses — kept separate from the database
+query so it's auditable on its own.
+
+`/admin/reports` shows the summary plus a per-customer breakdown (what they
+paid, what it cost to serve them, the resulting profit) and a **Download
+CSV for CA** button (`/api/admin/reports/accounting?format=csv`) —
+importable straight into Excel or Tally. `POST
+/api/admin/ledger/expense` logs a manual expense (hosting, domain renewal,
+anything not tied to a specific sale).
+
+Verified against the real database during this build: a test purchase run
+through the full webhook → refund cycle correctly showed a small net loss
+(the Razorpay fee isn't refunded when you refund a customer, so refunding
+a ₹999 sale nets **-₹19.98**, not ₹0) — that's not a bug, it's genuinely how
+refunds work, and it's exactly the kind of thing your CA needs the ledger
+to get right.
 
 ## Content & copyright
 
@@ -265,15 +359,19 @@ especially regarding India's DPDP Act and any GST obligations.
 ## Project shape
 
 - `src/app/page.tsx` — homepage (hero, Pulse, costs, free tools, personas, pack)
-- `src/app/quiz`, `/courses`, `/articles`, `/mentoring`, `/signin`,
-  `/settings`, `/privacy`, `/terms`, `/refund-policy` — the rest of the pages
-- `src/app/admin/mentors` — admin-only mentor onboarding
+- `src/app/quiz`, `/courses`, `/articles`, `/mentoring`, `/mock-feedback`,
+  `/signin`, `/settings`, `/privacy`, `/terms`, `/refund-policy` — the rest
+  of the pages
+- `src/app/admin/mentors`, `/admin/generate`, `/admin/reports` — admin-only:
+  mentor onboarding, content-drafting agents, traffic + accounting reports
 - `src/components/PulseFeed.tsx` — the auto-scrolling news ticker, DB-backed
   with a static fallback
 - `src/components/RagDemo.tsx` — the retrieve-then-generate mini demo on the
   RAG Basics course
 - `src/components/CourseTracker.tsx` — the animated per-course progress bar
   + 5-star rating widget
+- `src/components/AnalyticsBeacon.tsx` / `src/lib/trackEvent.ts` — the
+  site-wide page-view/click/time-on-page tracker, feeding `/admin/reports`
 - `prisma/schema.prisma` — the whole data model
 - `scripts/fetch-news.ts` / `src/app/api/cron/fetch-news` — the same fetch
   logic, callable manually or on Vercel's schedule
@@ -288,6 +386,9 @@ especially regarding India's DPDP Act and any GST obligations.
 - If a database password has ever been pasted into a chat log or anywhere
   outside a password manager, rotate it (Supabase → Project Settings →
   Database → Reset database password) once initial setup is done.
-- This repo is private. Collaborators are added manually by the owner
-  (GitHub → repo → Settings → Collaborators) — there's no self-service
-  access request.
+- This repo is **public** (as of the branch-protection setup — see
+  `CONTRIBUTING.md`). Its entire git history was scanned for secrets before
+  the switch and came back clean. Being public means branch protection is
+  enforced for free and reviewers don't need an explicit invite to read the
+  code — but it also means never committing anything sensitive here again.
+  `COSTS.md` stays gitignored specifically because of this.

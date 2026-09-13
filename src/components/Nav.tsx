@@ -10,6 +10,7 @@ const links = [
   { href: "/articles", label: "Articles" },
   { href: "/courses", label: "Courses" },
   { href: "/mentoring", label: "Mentoring", locked: true },
+  { href: "/mock-feedback", label: "Mock Feedback", locked: true },
   { href: "/#pack", label: "Interview Pack", locked: true },
   { href: "/settings", label: "Settings" },
 ];

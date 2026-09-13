@@ -3,6 +3,7 @@ import Script from "next/script";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Providers from "@/components/Providers";
+import AnalyticsBeacon from "@/components/AnalyticsBeacon";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           } catch (e) {}`}
         </Script>
         <Providers>
+          <AnalyticsBeacon />
           <Nav />
           {children}
           <Footer />

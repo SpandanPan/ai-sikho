@@ -42,10 +42,22 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
   // TODO before real payments: call Razorpay's refund API here
   // (razorpay.payments.refund(purchase.razorpayPaymentId, ...)) before
   // marking this REFUNDED — right now this only updates our own record.
-  const updated = await prisma.purchase.update({
-    where: { id: purchase.id },
-    data: { status: "REFUNDED", refundedAt: new Date() },
-  });
+  const [updated] = await prisma.$transaction([
+    prisma.purchase.update({
+      where: { id: purchase.id },
+      data: { status: "REFUNDED", refundedAt: new Date() },
+    }),
+    prisma.ledgerEntry.create({
+      data: {
+        type: "REFUND",
+        amountInPaise: purchase.amountInPaise,
+        category: "refund",
+        description: `Refund for purchase ${purchase.id}`,
+        userId: purchase.userId,
+        purchaseId: purchase.id,
+      },
+    }),
+  ]);
 
   return NextResponse.json({ purchase: updated });
 }

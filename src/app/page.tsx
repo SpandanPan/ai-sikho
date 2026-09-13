@@ -1,6 +1,7 @@
 import Image from "next/image";
 import PulseFeed from "@/components/PulseFeed";
 import FunFactLoader from "@/components/FunFactLoader";
+import TrackedLink from "@/components/TrackedLink";
 
 const personas = [
   { photo: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80", label: "Career switcher", detail: "No CS degree — now shipping RAG apps" },
@@ -45,12 +46,13 @@ export default function Home() {
             A daily read on what&apos;s actually happening in AI, what each model costs to run, and a
             structured way to prep for a GenAI or Agentic AI interview.
           </p>
-          <a
+          <TrackedLink
             href="/quiz"
+            label="hero-quiz-cta"
             className="inline-block mt-6 rounded bg-spark text-ink font-mono text-sm font-semibold px-5 py-3"
           >
             Take the free 60-second AI quiz →
-          </a>
+          </TrackedLink>
         </div>
       </header>
 
@@ -144,9 +146,13 @@ export default function Home() {
             <h3 className="font-semibold mb-1">Running a business? Bring me the busywork.</h3>
             <p className="text-sm text-ink-soft max-w-md">AI readiness audits, custom chatbots and RAG tools, workflow automation.</p>
           </div>
-          <a href="mailto:hello@yourdomain.com?subject=Automation%20inquiry" className="font-mono text-sm bg-ink text-paper rounded px-4 py-2.5">
+          <TrackedLink
+            href="mailto:hello@yourdomain.com?subject=Automation%20inquiry"
+            label="work-with-me-email"
+            className="font-mono text-sm bg-ink text-paper rounded px-4 py-2.5"
+          >
             Email hello@yourdomain.com
-          </a>
+          </TrackedLink>
         </div>
       </footer>
     </main>
