@@ -8,15 +8,26 @@ import { isValidRating } from "@/lib/courseTracking";
 // (rating requires a real, signed-in user — one rating per person per
 // course, upserted rather than duplicated).
 export async function GET(_req: Request, { params }: { params: { slug: string } }) {
-  const agg = await prisma.courseRating.aggregate({
-    where: { courseSlug: params.slug },
-    _avg: { rating: true },
-    _count: { rating: true },
-  });
+  const [agg, session] = await Promise.all([
+    prisma.courseRating.aggregate({
+      where: { courseSlug: params.slug },
+      _avg: { rating: true },
+      _count: { rating: true },
+    }),
+    getServerSession(authOptions),
+  ]);
+
+  const userId = (session?.user as { id?: string } | undefined)?.id;
+  const mine = userId
+    ? await prisma.courseRating.findUnique({
+        where: { userId_courseSlug: { userId, courseSlug: params.slug } },
+      })
+    : null;
 
   return NextResponse.json({
     average: agg._avg.rating ?? 0,
     count: agg._count.rating,
+    myRating: mine?.rating ?? null,
   });
 }
 

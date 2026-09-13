@@ -11,11 +11,15 @@ export default function CourseTracker({ slug }: { slug: string }) {
   const [rated, setRated] = useState<number | null>(null);
   const [summary, setSummary] = useState<{ average: number; count: number }>({ average: 0, count: 0 });
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`/api/courses/${slug}/ratings`)
       .then((r) => r.json())
-      .then(setSummary)
+      .then((d) => {
+        setSummary(d);
+        if (typeof d.myRating === "number") setRated(d.myRating);
+      })
       .catch(() => {});
   }, [slug]);
 
@@ -28,27 +32,49 @@ export default function CourseTracker({ slug }: { slug: string }) {
   }, [slug, signedIn]);
 
   async function updateProgress(next: number) {
+    const previous = percent;
     setLoading(true);
+    setErrorMsg(null);
     setPercent(next); // optimistic — the bar animates immediately
     try {
-      await fetch(`/api/courses/${slug}/progress`, {
+      const res = await fetch(`/api/courses/${slug}/progress`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ percent: next }),
       });
+      if (!res.ok) {
+        setPercent(previous);
+        setErrorMsg("Couldn't save progress — try again.");
+      }
+    } catch {
+      setPercent(previous);
+      setErrorMsg("Couldn't save progress — check your connection.");
     } finally {
       setLoading(false);
     }
   }
 
   async function submitRating(stars: number) {
+    const previous = rated;
     setRated(stars);
-    await fetch(`/api/courses/${slug}/ratings`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rating: stars }),
-    });
-    fetch(`/api/courses/${slug}/ratings`).then((r) => r.json()).then(setSummary);
+    setErrorMsg(null);
+    try {
+      const res = await fetch(`/api/courses/${slug}/ratings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating: stars }),
+      });
+      if (!res.ok) {
+        setRated(previous);
+        setErrorMsg("Couldn't save your rating — try again.");
+        return;
+      }
+      const updated = await fetch(`/api/courses/${slug}/ratings`).then((r) => r.json());
+      setSummary(updated);
+    } catch {
+      setRated(previous);
+      setErrorMsg("Couldn't save your rating — check your connection.");
+    }
   }
 
   return (
@@ -98,7 +124,9 @@ export default function CourseTracker({ slug }: { slug: string }) {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-accent2">Completed 🎉 Rate it:</span>
+                <span className="text-xs text-accent2">
+                  Completed 🎉 {rated ? "Your rating:" : "Rate it:"}
+                </span>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
@@ -114,6 +142,7 @@ export default function CourseTracker({ slug }: { slug: string }) {
               </div>
             )}
           </div>
+          {errorMsg && <p className="text-xs text-rust mt-2">{errorMsg}</p>}
         </div>
       )}
 
