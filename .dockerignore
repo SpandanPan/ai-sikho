@@ -1,8 +1,8 @@
 node_modules
 .next
-out
+.git
 .env
 .env.local
 *.log
+npm-debug.log*
 .DS_Store
-COSTS.md

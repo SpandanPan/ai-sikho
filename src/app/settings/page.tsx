@@ -2,6 +2,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import MotionToggle from "@/components/MotionToggle";
 import AccountPanel from "@/components/AccountPanel";
 import DeviceManager from "@/components/DeviceManager";
+import DeleteAccount from "@/components/DeleteAccount";
 
 function Section({ title, note, children }: { title: string; note: string; children: React.ReactNode }) {
   return (
@@ -34,6 +35,10 @@ export default function SettingsPage() {
 
         <Section title="Devices" note="Manage which devices are signed in.">
           <DeviceManager />
+        </Section>
+
+        <Section title="Danger Zone" note="Permanently delete your account.">
+          <DeleteAccount />
         </Section>
       </div>
     </main>

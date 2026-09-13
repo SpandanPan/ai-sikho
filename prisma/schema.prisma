@@ -41,6 +41,7 @@ model User {
 model OtpCode {
   id         String   @id @default(cuid())
   identifier String // normalized email or phone
+  ip         String? // for the per-IP rate limit in src/lib/rateLimit.ts
   codeHash   String
   expiresAt  DateTime
   consumed   Boolean  @default(false)
@@ -48,6 +49,7 @@ model OtpCode {
   createdAt  DateTime @default(now())
 
   @@index([identifier])
+  @@index([ip])
 }
 
 model Account {
@@ -219,8 +221,10 @@ model Purchase {
   amountInPaise     Int // store money as integer paise/cents, never floats
   currency          String         @default("INR")
   status            PurchaseStatus @default(PENDING)
+  contentAccessed   Boolean        @default(false) // set true once a download/course-open endpoint exists; see src/lib/refunds.ts
   razorpayOrderId   String?        @unique
   razorpayPaymentId String?        @unique
+  refundedAt        DateTime?
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
 
