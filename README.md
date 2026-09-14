@@ -290,6 +290,28 @@ IP (same `checkIpRateLimit` pattern as OTP requests, `src/lib/rateLimit.ts`)
 so it can't be spammed. Submissions land in `ServiceInquiry` and show up on
 `/admin/reports`, admin-only, newest first.
 
+## Newsletter (`NewsletterSubscriber`)
+
+The actual asset, per the original strategy plan — worth more long-term
+than site traffic, and until now completely missing from the homepage
+despite that. `NewsletterSignup` (homepage, above the footer) posts to
+`POST /api/newsletter` — public, no account needed, upserts on email so
+re-submitting or re-subscribing after unsubscribing never errors. Rate
+limited by IP, same pattern as everywhere else public input is accepted.
+Admin-only list + CSV export at `GET /api/admin/newsletter` (add
+`?format=csv`) — nothing here is customer-visible.
+
+## Homepage cross-promotion
+
+The homepage used to only feature the Interview Pack — Courses, Mentoring,
+and Mock Feedback existed but were only discoverable through the Nav. A
+**"More ways to prep"** section now sits right after the Pack pitch,
+teasing all three with a price and a link, so a visitor who isn't ready to
+buy the Kit still sees the other paths in. The footer (`Footer.tsx`) was
+also expanded from a single copyright line into a real sitemap — Explore /
+Prep / Company columns linking to every page on the site, not just the
+three legal ones.
+
 ## Analytics & reporting (`/admin/reports`)
 
 Self-hosted, minimal-PII traffic tracking — one table (`AnalyticsEvent`),
@@ -416,8 +438,9 @@ especially regarding India's DPDP Act and any GST obligations.
 
 ## Project shape
 
-- `src/app/page.tsx` — homepage (hero, Interview Pack, personas, Run It
-  Free + Pulse behind the soft gate, Work With Me)
+- `src/app/page.tsx` — homepage (hero, Interview Pack, "more ways to
+  prep" cross-promo, personas, Run It Free + Pulse behind the soft gate,
+  newsletter signup, Work With Me)
 - `src/app/quiz`, `/courses`, `/articles`, `/mentoring`, `/mock-feedback`,
   `/profile`, `/signin`, `/settings`, `/privacy`, `/terms`,
   `/refund-policy` — the rest of the pages
@@ -434,6 +457,8 @@ especially regarding India's DPDP Act and any GST obligations.
   form, `src/data/automationServices.ts` for the curated list
 - `src/components/RevisionBoard.tsx` / `EditableName.tsx` — the personal
   notes/bookmarks board and editable display name on `/profile`
+- `src/components/NewsletterSignup.tsx` — the email capture form on the
+  homepage
 - `src/components/SoftGate.tsx` — the 60-second sign-in nudge wrapper
 - `src/components/AnalyticsBeacon.tsx` / `src/lib/trackEvent.ts` — the
   site-wide page-view/click/time-on-page tracker, feeding `/admin/reports`

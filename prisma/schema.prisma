@@ -463,6 +463,18 @@ model AnalyticsEvent {
   @@index([anonId])
 }
 
+// ---- Newsletter -----------------------------------------------------
+// The actual asset, per the original strategy plan — "more valuable than
+// site traffic." Public signup, admin-only to read (src/lib/admin.ts).
+
+model NewsletterSubscriber {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  source          String? // where on the site they signed up, e.g. "homepage"
+  unsubscribedAt  DateTime?
+  createdAt       DateTime  @default(now())
+}
+
 // ---- Business automation inquiries -----------------------------------
 // The "Work With Me" lead form. Public and unauthenticated on purpose — a
 // business reaching out isn't necessarily an existing site user. Rate

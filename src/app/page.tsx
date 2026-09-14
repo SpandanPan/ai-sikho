@@ -4,6 +4,13 @@ import FunFactLoader from "@/components/FunFactLoader";
 import TrackedLink from "@/components/TrackedLink";
 import SoftGate from "@/components/SoftGate";
 import WorkWithMe from "@/components/WorkWithMe";
+import NewsletterSignup from "@/components/NewsletterSignup";
+
+const morePrep = [
+  { title: "Go deep on one topic", desc: "RAG, Knowledge Graphs, LLM Observability — short courses with real demos.", price: "From ₹149", href: "/courses", locked: false },
+  { title: "Time with someone who's done it", desc: "1:1 career guidance, slots open on a rolling 15-day window.", price: "Book a slot", href: "/mentoring", locked: true },
+  { title: "Real feedback on a mock answer", desc: "AI-graded, specific to what you actually wrote — not a generic rubric.", price: "₹149", href: "/mock-feedback", locked: true },
+];
 
 const personas = [
   { photo: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80", label: "Career switcher", detail: "No CS degree — now shipping RAG apps" },
@@ -81,6 +88,22 @@ export default function Home() {
         </p>
       </section>
 
+      <section className="border-b border-paper-line py-9">
+        <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">More ways to prep</p>
+        <div className="grid gap-3.5 sm:grid-cols-3">
+          {morePrep.map((m) => (
+            <a key={m.title} href={m.href} className="border border-paper-line rounded p-4 hover:border-accent transition-colors">
+              <h3 className="font-semibold text-sm mb-1 flex items-center gap-1.5">
+                {m.title}
+                {m.locked && <span title="Paid" aria-label="Paid">🔒</span>}
+              </h3>
+              <p className="text-sm text-ink-soft mb-3">{m.desc}</p>
+              <span className="font-mono text-xs text-accent-ink">{m.price} →</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
       <section className="border-b border-paper-line py-8">
         <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">Who this is for</p>
         <div className="grid gap-4 sm:grid-cols-3">
@@ -119,6 +142,15 @@ export default function Home() {
 
         <PulseFeed />
       </SoftGate>
+
+      <section className="border-b border-paper-line py-9">
+        <h2 className="font-display text-lg font-semibold mb-1">Get the free digest</h2>
+        <p className="text-sm text-ink-soft mb-4 max-w-md">
+          The plain-language version of what actually happened in AI this week — no spam, unsubscribe
+          any time.
+        </p>
+        <NewsletterSignup source="homepage" />
+      </section>
 
       <footer id="work" className="py-10">
         <div className="border border-paper-line rounded p-6">
