@@ -1,9 +1,10 @@
 # The Model Desk
 
 Free AI news + explainers, a ₹100→₹999 interview-prep ladder, paid short courses,
-1:1 mentoring, paid AI-graded mock-interview feedback, and a business-automation
-contact page. Next.js 14 (App Router) + TypeScript + Tailwind + Prisma + NextAuth
-+ Postgres (Supabase).
+1:1 mentoring, paid AI-graded mock-interview feedback, a signed-in profile with
+personal revision notes, and a real business-automation lead-capture flow.
+Next.js 14 (App Router) + TypeScript + Tailwind + Prisma + NextAuth + Postgres
+(Supabase).
 
 ## Requirements
 
@@ -119,7 +120,7 @@ Editor**, or run raw SQL in Supabase → **SQL Editor**.
 ## Testing
 
 ```bash
-npm run test        # 86 unit + integration tests (vitest)
+npm run test        # 136 unit + integration tests (vitest)
 npm run test:watch  # same, watch mode
 npm run build        # type-check + lint + production build
 ```
@@ -145,9 +146,8 @@ CI (`.github/workflows/ci.yml`) runs both on every push/PR to `main`.
 
 **Deployment target: Vercel** (decided — not a generic static host and not
 AWS; see the note below for why). Not connected yet, on purpose, since
-we're not deploying today (see `CONTRIBUTING.md`). See `COSTS.md` (local
-only, gitignored — ask whoever set it up) for the full monthly cost
-estimate to go to production.
+we're not deploying today (see `CONTRIBUTING.md`). See `COSTS.md` for the
+full monthly cost estimate to go to production.
 
 <details>
 <summary>If you deploy to AWS instead, later (not the current plan)</summary>
@@ -210,13 +210,13 @@ out via **Settings → Devices** (`/api/devices`).
 **The homepage's soft 60-second gate** (`src/components/SoftGate.tsx`) —
 the hero, the Interview Pack pitch, and the "who this is for" section are
 always free, no limit, since that's the actual sales pitch. The
-exploratory content below it (Run It Free, AI Pulse, What It Costs) blurs
-with a "sign in to keep exploring" prompt after 60 seconds on the page for
-a signed-out visitor — never for a signed-in one. The timer is per page
-load (resets on refresh), not cumulative across visits. Deliberately not
-applied to the quiz, courses catalog, or articles list — those exist
-specifically to be freely shareable/indexable top-of-funnel content, and
-gating them would work against the point of having them.
+exploratory content below it (Run It Free, AI Pulse) blurs with a "sign in
+to keep exploring" prompt after 60 seconds on the page for a signed-out
+visitor — never for a signed-in one. The timer is per page load (resets on
+refresh), not cumulative across visits. Deliberately not applied to the
+quiz, courses catalog, or articles list — those exist specifically to be
+freely shareable/indexable top-of-funnel content, and gating them would
+work against the point of having them.
 
 ## Profile (`/profile`)
 
@@ -233,9 +233,22 @@ breaks (shows 0) if the most recent active day is more than 1 day ago —
 verified end-to-end with real backdated rows, not just the pure function
 in isolation.
 
-**What's free without signing in**: the homepage (news, model costs, free
-tools), the quiz, the articles list, browsing the course catalog and
-mentor list (titles, summaries, prices) — including trying the RAG demo.
+**Editable name** (`EditableName`, `PATCH /api/account`) — the one editable
+identity field; email/phone aren't, since they're the sign-in identity
+itself, not a detail. Wired through NextAuth's `useSession().update()`
+properly, including a real subtlety fixed along the way: `update()` alone
+doesn't refresh JWT-cached fields unless the `jwt` callback explicitly
+handles `trigger === "update"`, which `src/lib/auth.ts` now does.
+
+**Personal revision board** (`RevisionBoard`, `Note` + `Bookmark` models,
+`/api/notes`, `/api/bookmarks`) — private notes and bookmarked resources
+for interview revision, entirely per-user (every route checks ownership
+before reading or writing, verified end-to-end including a bookmark URL
+validation test that rejects malformed links).
+
+**What's free without signing in**: the homepage (news, free tools), the
+quiz, the articles list, browsing the course catalog and mentor list
+(titles, summaries, prices) — including trying the RAG demo.
 
 **What requires signing in**: tracking progress on any course (free or
 paid), rating a course, booking a mentor slot, and anything involving a
@@ -264,6 +277,19 @@ signup.
 - **Payment**: bookings land as `PENDING`, same flow as course purchases —
   flip to `PAID` via the Razorpay webhook once wired up.
 
+## Work With Me (business automation leads)
+
+A real lead-capture flow, not a static mailto link. A visitor picks from a
+curated list of automation services (`src/data/automationServices.ts` —
+support chatbot, internal search, lead triage, workflow automation, an AI
+readiness audit, or "something else" as a catch-all), then fills in a
+short form (name + email or phone, optional message) that submits to
+`POST /api/inquiries`. Public and unauthenticated on purpose — a business
+reaching out isn't necessarily an existing site user — and rate-limited by
+IP (same `checkIpRateLimit` pattern as OTP requests, `src/lib/rateLimit.ts`)
+so it can't be spammed. Submissions land in `ServiceInquiry` and show up on
+`/admin/reports`, admin-only, newest first.
+
 ## Analytics & reporting (`/admin/reports`)
 
 Self-hosted, minimal-PII traffic tracking — one table (`AnalyticsEvent`),
@@ -272,16 +298,22 @@ analytics service. `AnalyticsBeacon` (mounted once in the root layout)
 fires a page view on every route change and a time-on-page beacon
 (`navigator.sendBeacon`, so it actually delivers on tab close) right before
 leaving each page; `trackClick()` is wired into a couple of real CTAs
-(the homepage's quiz button, the "Work With Me" email link) as the pattern
-to follow for tracking more. Visitors are identified by a random
+(the homepage's quiz button, each Work With Me service card) as the
+pattern to follow for tracking more. Visitors are identified by a random
 `anonId` in `localStorage`, not tied to their account unless they happen
 to be signed in — `src/lib/analytics.ts` (unit-tested) does the actual
 aggregation (page views, unique visitors, top pages, top clicks, average
 time on page) separately from the database query, so the math is testable
 without a database.
 
-The same admin page also shows the accounting summary (see below) —
-traffic and money, one screen.
+**Traffic by day/hour** (`/api/admin/reports/traffic/timeseries?granularity=hour|day&days=N`)
+— internal-only, same admin gate as everything else under `/api/admin/*`,
+never surfaced anywhere a customer can see it. `bucketByTime()` in
+`src/lib/analytics.ts` (unit-tested) does the actual bucketing, shown as a
+simple bar chart on `/admin/reports`.
+
+The same admin page also shows the accounting summary and business
+inquiries (see below) — traffic, leads, and money, one screen.
 
 ## Content-generation agents
 
@@ -384,18 +416,25 @@ especially regarding India's DPDP Act and any GST obligations.
 
 ## Project shape
 
-- `src/app/page.tsx` — homepage (hero, Pulse, costs, free tools, personas, pack)
+- `src/app/page.tsx` — homepage (hero, Interview Pack, personas, Run It
+  Free + Pulse behind the soft gate, Work With Me)
 - `src/app/quiz`, `/courses`, `/articles`, `/mentoring`, `/mock-feedback`,
-  `/signin`, `/settings`, `/privacy`, `/terms`, `/refund-policy` — the rest
-  of the pages
+  `/profile`, `/signin`, `/settings`, `/privacy`, `/terms`,
+  `/refund-policy` — the rest of the pages
 - `src/app/admin/mentors`, `/admin/generate`, `/admin/reports` — admin-only:
   mentor onboarding, content-drafting agents, traffic + accounting reports
+  + business inquiries
 - `src/components/PulseFeed.tsx` — the auto-scrolling news ticker, DB-backed
   with a static fallback
 - `src/components/RagDemo.tsx` — the retrieve-then-generate mini demo on the
   RAG Basics course
 - `src/components/CourseTracker.tsx` — the animated per-course progress bar
   + 5-star rating widget
+- `src/components/WorkWithMe.tsx` — the automation-services picker + lead
+  form, `src/data/automationServices.ts` for the curated list
+- `src/components/RevisionBoard.tsx` / `EditableName.tsx` — the personal
+  notes/bookmarks board and editable display name on `/profile`
+- `src/components/SoftGate.tsx` — the 60-second sign-in nudge wrapper
 - `src/components/AnalyticsBeacon.tsx` / `src/lib/trackEvent.ts` — the
   site-wide page-view/click/time-on-page tracker, feeding `/admin/reports`
 - `prisma/schema.prisma` — the whole data model
@@ -417,4 +456,5 @@ especially regarding India's DPDP Act and any GST obligations.
   the switch and came back clean. Being public means branch protection is
   enforced for free and reviewers don't need an explicit invite to read the
   code — but it also means never committing anything sensitive here again.
-  `COSTS.md` stays gitignored specifically because of this.
+  `COSTS.md` is intentionally tracked and public too — it's cost estimates
+  and pricing math, not credentials; nothing in it is a secret.
