@@ -38,7 +38,11 @@ export default function Nav() {
               )}
             </a>
           ))}
-          {status !== "authenticated" && (
+          {status === "authenticated" ? (
+            <a href="/profile" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
+              Profile
+            </a>
+          ) : (
             <a href="/signin" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
               Sign in
             </a>

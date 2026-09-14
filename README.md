@@ -207,6 +207,32 @@ OTP form and after a Google redirect) rather than silently bumping an
 older device. A legitimate user who hits the cap can self-serve their way
 out via **Settings → Devices** (`/api/devices`).
 
+**The homepage's soft 60-second gate** (`src/components/SoftGate.tsx`) —
+the hero, the Interview Pack pitch, and the "who this is for" section are
+always free, no limit, since that's the actual sales pitch. The
+exploratory content below it (Run It Free, AI Pulse, What It Costs) blurs
+with a "sign in to keep exploring" prompt after 60 seconds on the page for
+a signed-out visitor — never for a signed-in one. The timer is per page
+load (resets on refresh), not cumulative across visits. Deliberately not
+applied to the quiz, courses catalog, or articles list — those exist
+specifically to be freely shareable/indexable top-of-funnel content, and
+gating them would work against the point of having them.
+
+## Profile (`/profile`)
+
+Once signed in: current streak (consecutive days visited, computed from
+real page-view history — `src/lib/streak.ts`, unit-tested and verified
+against seeded multi-day data during this build), every course with its
+real status (not started / in progress at X% / completed), quiz attempt
+history (score + date), and the last few distinct pages visited. All read
+from data that already existed for other reasons (`CourseProgress`,
+`QuizAttempt`, `AnalyticsEvent`) — no new write path needed, `/api/profile`
+just aggregates. The streak specifically only counts a day as "active" if
+that user had at least one tracked page view that calendar day (UTC), and
+breaks (shows 0) if the most recent active day is more than 1 day ago —
+verified end-to-end with real backdated rows, not just the pure function
+in isolation.
+
 **What's free without signing in**: the homepage (news, model costs, free
 tools), the quiz, the articles list, browsing the course catalog and
 mentor list (titles, summaries, prices) — including trying the RAG demo.

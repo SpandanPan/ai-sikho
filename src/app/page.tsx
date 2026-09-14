@@ -2,6 +2,7 @@ import Image from "next/image";
 import PulseFeed from "@/components/PulseFeed";
 import FunFactLoader from "@/components/FunFactLoader";
 import TrackedLink from "@/components/TrackedLink";
+import SoftGate from "@/components/SoftGate";
 
 const personas = [
   { photo: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80", label: "Career switcher", detail: "No CS degree — now shipping RAG apps" },
@@ -106,39 +107,41 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="free" className="border-b border-paper-line py-9">
-        <h2 className="font-display text-xl font-semibold mb-1">Run It Free</h2>
-        <p className="text-sm text-ink-soft mb-5">No API key charges — good enough to learn and prototype on.</p>
-        <div className="grid gap-3.5 sm:grid-cols-3">
-          {freeTools.map((t) => (
-            <div key={t.name} className="border border-paper-line rounded p-4">
-              <h3 className="font-semibold text-sm mb-1.5">{t.name}</h3>
-              <p className="text-sm text-ink-soft">{t.desc}</p>
-              <span className="mt-2 inline-block font-mono text-[10.5px] uppercase text-rust">Best for: {t.best}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      <SoftGate>
+        <section id="free" className="border-b border-paper-line py-9">
+          <h2 className="font-display text-xl font-semibold mb-1">Run It Free</h2>
+          <p className="text-sm text-ink-soft mb-5">No API key charges — good enough to learn and prototype on.</p>
+          <div className="grid gap-3.5 sm:grid-cols-3">
+            {freeTools.map((t) => (
+              <div key={t.name} className="border border-paper-line rounded p-4">
+                <h3 className="font-semibold text-sm mb-1.5">{t.name}</h3>
+                <p className="text-sm text-ink-soft">{t.desc}</p>
+                <span className="mt-2 inline-block font-mono text-[10.5px] uppercase text-rust">Best for: {t.best}</span>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <PulseFeed />
+        <PulseFeed />
 
-      <section id="costs" className="border-b border-paper-line py-9">
-        <h2 className="font-display text-xl font-semibold mb-1">What It Costs</h2>
-        <p className="text-sm text-ink-soft mb-5">List price per 1M tokens, input / output.</p>
-        <div className="grid gap-3.5 sm:grid-cols-3">
-          {costs.map((c) => (
-            <div key={c.provider} className="border border-paper-line rounded p-4">
-              <div className="font-mono text-[11px] uppercase tracking-wide text-accent2 mb-2">{c.provider}</div>
-              {c.rows.map(([model, price]) => (
-                <div key={model} className="flex justify-between text-sm py-1.5 border-t border-paper-line first:border-t-0">
-                  <span>{model}</span>
-                  <span className="font-mono text-xs text-accent-ink">{price}</span>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </section>
+        <section id="costs" className="border-b border-paper-line py-9">
+          <h2 className="font-display text-xl font-semibold mb-1">What It Costs</h2>
+          <p className="text-sm text-ink-soft mb-5">List price per 1M tokens, input / output.</p>
+          <div className="grid gap-3.5 sm:grid-cols-3">
+            {costs.map((c) => (
+              <div key={c.provider} className="border border-paper-line rounded p-4">
+                <div className="font-mono text-[11px] uppercase tracking-wide text-accent2 mb-2">{c.provider}</div>
+                {c.rows.map(([model, price]) => (
+                  <div key={model} className="flex justify-between text-sm py-1.5 border-t border-paper-line first:border-t-0">
+                    <span>{model}</span>
+                    <span className="font-mono text-xs text-accent-ink">{price}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+      </SoftGate>
 
       <footer id="work" className="py-10">
         <div className="border border-paper-line rounded p-6 flex flex-wrap items-center justify-between gap-5">
