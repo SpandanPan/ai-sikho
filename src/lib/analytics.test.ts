@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { summarizeTraffic } from "./analytics";
+import { summarizeTraffic, bucketByTime } from "./analytics";
 
 describe("summarizeTraffic", () => {
   it("counts page views and clicks separately", () => {
@@ -60,5 +60,38 @@ describe("summarizeTraffic", () => {
     expect(summary.pageViews).toBe(0);
     expect(summary.uniqueVisitors).toBe(0);
     expect(summary.topPaths).toEqual([]);
+  });
+});
+
+describe("bucketByTime", () => {
+  it("groups timestamps into daily buckets", () => {
+    const result = bucketByTime(
+      [new Date("2026-09-14T01:00:00Z"), new Date("2026-09-14T23:00:00Z"), new Date("2026-09-13T12:00:00Z")],
+      "day"
+    );
+    expect(result).toEqual([
+      { bucket: "2026-09-13", count: 1 },
+      { bucket: "2026-09-14", count: 2 },
+    ]);
+  });
+
+  it("groups timestamps into hourly buckets", () => {
+    const result = bucketByTime(
+      [new Date("2026-09-14T01:15:00Z"), new Date("2026-09-14T01:45:00Z"), new Date("2026-09-14T02:00:00Z")],
+      "hour"
+    );
+    expect(result).toEqual([
+      { bucket: "2026-09-14T01:00", count: 2 },
+      { bucket: "2026-09-14T02:00", count: 1 },
+    ]);
+  });
+
+  it("returns buckets sorted chronologically regardless of input order", () => {
+    const result = bucketByTime([new Date("2026-09-14T00:00:00Z"), new Date("2026-09-12T00:00:00Z")], "day");
+    expect(result.map((r) => r.bucket)).toEqual(["2026-09-12", "2026-09-14"]);
+  });
+
+  it("returns an empty array for no timestamps", () => {
+    expect(bucketByTime([], "day")).toEqual([]);
   });
 });

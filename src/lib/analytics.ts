@@ -55,3 +55,19 @@ export function summarizeTraffic(events: AnalyticsEventLike[]): TrafficSummary {
     topClicks,
   };
 }
+
+export type TimeseriesPoint = { bucket: string; count: number };
+
+// Admin-only traffic-by-date/hour breakdown — see /api/admin/reports/traffic
+// (granularity=hour|day). Never exposed to a non-admin.
+export function bucketByTime(timestamps: Date[], granularity: "hour" | "day"): TimeseriesPoint[] {
+  const counts = new Map<string, number>();
+  for (const t of timestamps) {
+    const iso = t.toISOString();
+    const key = granularity === "hour" ? `${iso.slice(0, 13)}:00` : iso.slice(0, 10);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([bucket, count]) => ({ bucket, count }))
+    .sort((a, b) => a.bucket.localeCompare(b.bucket));
+}

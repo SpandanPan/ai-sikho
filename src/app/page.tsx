@@ -3,17 +3,12 @@ import PulseFeed from "@/components/PulseFeed";
 import FunFactLoader from "@/components/FunFactLoader";
 import TrackedLink from "@/components/TrackedLink";
 import SoftGate from "@/components/SoftGate";
+import WorkWithMe from "@/components/WorkWithMe";
 
 const personas = [
   { photo: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80", label: "Career switcher", detail: "No CS degree — now shipping RAG apps" },
   { photo: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=200&q=80", label: "Fresh graduate", detail: "Landed a first AI Engineer role" },
   { photo: "https://images.unsplash.com/photo-1573164713988-8665fc963095?w=200&q=80", label: "Small business owner", detail: "Automated support with one weekend build" },
-];
-
-const costs = [
-  { provider: "Anthropic · Claude", rows: [["Haiku 4.5", "$1 / $5"], ["Sonnet 5", "$2 / $10"], ["Opus 5", "$5 / $25"]] },
-  { provider: "OpenAI · GPT", rows: [["GPT-5.5 mini-tier", "$0.20–2 / $1.20–12"], ["GPT-5.5 flagship", "$5 / $30"]] },
-  { provider: "Google · Gemini", rows: [["2.5 Flash-Lite", "$0.30 / $2.50"], ["2.5 Flash", "$1.50 / $7.50"], ["2.5 Pro", "$1.25–2 / $10–12"]] },
 ];
 
 const freeTools = [
@@ -123,39 +118,11 @@ export default function Home() {
         </section>
 
         <PulseFeed />
-
-        <section id="costs" className="border-b border-paper-line py-9">
-          <h2 className="font-display text-xl font-semibold mb-1">What It Costs</h2>
-          <p className="text-sm text-ink-soft mb-5">List price per 1M tokens, input / output.</p>
-          <div className="grid gap-3.5 sm:grid-cols-3">
-            {costs.map((c) => (
-              <div key={c.provider} className="border border-paper-line rounded p-4">
-                <div className="font-mono text-[11px] uppercase tracking-wide text-accent2 mb-2">{c.provider}</div>
-                {c.rows.map(([model, price]) => (
-                  <div key={model} className="flex justify-between text-sm py-1.5 border-t border-paper-line first:border-t-0">
-                    <span>{model}</span>
-                    <span className="font-mono text-xs text-accent-ink">{price}</span>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </section>
       </SoftGate>
 
       <footer id="work" className="py-10">
-        <div className="border border-paper-line rounded p-6 flex flex-wrap items-center justify-between gap-5">
-          <div>
-            <h3 className="font-semibold mb-1">Running a business? Bring me the busywork.</h3>
-            <p className="text-sm text-ink-soft max-w-md">AI readiness audits, custom chatbots and RAG tools, workflow automation.</p>
-          </div>
-          <TrackedLink
-            href="mailto:hello@yourdomain.com?subject=Automation%20inquiry"
-            label="work-with-me-email"
-            className="font-mono text-sm bg-ink text-paper rounded px-4 py-2.5"
-          >
-            Email hello@yourdomain.com
-          </TrackedLink>
+        <div className="border border-paper-line rounded p-6">
+          <WorkWithMe />
         </div>
       </footer>
     </main>

@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react";
 const links = [
   { href: "/quiz", label: "Quiz" },
   { href: "/#pulse", label: "Pulse" },
-  { href: "/#costs", label: "Model Costs" },
   { href: "/#free", label: "Run It Free" },
   { href: "/articles", label: "Articles" },
   { href: "/courses", label: "Courses" },

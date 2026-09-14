@@ -463,6 +463,25 @@ model AnalyticsEvent {
   @@index([anonId])
 }
 
+// ---- Business automation inquiries -----------------------------------
+// The "Work With Me" lead form. Public and unauthenticated on purpose — a
+// business reaching out isn't necessarily an existing site user. Rate
+// limited by IP (src/lib/rateLimit.ts's checkIpRateLimit) to stop spam,
+// same pattern as OTP requests.
+
+model ServiceInquiry {
+  id        String   @id @default(cuid())
+  service   String // a slug from src/data/automationServices.ts, or free text when "other"
+  name      String
+  email     String?
+  phone     String?
+  message   String?
+  ip        String? // for the per-IP rate limit in src/app/api/inquiries/route.ts
+  createdAt DateTime @default(now())
+
+  @@index([ip])
+}
+
 // ---- AI Pulse news feed --------------------------------------------------
 // Populated daily by scripts/fetch-news.ts (see vercel.json cron).
 

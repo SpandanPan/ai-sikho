@@ -57,12 +57,19 @@ export const articles: Article[] = [
     level: "starter",
     status: "coming-soon",
   },
+  {
+    slug: "what-models-actually-cost",
+    title: "What Models Actually Cost",
+    summary: "Per-token pricing across Claude, GPT, and Gemini, translated into what a real feature costs to run — updated as pricing changes.",
+    level: "starter",
+    status: "coming-soon",
+  },
 
   // -- Builder: some technical comfort, actively building something --
   {
     slug: "what-is-a-transformer",
     title: "What Is a Transformer?",
-    summary: "The architecture behind every model on the cost table — explained without the math.",
+    summary: "The architecture behind every model discussed on this site — explained without the math.",
     level: "builder",
     status: "coming-soon",
   },

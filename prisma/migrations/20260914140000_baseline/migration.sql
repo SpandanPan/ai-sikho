@@ -336,6 +336,20 @@ CREATE TABLE "AnalyticsEvent" (
 );
 
 -- CreateTable
+CREATE TABLE "ServiceInquiry" (
+    "id" TEXT NOT NULL,
+    "service" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT,
+    "phone" TEXT,
+    "message" TEXT,
+    "ip" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ServiceInquiry_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "NewsItem" (
     "id" TEXT NOT NULL,
     "source" TEXT NOT NULL,
@@ -457,6 +471,9 @@ CREATE INDEX "AnalyticsEvent_path_idx" ON "AnalyticsEvent"("path");
 CREATE INDEX "AnalyticsEvent_anonId_idx" ON "AnalyticsEvent"("anonId");
 
 -- CreateIndex
+CREATE INDEX "ServiceInquiry_ip_idx" ON "ServiceInquiry"("ip");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "NewsItem_link_key" ON "NewsItem"("link");
 
 -- CreateIndex
@@ -516,13 +533,3 @@ ALTER TABLE "MentorBooking" ADD CONSTRAINT "MentorBooking_slotId_fkey" FOREIGN K
 -- AddForeignKey
 ALTER TABLE "AnalyticsEvent" ADD CONSTRAINT "AnalyticsEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
-┌─────────────────────────────────────────────────────────┐
-│  Update available 5.22.0 -> 8.0.0-rc.15                 │
-│                                                         │
-│  This is a major update - please follow the guide at    │
-│  https://pris.ly/d/major-version-upgrade                │
-│                                                         │
-│  Run the following to update                            │
-│    npm i --save-dev prisma@latest                       │
-│    npm i @prisma/client@latest                          │
-└─────────────────────────────────────────────────────────┘

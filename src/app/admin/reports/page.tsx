@@ -13,6 +13,9 @@ type Traffic = {
   topClicks: { label: string; count: number }[];
 };
 
+type Timeseries = { granularity: string; days: number; series: { bucket: string; count: number }[] };
+type Inquiry = { id: string; service: string; name: string; email: string | null; phone: string | null; message: string | null; createdAt: string };
+
 type Accounting = {
   summary: {
     revenueInPaise: number;
@@ -32,12 +35,16 @@ function inr(paise: number) {
 export default function AdminReportsPage() {
   const { status } = useSession();
   const [traffic, setTraffic] = useState<Traffic | null>(null);
+  const [timeseries, setTimeseries] = useState<Timeseries | null>(null);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [accounting, setAccounting] = useState<Accounting | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (status !== "authenticated") return;
     fetch("/api/admin/reports/traffic").then((r) => (r.ok ? r.json() : Promise.reject(r))).then(setTraffic).catch(() => setError("Admin only, or not signed in."));
+    fetch("/api/admin/reports/traffic/timeseries?granularity=day&days=14").then((r) => (r.ok ? r.json() : Promise.reject(r))).then(setTimeseries).catch(() => {});
+    fetch("/api/admin/inquiries").then((r) => (r.ok ? r.json() : Promise.reject(r))).then((d) => setInquiries(d.inquiries ?? [])).catch(() => {});
     fetch("/api/admin/reports/accounting").then((r) => (r.ok ? r.json() : Promise.reject(r))).then(setAccounting).catch(() => {});
   }, [status]);
 
@@ -97,6 +104,55 @@ export default function AdminReportsPage() {
           </>
         ) : (
           <p className="text-sm text-ink-soft">Loading…</p>
+        )}
+      </section>
+
+      <section className="mb-10">
+        <h2 className="font-semibold text-sm mb-3">Page views by day (last {timeseries?.days ?? "…"} days)</h2>
+        <p className="text-xs text-ink-soft mb-3">Internal only — never shown to visitors.</p>
+        {timeseries ? (
+          timeseries.series.length === 0 ? (
+            <p className="text-sm text-ink-soft">No traffic recorded in this window yet.</p>
+          ) : (
+            <div className="flex flex-col gap-1">
+              {timeseries.series.map((p) => {
+                const max = Math.max(...timeseries.series.map((s) => s.count), 1);
+                return (
+                  <div key={p.bucket} className="flex items-center gap-3 text-xs">
+                    <span className="font-mono w-24 flex-none text-ink-soft">{p.bucket}</span>
+                    <span className="flex-1 h-2 bg-paper-line rounded-full overflow-hidden">
+                      <span className="block h-full bg-accent2 rounded-full" style={{ width: `${(p.count / max) * 100}%` }} />
+                    </span>
+                    <span className="font-mono w-8 text-right">{p.count}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )
+        ) : (
+          <p className="text-sm text-ink-soft">Loading…</p>
+        )}
+      </section>
+
+      <section className="mb-10">
+        <h2 className="font-semibold text-sm mb-3">Automation inquiries</h2>
+        {inquiries.length === 0 ? (
+          <p className="text-sm text-ink-soft">No inquiries yet.</p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {inquiries.map((i) => (
+              <div key={i.id} className="border border-paper-line rounded p-3.5 text-sm">
+                <div className="flex justify-between items-start gap-3">
+                  <div>
+                    <p className="font-semibold">{i.name} — <span className="font-mono text-xs text-accent-ink">{i.service}</span></p>
+                    <p className="text-xs text-ink-soft">{i.email} {i.phone ? `· ${i.phone}` : ""}</p>
+                  </div>
+                  <span className="text-xs text-ink-soft flex-none">{new Date(i.createdAt).toLocaleDateString()}</span>
+                </div>
+                {i.message && <p className="text-xs text-ink-soft mt-2">{i.message}</p>}
+              </div>
+            ))}
+          </div>
         )}
       </section>
 
