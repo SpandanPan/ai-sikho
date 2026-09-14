@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import EditableName from "@/components/EditableName";
+import RevisionBoard from "@/components/RevisionBoard";
 
 type Profile = {
   streak: { current: number; longest: number };
@@ -17,7 +19,7 @@ const STATUS_LABEL: Record<Profile["courses"][number]["status"], string> = {
 };
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
@@ -36,10 +38,13 @@ export default function ProfilePage() {
 
   return (
     <main className="mx-auto max-w-2xl px-5 py-12">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-2">Your profile</p>
-      <h1 className="font-display text-2xl font-semibold mb-8">
-        {session?.user?.email ?? session?.user?.name}
-      </h1>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-1">Your profile</p>
+      <div className="mb-2">
+        <EditableName />
+      </div>
+      <p className="text-xs text-ink-soft mb-8">
+        <a href="/settings" className="text-accent-ink underline">Account, devices &amp; theme →</a>
+      </p>
 
       {!profile ? (
         <p className="text-sm text-ink-soft">Loading…</p>
@@ -108,6 +113,11 @@ export default function ProfilePage() {
                 ))}
               </div>
             )}
+          </section>
+
+          <section>
+            <h2 className="font-semibold text-sm mb-3">Revision — notes &amp; bookmarks</h2>
+            <RevisionBoard />
           </section>
         </div>
       )}

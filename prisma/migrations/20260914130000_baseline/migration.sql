@@ -256,6 +256,30 @@ CREATE TABLE "MockAnswerSubmission" (
 );
 
 -- CreateTable
+CREATE TABLE "Note" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Note_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Bookmark" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "tag" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Bookmark_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Mentor" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -403,6 +427,12 @@ CREATE UNIQUE INDEX "MockAnswerSubmission_razorpayPaymentId_key" ON "MockAnswerS
 CREATE INDEX "MockAnswerSubmission_userId_status_idx" ON "MockAnswerSubmission"("userId", "status");
 
 -- CreateIndex
+CREATE INDEX "Note_userId_idx" ON "Note"("userId");
+
+-- CreateIndex
+CREATE INDEX "Bookmark_userId_idx" ON "Bookmark"("userId");
+
+-- CreateIndex
 CREATE INDEX "MentorSlot_mentorId_startTime_idx" ON "MentorSlot"("mentorId", "startTime");
 
 -- CreateIndex
@@ -469,6 +499,12 @@ ALTER TABLE "LedgerEntry" ADD CONSTRAINT "LedgerEntry_purchaseId_fkey" FOREIGN K
 ALTER TABLE "MockAnswerSubmission" ADD CONSTRAINT "MockAnswerSubmission_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Note" ADD CONSTRAINT "Note_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Bookmark" ADD CONSTRAINT "Bookmark_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "MentorSlot" ADD CONSTRAINT "MentorSlot_mentorId_fkey" FOREIGN KEY ("mentorId") REFERENCES "Mentor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -480,3 +516,13 @@ ALTER TABLE "MentorBooking" ADD CONSTRAINT "MentorBooking_slotId_fkey" FOREIGN K
 -- AddForeignKey
 ALTER TABLE "AnalyticsEvent" ADD CONSTRAINT "AnalyticsEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+┌─────────────────────────────────────────────────────────┐
+│  Update available 5.22.0 -> 8.0.0-rc.15                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘

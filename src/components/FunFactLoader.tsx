@@ -28,7 +28,13 @@ export default function FunFactLoader() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink text-paper px-6">
+    // Fixed literal colors, not the ink/paper tokens — this overlay is
+    // meant to always be a dramatic dark flash. ink/paper flip meaning
+    // between light and dark theme (ink=dark text in light mode, but
+    // ink=light text in dark mode), so using them here inverted this to a
+    // jarring white flash specifically when the site was in dark theme —
+    // a real bug, found and fixed during this session.
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#141c19] text-[#e9ede7] px-6">
       <div className="max-w-sm text-center">
         <p className="font-mono text-xs uppercase tracking-widest text-spark mb-3">Did you know?</p>
         <p className="font-display text-lg leading-snug">{fact}</p>

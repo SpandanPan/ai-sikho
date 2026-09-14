@@ -95,7 +95,17 @@ export const authOptions: AuthOptions = {
       await prisma.deviceSession.create({ data: { userId: user.id, deviceId: crypto.randomUUID() } });
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
+      if (trigger === "update" && token.sub) {
+        // Client called useSession().update() after PATCH /api/account
+        // changed the name — re-read it so the JWT (and therefore every
+        // page's session.user.name) reflects it. This is the one
+        // deliberate exception to "never hit the DB on token refresh": it
+        // only runs on an explicit update, not on ordinary requests.
+        const fresh = await prisma.user.findUnique({ where: { id: token.sub }, select: { name: true } });
+        if (fresh) token.name = fresh.name;
+        return token;
+      }
       if (user) {
         // signIn already created this device's row (or blocked the sign-in
         // entirely, in which case NextAuth never reaches here) — attach its

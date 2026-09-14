@@ -116,7 +116,7 @@ export default function Home() {
               <div key={t.name} className="border border-paper-line rounded p-4">
                 <h3 className="font-semibold text-sm mb-1.5">{t.name}</h3>
                 <p className="text-sm text-ink-soft">{t.desc}</p>
-                <span className="mt-2 inline-block font-mono text-[10.5px] uppercase text-rust">Best for: {t.best}</span>
+                <span className="mt-2 inline-block font-mono text-[10.5px] uppercase text-accent2">Best for: {t.best}</span>
               </div>
             ))}
           </div>
