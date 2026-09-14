@@ -33,7 +33,7 @@ export default function EditableName() {
   if (!editing) {
     return (
       <div className="flex items-center gap-3">
-        <h1 className="font-display text-2xl font-semibold">{displayName}</h1>
+        <h1 className="font-display text-2xl font-semibold">Welcome, {displayName}</h1>
         <button
           onClick={() => {
             setName(session?.user?.name ?? "");
