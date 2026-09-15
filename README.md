@@ -496,6 +496,96 @@ this is the check-then-act step once you've read that email). Razorpay's
 actual refund API call is a TODO in that route, marked clearly, until real
 payments are live.
 
+## Cart, checkout, and coupons
+
+The Interview Pack tracks and paid courses are now actually buyable —
+this closes the "no live checkout UI anywhere" gap flagged repeatedly
+earlier in this project's history. "Add to cart" on any track's
+Starter/Kit card or a paid course (`AddToCartButton.tsx`) adds to a
+localStorage-backed cart (`CartContext.tsx` — per-browser, not account
+state; real prices are always re-resolved server-side at checkout, never
+trusted from the client). `/cart` shows the items, an optional coupon
+code, and a Checkout button.
+
+**`POST /api/checkout`**: resolves every cart item against the real data
+files (`src/lib/cart.ts`'s `resolveCartItem` — a client could send any
+price it wants, this is what makes that irrelevant), creates one Razorpay
+order for the whole cart, and one `Purchase` row per item, all sharing
+that order. This needed a real schema change: `Purchase.razorpayOrderId`
+was `@unique` (one purchase per order) and is now just indexed, since a
+multi-item cart is exactly "several purchases, one order." The webhook
+(`src/app/api/webhooks/razorpay`) was updated to match —
+`findMany`+flip-all-together instead of `findUnique`.
+
+**Coupons** (`src/lib/coupons.ts`, admin-created via `POST
+/api/admin/coupons`, capped at 10% by the code itself, not just
+convention): `POST /api/coupons/validate` is a public, validate-only
+check a checkout can price against without redeeming anything.
+Redemption is only counted in the webhook, on confirmed payment, not at
+checkout — an abandoned checkout must never burn a redemption of a
+limited coupon. A cart's discount is split proportionally across its
+Purchase rows (`distributeDiscount`), with the last item absorbing
+rounding drift so the parts always sum to exactly the discount.
+
+**Verified end-to-end** during this build: a real 2-item cart (a pack
+Starter + a course) with a real 10%-off coupon, a correctly-signed
+webhook call against the actual running route, confirmed both purchases
+flip to `PAID` together, exactly 4 ledger entries land (revenue + fee ×
+2), the coupon's redemption count increments by exactly 1 (not 2, despite
+2 purchases), and both a receipt email and a course-welcome email fire
+with the right addresses and post-discount amounts. **Not verified**: an
+actual live Razorpay payment — `RAZORPAY_KEY_ID/SECRET` aren't set in
+this environment, so `POST /api/checkout` will return a clear 502
+("Razorpay isn't configured") until they are.
+
+## Invoices (`/invoice/[purchaseId]`)
+
+Signed-in, owner-or-admin only (same purchase ID returns 404 either way to
+a stranger, rather than leaking that it exists). An invoice number is
+assigned lazily — the first time anyone actually opens it — atomically via
+a single-row counter (`InvoiceCounter`, incremented inside a transaction;
+verified concurrent requests can't collide on the same number). No PDF
+library is wired up; the page is print-styled and the "Print / Save as
+PDF" button is just `window.print()` — a real, working way to get a PDF
+with zero new dependencies, though a proper PDF generator (for emailing
+one as an attachment) is a natural upgrade later.
+
+**On GST**: the invoice shows **no tax line at all** unless `GST_NUMBER`
+is set in env — displaying or collecting GST without being registered
+isn't just wrong, it isn't allowed. Registration is mandatory only past
+₹20 lakh/year turnover for services (₹10 lakh in a few special-category
+states); below that it's optional. Once `GST_NUMBER` is set,
+`src/lib/invoice.ts` derives the GST amount from the total paid (treated
+as GST-inclusive, the normal convention for consumer pricing in India) at
+`GST_RATE_PERCENT` (default 18%). It shows one combined GST line, not a
+CGST+SGST vs. IGST split — that split depends on buyer vs. seller state,
+which this app doesn't collect anywhere today. Confirm your actual
+registration status and invoice format with a CA before this matters for
+real money; this is deliberately built to default to correct for "not
+registered yet" rather than to "looks more official."
+
+## Email (`src/lib/email.ts`)
+
+Three purpose-separated sender addresses on one domain
+(`receipts@`/`courses@`/`support@`, derived from `EMAIL_DOMAIN`) — kept
+separate so a receipt (transactional, must-deliver) never shares sending
+reputation with a support reply or a course-welcome message. **Not wired
+to a live provider** — same honest pattern as OTP delivery: until
+`RESEND_API_KEY` is set, every send is logged server-side
+(`[email] NOT SENT (no RESEND_API_KEY) — ...`) instead of delivered,
+verified for real during this build via the checkout/help flows above. A
+receipt + invoice link fires on every paid purchase; a course-welcome
+email fires additionally when the product is a course; a support
+acknowledgment fires on every `/help` submission.
+
+## Help (`/help`)
+
+A real contact form, public and unauthenticated (someone needing help may
+not be signed in — that could be the actual problem), rate-limited by IP
+same as `/api/inquiries`. Saves a `SupportRequest` row (visible to you at
+`/admin/reports`) and best-effort emails both you and the sender — the
+saved row is the source of truth if the email never wired up.
+
 ## Accounting ledger (for your CA)
 
 One table, `LedgerEntry`, is the single source of truth — every sale,

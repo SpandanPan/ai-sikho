@@ -18,6 +18,7 @@ const morePrep = [
 const personas = [
   { photo: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80", label: "Career switcher", detail: "No CS degree — now shipping RAG apps" },
   { photo: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=200&q=80", label: "Fresh graduate", detail: "Landed a first AI Engineer role" },
+  { photo: "https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?w=200&q=80", label: "Junior professional", detail: "2-3 years in, moved into an AI-adjacent role at the same company" },
   { photo: "https://images.unsplash.com/photo-1573164713988-8665fc963095?w=200&q=80", label: "Small business owner", detail: "Automated support with one weekend build" },
 ];
 
@@ -82,7 +83,7 @@ export default function Home() {
 
       <section className="border-b border-paper-line py-8">
         <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">Who this is for</p>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {personas.map((p) => (
             <div key={p.label} className="flex items-center gap-3">
               <Image

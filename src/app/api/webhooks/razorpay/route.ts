@@ -5,6 +5,9 @@ import { calculatePlatformFee } from "@/lib/ledger";
 import { calculateGenerationCostInPaise } from "@/lib/agentPricing";
 import { gradeAnswer, ContentAgentError } from "@/lib/contentAgent";
 import { createZoomMeeting, isZoomConfigured } from "@/lib/zoom";
+import { sendEmail, buildReceiptEmail, buildCourseWelcomeEmail } from "@/lib/email";
+import { describeProduct } from "@/lib/invoice";
+import { courses } from "@/data/courses";
 
 // Razorpay calls this after a payment. Verify the signature before trusting
 // anything in the body — otherwise anyone could POST a fake "paid" event
@@ -27,39 +30,88 @@ export async function POST(req: Request) {
   if (event.event === "payment.captured") {
     const payment = event.payload.payment.entity;
 
+    // A cart checkout creates one Purchase row per item, all sharing this
+    // one order — findMany, not findUnique, and flip all of them together.
     // Idempotency: if this payment was already recorded (a retried
-    // webhook), the purchase's status is already PAID and this lookup by
-    // orderId still finds it — updating it again to the same state, and
-    // creating a second pair of ledger entries, would silently double-count
-    // revenue. Guard on current status before writing anything.
-    const purchase = await prisma.purchase.findUnique({ where: { razorpayOrderId: payment.order_id } });
-    if (purchase && purchase.status !== "PAID") {
-      await prisma.$transaction([
-        prisma.purchase.update({
-          where: { id: purchase.id },
-          data: { status: "PAID", razorpayPaymentId: payment.id },
-        }),
-        prisma.ledgerEntry.create({
-          data: {
-            type: "REVENUE",
-            amountInPaise: purchase.amountInPaise,
-            category: purchase.product === "COURSE" ? "course_sale" : "kit_sale",
-            description: `Purchase ${purchase.id}`,
-            userId: purchase.userId,
-            purchaseId: purchase.id,
-          },
-        }),
-        prisma.ledgerEntry.create({
-          data: {
-            type: "PLATFORM_FEE",
-            amountInPaise: calculatePlatformFee(purchase.amountInPaise),
-            category: "razorpay_fee",
-            description: `Razorpay fee on purchase ${purchase.id}`,
-            userId: purchase.userId,
-            purchaseId: purchase.id,
-          },
-        }),
-      ]);
+    // webhook), each purchase's status is already PAID — re-filtering on
+    // status !== "PAID" before writing anything stops a retry from
+    // double-counting revenue or double-sending receipt emails.
+    const purchases = await prisma.purchase.findMany({
+      where: { razorpayOrderId: payment.order_id, status: { not: "PAID" } },
+      include: { user: true },
+    });
+    if (purchases.length > 0) {
+      await prisma.$transaction(
+        purchases.flatMap((purchase) => [
+          prisma.purchase.update({
+            where: { id: purchase.id },
+            data: { status: "PAID", razorpayPaymentId: payment.id },
+          }),
+          prisma.ledgerEntry.create({
+            data: {
+              type: "REVENUE",
+              amountInPaise: purchase.amountInPaise,
+              category: purchase.product === "COURSE" ? "course_sale" : "kit_sale",
+              description: `Purchase ${purchase.id}`,
+              userId: purchase.userId,
+              purchaseId: purchase.id,
+            },
+          }),
+          prisma.ledgerEntry.create({
+            data: {
+              type: "PLATFORM_FEE",
+              amountInPaise: calculatePlatformFee(purchase.amountInPaise),
+              category: "razorpay_fee",
+              description: `Razorpay fee on purchase ${purchase.id}`,
+              userId: purchase.userId,
+              purchaseId: purchase.id,
+            },
+          }),
+        ])
+      );
+
+      // Coupon redemption is counted here, on confirmed payment, not at
+      // checkout — an abandoned checkout must never burn a redemption of
+      // a limited coupon. Once per unique code actually used in this
+      // batch, not once per Purchase row (a cart can have several rows
+      // sharing one coupon).
+      const couponCodes = [...new Set(purchases.map((p) => p.couponCode).filter((c): c is string => c !== null))];
+      if (couponCodes.length > 0) {
+        await prisma.coupon.updateMany({
+          where: { code: { in: couponCodes } },
+          data: { timesRedeemed: { increment: 1 } },
+        });
+      }
+
+      // Emails are best-effort, after the money is safely recorded — a
+      // failed send must never look like the payment itself failed.
+      for (const purchase of purchases) {
+        if (!purchase.user.email) continue;
+        try {
+          await sendEmail(
+            buildReceiptEmail({
+              to: purchase.user.email,
+              productLabel: describeProduct(purchase),
+              amountInPaise: purchase.amountInPaise,
+              invoiceUrl: `${process.env.NEXTAUTH_URL ?? ""}/invoice/${purchase.id}`,
+            })
+          );
+          if (purchase.product === "COURSE" && purchase.courseSlug) {
+            const course = courses.find((c) => c.slug === purchase.courseSlug);
+            if (course) {
+              await sendEmail(
+                buildCourseWelcomeEmail({
+                  to: purchase.user.email,
+                  courseTitle: course.title,
+                  courseUrl: `${process.env.NEXTAUTH_URL ?? ""}/courses`,
+                })
+              );
+            }
+          }
+        } catch (err) {
+          console.error(`[email] failed for purchase ${purchase.id}:`, err);
+        }
+      }
     }
 
     const booking = await prisma.mentorBooking.findUnique({

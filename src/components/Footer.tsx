@@ -21,6 +21,7 @@ const columns = [
     heading: "Company",
     links: [
       { href: "/#work", label: "Work With Me" },
+      { href: "/help", label: "Help" },
       { href: "/privacy", label: "Privacy" },
       { href: "/terms", label: "Terms" },
       { href: "/refund-policy", label: "Refunds" },

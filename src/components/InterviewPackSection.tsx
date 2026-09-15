@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { interviewPacks, formatPackPrice } from "@/data/interviewPacks";
+import AddToCartButton from "@/components/AddToCartButton";
 
 // Client component only because picking a track needs state — the rest of
 // the homepage stays a server component. Same #pack anchor as before, so
@@ -47,16 +48,31 @@ export default function InterviewPackSection() {
             <h3 className="font-semibold mb-1">Starter Pack</h3>
             <p className="text-sm text-ink-soft">25 questions + 1 checklist. A taste of the full kit.</p>
           </div>
-          <div className="font-mono text-xl text-accent-ink mt-3">{formatPackPrice(pack.starterPriceInPaise)}</div>
+          <div className="flex items-center justify-between mt-3">
+            <div className="font-mono text-xl text-accent-ink">{formatPackPrice(pack.starterPriceInPaise)}</div>
+            <AddToCartButton
+              item={{ key: `pack-starter:${pack.slug}`, type: "pack-starter", slug: pack.slug, label: `${pack.title} — Starter Pack`, amountInPaise: pack.starterPriceInPaise }}
+              className="font-mono text-[10.5px] border border-paper-line rounded px-2.5 py-1.5"
+            />
+          </div>
         </div>
         <div className="border border-accent rounded p-5 bg-paper-raised flex flex-col justify-between">
           <div>
             <h3 className="font-semibold mb-1">{pack.title} Interview Kit</h3>
             <p className="text-sm text-ink-soft">{pack.kitContents}.</p>
           </div>
-          <div className="font-mono text-xl text-accent-ink mt-3">{formatPackPrice(pack.kitPriceInPaise)}</div>
+          <div className="flex items-center justify-between mt-3">
+            <div className="font-mono text-xl text-accent-ink">{formatPackPrice(pack.kitPriceInPaise)}</div>
+            <AddToCartButton
+              item={{ key: `pack-kit:${pack.slug}`, type: "pack-kit", slug: pack.slug, label: `${pack.title} — Interview Kit`, amountInPaise: pack.kitPriceInPaise }}
+              className="font-mono text-[10.5px] bg-ink text-paper rounded px-2.5 py-1.5"
+            />
+          </div>
         </div>
       </div>
+      <p className="text-sm mt-4">
+        <a href="/cart" className="text-accent-ink underline">View cart →</a>
+      </p>
       <p className="text-sm mt-4">
         Want a deeper dive on one topic instead? <a href="/courses" className="text-accent-ink underline">See the ₹149–199 courses →</a>
       </p>

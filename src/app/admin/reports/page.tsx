@@ -17,6 +17,7 @@ type Traffic = {
 type Timeseries = { granularity: string; days: number; series: { bucket: string; count: number }[] };
 type CostSeries = { days: number; series: { date: string; revenueInPaise: number; costsInPaise: number; netInPaise: number }[] };
 type Inquiry = { id: string; service: string; name: string; email: string | null; phone: string | null; message: string | null; createdAt: string };
+type SupportRequest = { id: string; name: string; email: string; message: string; resolved: boolean; createdAt: string };
 
 type Accounting = {
   summary: {
@@ -40,6 +41,7 @@ export default function AdminReportsPage() {
   const [timeseries, setTimeseries] = useState<Timeseries | null>(null);
   const [costSeries, setCostSeries] = useState<CostSeries | null>(null);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [supportRequests, setSupportRequests] = useState<SupportRequest[]>([]);
   const [accounting, setAccounting] = useState<Accounting | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,6 +51,7 @@ export default function AdminReportsPage() {
     fetch("/api/admin/reports/traffic/timeseries?granularity=day&days=14").then((r) => (r.ok ? r.json() : Promise.reject(r))).then(setTimeseries).catch(() => {});
     fetch("/api/admin/reports/costs/timeseries?days=14").then((r) => (r.ok ? r.json() : Promise.reject(r))).then(setCostSeries).catch(() => {});
     fetch("/api/admin/inquiries").then((r) => (r.ok ? r.json() : Promise.reject(r))).then((d) => setInquiries(d.inquiries ?? [])).catch(() => {});
+    fetch("/api/admin/support").then((r) => (r.ok ? r.json() : Promise.reject(r))).then((d) => setSupportRequests(d.requests ?? [])).catch(() => {});
     fetch("/api/admin/reports/accounting").then((r) => (r.ok ? r.json() : Promise.reject(r))).then(setAccounting).catch(() => {});
   }, [status]);
 
@@ -213,6 +216,28 @@ export default function AdminReportsPage() {
                   <span className="text-xs text-ink-soft flex-none">{new Date(i.createdAt).toLocaleDateString()}</span>
                 </div>
                 {i.message && <p className="text-xs text-ink-soft mt-2">{i.message}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mb-10">
+        <h2 className="font-semibold text-sm mb-3">Support requests (/help)</h2>
+        {supportRequests.length === 0 ? (
+          <p className="text-sm text-ink-soft">No support requests yet.</p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {supportRequests.map((r) => (
+              <div key={r.id} className="border border-paper-line rounded p-3.5 text-sm">
+                <div className="flex justify-between items-start gap-3">
+                  <div>
+                    <p className="font-semibold">{r.name}</p>
+                    <p className="text-xs text-ink-soft">{r.email}</p>
+                  </div>
+                  <span className="text-xs text-ink-soft flex-none">{new Date(r.createdAt).toLocaleDateString()}</span>
+                </div>
+                <p className="text-xs text-ink-soft mt-2">{r.message}</p>
               </div>
             ))}
           </div>

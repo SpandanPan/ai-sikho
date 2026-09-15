@@ -1,6 +1,7 @@
 import { courses, formatPrice } from "@/data/courses";
 import RagDemo from "@/components/RagDemo";
 import CourseTracker from "@/components/CourseTracker";
+import AddToCartButton from "@/components/AddToCartButton";
 
 export default function CoursesPage() {
   return (
@@ -27,13 +28,21 @@ export default function CoursesPage() {
                 </h2>
                 <p className="text-sm text-ink-soft mt-1 max-w-lg">{c.summary}</p>
               </div>
-              <span
-                className={`font-mono text-sm whitespace-nowrap ${
-                  c.priceInPaise === 0 ? "text-accent2" : "text-accent-ink"
-                }`}
-              >
-                {formatPrice(c.priceInPaise)}
-              </span>
+              <div className="flex flex-col items-end gap-1.5">
+                <span
+                  className={`font-mono text-sm whitespace-nowrap ${
+                    c.priceInPaise === 0 ? "text-accent2" : "text-accent-ink"
+                  }`}
+                >
+                  {formatPrice(c.priceInPaise)}
+                </span>
+                {c.priceInPaise > 0 && (
+                  <AddToCartButton
+                    item={{ key: `course:${c.slug}`, type: "course", slug: c.slug, label: c.title, amountInPaise: c.priceInPaise }}
+                    className="font-mono text-[10.5px] border border-paper-line rounded px-2.5 py-1.5"
+                  />
+                )}
+              </div>
             </div>
             {c.hasDemo && (
               <div className="mt-4">

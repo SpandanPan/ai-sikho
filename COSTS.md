@@ -32,9 +32,11 @@ committed P&L.
 
 ## LLM API costs (content-generation agents) — and how to get access
 
-Two providers wired up (`src/lib/contentAgent.ts`), pick either per job in
-`/admin/generate`. Same per-token prices as the planned "What Models
-Actually Cost" article, for consistency:
+Three providers wired up (`src/lib/contentAgent.ts`) — Claude, GPT, and a
+self-hosted Ollama model at genuinely $0/token (see `AGENT_COSTS.md` for
+the full map of which agent uses which and why). The two paid ones, same
+per-token prices as the planned "What Models Actually Cost" article, for
+consistency:
 
 | Provider | Model (configurable via env) | Input $/1M tokens | Output $/1M tokens |
 |---|---|---|---|
@@ -51,6 +53,16 @@ Neither has a monthly fee by itself — you're billed only for tokens actually u
 **What it actually costs per job, worked example:** generating ~2,000 input + 3,000 output tokens on Claude Sonnet 5 ≈ (2,000/1M × $2) + (3,000/1M × $10) = $0.034 ≈ **₹2.82** at ₹83/USD. `src/lib/agentPricing.ts` computes this exactly from the real token counts returned by each API (not an estimate) and logs it to the accounting ledger automatically under category `ai_generation` — visible in `/admin/reports`.
 
 **Suggested retail pricing**: `suggestedPriceInPaise()` applies a 3x margin over actual cost, rounded up to a clean ₹10 — so that ₹2.82 job suggests a **₹10** price point if this ever becomes a customer-facing "generate custom content" feature (not built yet — right now these are admin-only drafting tools that feed the existing paid Kit/courses, not sold separately).
+
+## Cart, coupons, and invoicing — no new fixed cost
+
+Checkout, coupons, and invoice generation (see README) are all built on
+what's already listed above — one more Razorpay order per checkout (same
+~2% rate, no new fee type), Resend for the receipt/course-welcome/support
+emails (same free tier already counted), and a print-to-PDF invoice page
+with no new PDF-generation service. A coupon discount is a revenue
+reduction, not a cost — reflected as a smaller `amountInPaise` on the
+`Purchase` row itself, not a separate ledger line.
 
 ## What this actually means
 

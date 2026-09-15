@@ -237,20 +237,68 @@ model Purchase {
   product           ProductSlug
   courseSlug        String? // set when product = COURSE, references Course.slug
   packTrack         String? // set when product = STARTER_PACK or INTERVIEW_KIT, references interviewPacks.ts's slug (e.g. "agentic-ai")
-  amountInPaise     Int // store money as integer paise/cents, never floats
+  amountInPaise     Int // the actual amount charged, AFTER any coupon discount — store money as integer paise/cents, never floats
+  couponCode        String? // set if a coupon was applied — see src/lib/coupons.ts
+  discountInPaise   Int?           @default(0) // how much the coupon knocked off; amountInPaise + discountInPaise = the pre-discount price
   currency          String         @default("INR")
   status            PurchaseStatus @default(PENDING)
   contentAccessed   Boolean        @default(false) // set true once a download/course-open endpoint exists; see src/lib/refunds.ts
-  razorpayOrderId   String?        @unique
-  razorpayPaymentId String?        @unique
+  // NOT unique — a cart checkout creates one Purchase row per item, all
+  // sharing one Razorpay order (and, once paid, one payment) for the
+  // whole cart. The webhook (src/app/api/webhooks/razorpay) looks these
+  // up by findMany, not findUnique, and flips all of them to PAID
+  // together. See src/lib/cart.ts / POST /api/checkout.
+  razorpayOrderId   String?
+  razorpayPaymentId String?
   refundedAt        DateTime?
+  invoiceNumber     String?        @unique // assigned lazily, once, the first time /invoice/[id] is opened — see src/lib/invoice.ts
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   ledgerEntries LedgerEntry[]
 
+  @@index([razorpayOrderId])
+
   @@index([userId, status])
+}
+
+// Discounts, capped at 10% by application logic (src/lib/coupons.ts), not
+// just convention — createCoupon rejects anything higher before it ever
+// reaches this table.
+model Coupon {
+  id              String    @id @default(cuid())
+  code            String    @unique // stored upper-cased; comparisons are case-insensitive
+  discountPercent Int // 1-10
+  active          Boolean   @default(true)
+  maxRedemptions  Int? // null = unlimited
+  timesRedeemed   Int       @default(0)
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+// One global counter for sequential invoice numbers — a single row,
+// incremented inside a transaction so two concurrent invoice views can
+// never get the same number. Not per-year/financial-year sequencing (a
+// real requirement once GST-registered and issuing "Tax Invoices" — see
+// src/lib/invoice.ts) because that's a decision to make once registration
+// is actually real, not before.
+model InvoiceCounter {
+  id         String @id @default("singleton")
+  nextNumber Int    @default(1)
+}
+
+// The /help contact form. Deliberately not "no self-service mentor
+// signup"-style admin-only — anyone should be able to reach support,
+// signed in or not.
+model SupportRequest {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  ip        String? // for the same per-IP rate limit pattern as OTP/inquiries
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 // ---- Accounting ledger -----------------------------------------------------

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useCart } from "./CartContext";
 
 const links = [
   { href: "/quiz", label: "Quiz" },
@@ -20,6 +21,7 @@ const links = [
 // which was the actual "hard to find things" problem on a phone.
 export default function Nav() {
   const { status } = useSession();
+  const { items } = useCart();
   const [open, setOpen] = useState(false);
 
   return (
@@ -54,6 +56,12 @@ export default function Nav() {
           )}
           <a href="/settings" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
             Settings
+          </a>
+          <a href="/help" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
+            Help
+          </a>
+          <a href="/cart" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
+            Cart{items.length > 0 && ` (${items.length})`}
           </a>
           <a href="/#work" className="font-mono text-xs bg-ink text-paper rounded px-3 py-1.5">
             Work With Me
@@ -93,6 +101,12 @@ export default function Nav() {
           )}
           <a href="/settings" onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
             Settings
+          </a>
+          <a href="/help" onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
+            Help
+          </a>
+          <a href="/cart" onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
+            Cart{items.length > 0 && ` (${items.length})`}
           </a>
           <a href="/#work" onClick={() => setOpen(false)} className="font-mono text-sm bg-ink text-paper rounded px-3 py-2 self-start">
             Work With Me
