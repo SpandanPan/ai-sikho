@@ -61,6 +61,28 @@ describe("summarizeTraffic", () => {
     expect(summary.uniqueVisitors).toBe(0);
     expect(summary.topPaths).toEqual([]);
   });
+
+  it("attributes a UTM-tagged visit to its source and campaign, over referrer", () => {
+    const summary = summarizeTraffic([
+      { type: "PAGE_VIEW", path: "/", anonId: "a", referrer: "https://instagram.com/", utmSource: "instagram", utmCampaign: "launch_post" },
+    ]);
+    expect(summary.topSources).toEqual([{ source: "instagram / launch_post", views: 1 }]);
+  });
+
+  it("falls back to the referrer's bare domain when there's no UTM tag", () => {
+    const summary = summarizeTraffic([
+      { type: "PAGE_VIEW", path: "/", anonId: "a", referrer: "https://www.google.com/search?q=genai+interview" },
+    ]);
+    expect(summary.topSources).toEqual([{ source: "google.com", views: 1 }]);
+  });
+
+  it("buckets direct traffic and stripped referrers together as unknown", () => {
+    const summary = summarizeTraffic([
+      { type: "PAGE_VIEW", path: "/", anonId: "a" },
+      { type: "PAGE_VIEW", path: "/", anonId: "b" },
+    ]);
+    expect(summary.topSources).toEqual([{ source: "(direct / unknown)", views: 2 }]);
+  });
 });
 
 describe("bucketByTime", () => {

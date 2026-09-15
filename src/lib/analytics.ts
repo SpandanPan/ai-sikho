@@ -5,6 +5,10 @@ export type AnalyticsEventLike = {
   type: "PAGE_VIEW" | "CLICK" | "TIME_ON_PAGE";
   path: string;
   anonId: string;
+  referrer?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
   label?: string | null;
   valueMs?: number | null;
 };
@@ -16,7 +20,25 @@ export type TrafficSummary = {
   avgTimeOnPageMs: number | null;
   topPaths: { path: string; views: number }[];
   topClicks: { label: string; count: number }[];
+  topSources: { source: string; views: number }[];
 };
+
+// One label per page view, cheapest-to-richest signal available: a UTM
+// campaign beats a UTM source alone, which beats the referring domain,
+// which beats nothing at all (direct traffic or an app that strips
+// referrers — these two are indistinguishable, so both fall under
+// "(direct / unknown)" rather than a misleading "direct").
+function attributeSource(e: AnalyticsEventLike): string {
+  if (e.utmSource) return e.utmCampaign ? `${e.utmSource} / ${e.utmCampaign}` : e.utmSource;
+  if (e.referrer) {
+    try {
+      return new URL(e.referrer).hostname.replace(/^www\./, "");
+    } catch {
+      return e.referrer;
+    }
+  }
+  return "(direct / unknown)";
+}
 
 export function summarizeTraffic(events: AnalyticsEventLike[]): TrafficSummary {
   const pageViews = events.filter((e) => e.type === "PAGE_VIEW");
@@ -42,6 +64,17 @@ export function summarizeTraffic(events: AnalyticsEventLike[]): TrafficSummary {
     .map(([label, count]) => ({ label, count }))
     .sort((a, b) => b.count - a.count);
 
+  // Attributed per page view, not per visitor — one visitor browsing 5
+  // pages counts 5 times here, same convention as topPaths above.
+  const sourceCounts = new Map<string, number>();
+  for (const e of pageViews) {
+    const source = attributeSource(e);
+    sourceCounts.set(source, (sourceCounts.get(source) ?? 0) + 1);
+  }
+  const topSources = [...sourceCounts.entries()]
+    .map(([source, views]) => ({ source, views }))
+    .sort((a, b) => b.views - a.views);
+
   const avgTimeOnPageMs = timings.length
     ? Math.round(timings.reduce((sum, e) => sum + (e.valueMs ?? 0), 0) / timings.length)
     : null;
@@ -53,6 +86,7 @@ export function summarizeTraffic(events: AnalyticsEventLike[]): TrafficSummary {
     avgTimeOnPageMs,
     topPaths,
     topClicks,
+    topSources,
   };
 }
 

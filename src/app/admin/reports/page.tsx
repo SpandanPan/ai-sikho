@@ -11,9 +11,11 @@ type Traffic = {
   avgTimeOnPageMs: number | null;
   topPaths: { path: string; views: number }[];
   topClicks: { label: string; count: number }[];
+  topSources: { source: string; views: number }[];
 };
 
 type Timeseries = { granularity: string; days: number; series: { bucket: string; count: number }[] };
+type CostSeries = { days: number; series: { date: string; revenueInPaise: number; costsInPaise: number; netInPaise: number }[] };
 type Inquiry = { id: string; service: string; name: string; email: string | null; phone: string | null; message: string | null; createdAt: string };
 
 type Accounting = {
@@ -36,6 +38,7 @@ export default function AdminReportsPage() {
   const { status } = useSession();
   const [traffic, setTraffic] = useState<Traffic | null>(null);
   const [timeseries, setTimeseries] = useState<Timeseries | null>(null);
+  const [costSeries, setCostSeries] = useState<CostSeries | null>(null);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [accounting, setAccounting] = useState<Accounting | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -44,8 +47,20 @@ export default function AdminReportsPage() {
     if (status !== "authenticated") return;
     fetch("/api/admin/reports/traffic").then((r) => (r.ok ? r.json() : Promise.reject(r))).then(setTraffic).catch(() => setError("Admin only, or not signed in."));
     fetch("/api/admin/reports/traffic/timeseries?granularity=day&days=14").then((r) => (r.ok ? r.json() : Promise.reject(r))).then(setTimeseries).catch(() => {});
+    fetch("/api/admin/reports/costs/timeseries?days=14").then((r) => (r.ok ? r.json() : Promise.reject(r))).then(setCostSeries).catch(() => {});
     fetch("/api/admin/inquiries").then((r) => (r.ok ? r.json() : Promise.reject(r))).then((d) => setInquiries(d.inquiries ?? [])).catch(() => {});
     fetch("/api/admin/reports/accounting").then((r) => (r.ok ? r.json() : Promise.reject(r))).then(setAccounting).catch(() => {});
+  }, [status]);
+
+  // Refresh every 60s while the page is open — the point of a "live"
+  // dashboard is not having to manually reload it.
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    const id = setInterval(() => {
+      fetch("/api/admin/reports/traffic").then((r) => (r.ok ? r.json() : null)).then((d) => d && setTraffic(d));
+      fetch("/api/admin/reports/costs/timeseries?days=14").then((r) => (r.ok ? r.json() : null)).then((d) => d && setCostSeries(d));
+    }, 60000);
+    return () => clearInterval(id);
   }, [status]);
 
   if (status === "loading") return null;
@@ -83,7 +98,7 @@ export default function AdminReportsPage() {
                 </div>
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-3 gap-4">
               <div>
                 <p className="font-mono text-[10.5px] uppercase text-ink-soft mb-1.5">Top pages</p>
                 {traffic.topPaths.slice(0, 8).map((p) => (
@@ -99,6 +114,18 @@ export default function AdminReportsPage() {
                     <span className="font-mono">{c.label}</span><span>{c.count}</span>
                   </div>
                 ))}
+              </div>
+              <div>
+                <p className="font-mono text-[10.5px] uppercase text-ink-soft mb-1.5">Where from</p>
+                {traffic.topSources.slice(0, 8).map((s) => (
+                  <div key={s.source} className="flex justify-between text-xs py-1 border-t border-paper-line first:border-t-0">
+                    <span className="font-mono truncate max-w-[10ch]" title={s.source}>{s.source}</span><span>{s.views}</span>
+                  </div>
+                ))}
+                <p className="text-[10px] text-ink-soft mt-2">
+                  Tag links with <code className="font-mono">?utm_source=...&amp;utm_campaign=...</code> to see
+                  which specific post/ad sent someone, not just the domain.
+                </p>
               </div>
             </div>
           </>
@@ -124,6 +151,42 @@ export default function AdminReportsPage() {
                       <span className="block h-full bg-accent2 rounded-full" style={{ width: `${(p.count / max) * 100}%` }} />
                     </span>
                     <span className="font-mono w-8 text-right">{p.count}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )
+        ) : (
+          <p className="text-sm text-ink-soft">Loading…</p>
+        )}
+      </section>
+
+      <section className="mb-10">
+        <h2 className="font-semibold text-sm mb-3">Revenue vs. cost by day (last {costSeries?.days ?? "…"} days)</h2>
+        <p className="text-xs text-ink-soft mb-3">
+          Cost = Razorpay fees + AI generation spend + any other logged expense. Refreshes automatically every minute.
+        </p>
+        {costSeries ? (
+          costSeries.series.length === 0 ? (
+            <p className="text-sm text-ink-soft">No ledger activity recorded in this window yet.</p>
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              {costSeries.series.map((p) => {
+                const max = Math.max(...costSeries.series.map((s) => Math.max(s.revenueInPaise, s.costsInPaise)), 1);
+                return (
+                  <div key={p.date} className="flex items-center gap-3 text-xs">
+                    <span className="font-mono w-24 flex-none text-ink-soft">{p.date}</span>
+                    <span className="flex-1 flex flex-col gap-0.5">
+                      <span className="h-1.5 bg-paper-line rounded-full overflow-hidden">
+                        <span className="block h-full bg-accent2 rounded-full" style={{ width: `${(p.revenueInPaise / max) * 100}%` }} />
+                      </span>
+                      <span className="h-1.5 bg-paper-line rounded-full overflow-hidden">
+                        <span className="block h-full bg-rust rounded-full" style={{ width: `${(p.costsInPaise / max) * 100}%` }} />
+                      </span>
+                    </span>
+                    <span className="font-mono w-32 text-right flex-none">
+                      {inr(p.revenueInPaise)} <span className="text-ink-soft">− {inr(p.costsInPaise)}</span>
+                    </span>
                   </div>
                 );
               })}

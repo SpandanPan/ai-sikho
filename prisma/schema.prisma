@@ -470,6 +470,13 @@ model AnalyticsEvent {
   type      AnalyticsEventType
   path      String
   referrer  String?
+  // Campaign attribution — captured client-side from the URL of whichever
+  // page a visitor actually landed on (src/lib/trackEvent.ts), since
+  // referrer alone only gives a domain ("google.com"), not which specific
+  // post/ad/campaign sent them. Null for ordinary organic/direct visits.
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
   anonId    String // random per-browser id, not personally identifying on its own
   userId    String? // set only if the visitor was signed in at the time
   label     String? // e.g. which button was clicked, for CLICK events
@@ -481,6 +488,7 @@ model AnalyticsEvent {
   @@index([type, createdAt])
   @@index([path])
   @@index([anonId])
+  @@index([utmSource])
 }
 
 // ---- Newsletter -----------------------------------------------------

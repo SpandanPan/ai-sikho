@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculatePlatformFee, summarizeLedger, paiseToRupees } from "./ledger";
+import { calculatePlatformFee, summarizeLedger, summarizeLedgerByDay, paiseToRupees } from "./ledger";
 
 describe("calculatePlatformFee", () => {
   it("computes 2% by default", () => {
@@ -53,6 +53,41 @@ describe("summarizeLedger", () => {
 
   it("rejects a negative amount on any entry", () => {
     expect(() => summarizeLedger([{ type: "REVENUE", amountInPaise: -1 }])).toThrow();
+  });
+});
+
+describe("summarizeLedgerByDay", () => {
+  it("groups revenue and costs by calendar day, netting them", () => {
+    const points = summarizeLedgerByDay([
+      { type: "REVENUE", amountInPaise: 10000, createdAt: new Date("2026-09-14T10:00:00Z") },
+      { type: "EXPENSE", amountInPaise: 300, createdAt: new Date("2026-09-14T11:00:00Z") },
+      { type: "PLATFORM_FEE", amountInPaise: 200, createdAt: new Date("2026-09-14T12:00:00Z") },
+      { type: "REVENUE", amountInPaise: 5000, createdAt: new Date("2026-09-15T09:00:00Z") },
+    ]);
+    expect(points).toEqual([
+      { date: "2026-09-14", revenueInPaise: 10000, costsInPaise: 500, netInPaise: 9500 },
+      { date: "2026-09-15", revenueInPaise: 5000, costsInPaise: 0, netInPaise: 5000 },
+    ]);
+  });
+
+  it("subtracts a refund from that day's revenue", () => {
+    const points = summarizeLedgerByDay([
+      { type: "REVENUE", amountInPaise: 10000, createdAt: new Date("2026-09-14T10:00:00Z") },
+      { type: "REFUND", amountInPaise: 10000, createdAt: new Date("2026-09-14T15:00:00Z") },
+    ]);
+    expect(points).toEqual([{ date: "2026-09-14", revenueInPaise: 0, costsInPaise: 0, netInPaise: 0 }]);
+  });
+
+  it("returns days sorted chronologically regardless of input order", () => {
+    const points = summarizeLedgerByDay([
+      { type: "EXPENSE", amountInPaise: 100, createdAt: new Date("2026-09-16T00:00:00Z") },
+      { type: "EXPENSE", amountInPaise: 100, createdAt: new Date("2026-09-14T00:00:00Z") },
+    ]);
+    expect(points.map((p) => p.date)).toEqual(["2026-09-14", "2026-09-16"]);
+  });
+
+  it("returns an empty array for no entries", () => {
+    expect(summarizeLedgerByDay([])).toEqual([]);
   });
 });
 

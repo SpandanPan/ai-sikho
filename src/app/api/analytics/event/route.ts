@@ -11,7 +11,7 @@ const VALID_TYPES = new Set(["PAGE_VIEW", "CLICK", "TIME_ON_PAGE"]);
 // the false-positive risk of blocking a legitimate heavy user.
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
-  const { type, path, referrer, anonId, label, valueMs } = body ?? {};
+  const { type, path, referrer, utmSource, utmMedium, utmCampaign, anonId, label, valueMs } = body ?? {};
 
   if (!VALID_TYPES.has(type) || typeof path !== "string" || typeof anonId !== "string") {
     return NextResponse.json({ error: "Invalid event" }, { status: 400 });
@@ -24,6 +24,9 @@ export async function POST(req: Request) {
         type,
         path: path.slice(0, 500),
         referrer: typeof referrer === "string" ? referrer.slice(0, 500) : null,
+        utmSource: typeof utmSource === "string" ? utmSource.slice(0, 200) : null,
+        utmMedium: typeof utmMedium === "string" ? utmMedium.slice(0, 200) : null,
+        utmCampaign: typeof utmCampaign === "string" ? utmCampaign.slice(0, 200) : null,
         anonId: anonId.slice(0, 100),
         userId: session?.user?.id ?? null,
         label: typeof label === "string" ? label.slice(0, 200) : null,

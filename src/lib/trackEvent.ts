@@ -18,9 +18,38 @@ type EventPayload = {
   type: "PAGE_VIEW" | "CLICK" | "TIME_ON_PAGE";
   path: string;
   referrer?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
   label?: string;
   valueMs?: number;
 };
+
+// utm_* params only ever appear on the URL of the page that started the
+// visit (the link someone actually clicked) — by the time a visitor is two
+// clicks deep on the site, the query string is gone. So they're captured
+// once per browser, on whichever page view sees them first, and reused for
+// every event after that — otherwise a campaign's attribution would vanish
+// the moment the visitor navigated anywhere else on the site.
+function captureUtmParams(): { utmSource?: string; utmMedium?: string; utmCampaign?: string } {
+  if (typeof window === "undefined") return {};
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = {
+      utmSource: params.get("utm_source") ?? undefined,
+      utmMedium: params.get("utm_medium") ?? undefined,
+      utmCampaign: params.get("utm_campaign") ?? undefined,
+    };
+    if (fromUrl.utmSource || fromUrl.utmMedium || fromUrl.utmCampaign) {
+      localStorage.setItem("utmParams", JSON.stringify(fromUrl));
+      return fromUrl;
+    }
+    const stored = localStorage.getItem("utmParams");
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {}; // localStorage unavailable — attribution is best-effort, not load-bearing
+  }
+}
 
 function send(payload: EventPayload, useBeacon = false) {
   const body = JSON.stringify({ ...payload, anonId: getAnonId() });
@@ -43,7 +72,7 @@ export function trackClick(label: string) {
 }
 
 export function trackPageView(path: string) {
-  send({ type: "PAGE_VIEW", path, referrer: document.referrer || undefined });
+  send({ type: "PAGE_VIEW", path, referrer: document.referrer || undefined, ...captureUtmParams() });
 }
 
 export function trackTimeOnPage(path: string, valueMs: number) {
