@@ -17,6 +17,7 @@ committed P&L.
 | **Email (Resend, for OTP + receipts)** | $0 (free tier: 3,000 emails/mo, 100/day) | $0 until you outgrow it, then **$20/mo** | Free tier likely covers early-stage volume entirely. |
 | **Error tracking (Sentry)** | $0 (free tier: ~5k events/mo) | $0 until you outgrow it, then **~$26/mo** | Not wired up yet — see backend punch-list. Worth adding before real users, not before. |
 | **Google OAuth** | $0 | $0 | Free at this usage level, no tier to worry about. |
+| **Zoom (mentor video calls)** | $0 (Basic account) | $0, unless you want cloud recording or other add-ons | 1:1 meetings have no time limit on Zoom's free Basic tier — the well-known 40-minute cap only applies to meetings with 3+ participants. A Server-to-Server OAuth app (also free) creates the meeting via API; until it's configured, each mentor's own personal meeting link is used instead (also $0). See the Mentoring section in README. |
 
 **Fixed monthly total**: **$0** to start (everything on free tiers) → **~$46/mo** once running with backups and a real domain (branch protection is already free, being public).
 

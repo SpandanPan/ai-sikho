@@ -262,12 +262,27 @@ bookings). Quiz attempts are anonymized (`userId` set to null) rather than
 deleted, to preserve aggregate stats without a personal link — see
 `/privacy` for the stated policy this code actually implements.
 
-## Mentoring (`/mentoring`, admin at `/admin/mentors`)
+## Mentoring (`/mentoring`, mentor dashboard at `/mentor`, admin at `/admin/mentors`)
 
-A placeholder exactly as scoped: you (and only you, via `ADMIN_EMAILS`)
-onboard mentors and their availability by hand; no self-service mentor
-signup.
+Onboarding a mentor (creating the record at all) stays admin-only, via
+`ADMIN_EMAILS` — no self-service mentor signup. Everything past that point
+is self-service from the mentor's own dashboard.
 
+- **Mentor sign-in**: no separate mentor auth system — a mentor signs in
+  through the site's normal email/phone OTP flow (`src/lib/auth.ts`).
+  Onboarding a mentor at `/admin/mentors` now takes their email and links
+  it (find-or-create, same upsert `src/lib/auth.ts` does on first sign-in)
+  to a `Mentor` row via `Mentor.userId`. Once linked, that login sees a
+  "Mentor dashboard →" link on `/profile` and can reach `/mentor`;
+  anyone else signed in gets a clean "not linked to a mentor profile" on
+  that route rather than a raw 403 page.
+- **Mentor dashboard (`/mentor`)**: a mentor can see their upcoming paid
+  bookings (with the call link), see and add their own open availability
+  slots, remove an open (unbooked) slot, and edit their own bio,
+  credentials, price per session, and personal meeting link — all via
+  `src/app/api/mentor/*`, scoped to whichever `Mentor` row their session is
+  linked to. The admin slot/mentor routes still work too, unchanged — a
+  fallback if you're setting things up on a mentor's behalf.
 - **Booking window**: always the next 15 days from the moment someone is
   actually looking (`src/lib/mentorSlots.ts`, unit-tested) — rolls forward
   daily, not a fixed range.
@@ -276,6 +291,28 @@ signup.
   other gets a clean "someone else just booked this" error.
 - **Payment**: bookings land as `PENDING`, same flow as course purchases —
   flip to `PAID` via the Razorpay webhook once wired up.
+- **Video call link**: created the moment a booking flips to `PAID`
+  (`src/app/api/webhooks/razorpay`, using `src/lib/zoom.ts`). Two paths,
+  both genuinely free:
+  - If `ZOOM_ACCOUNT_ID`/`ZOOM_CLIENT_ID`/`ZOOM_CLIENT_SECRET` are set (a
+    Server-to-Server OAuth app under your own Zoom account — see
+    `.env.example`), a unique Zoom meeting is created per booking. Zoom's
+    free Basic tier has no time limit on 1:1 calls (the 40-minute cap only
+    applies to meetings with 3+ participants), so this costs $0. **Not
+    wired up in this environment** — no live Zoom credentials to test
+    against, same situation as Razorpay/the LLM keys elsewhere in this
+    repo.
+  - Otherwise, the mentor's own `personalMeetingUrl` (set from `/mentor` —
+    paste any permanent Zoom/Google Meet/Teams link) is used instead. Zero
+    setup, works from day one, same link reused across their sessions
+    rather than a unique one per booking.
+  - Either way, there's no automated email invite yet — no email provider
+    is wired up (same `TODO` as OTP delivery, see `.env.example`). The
+    link is surfaced in-app instead: the customer sees "Join call →" on
+    `/profile`, the mentor sees "Start call →" on `/mentor`. If the meeting
+    creation step itself fails (e.g. a misconfigured Zoom app), the
+    booking still stays `PAID` — money already changed hands — and the UI
+    shows "Link pending" rather than erroring.
 
 ## Work With Me (business automation leads)
 
@@ -444,9 +481,11 @@ especially regarding India's DPDP Act and any GST obligations.
 - `src/app/quiz`, `/courses`, `/articles`, `/mentoring`, `/mock-feedback`,
   `/profile`, `/signin`, `/settings`, `/privacy`, `/terms`,
   `/refund-policy` — the rest of the pages
+- `src/app/mentor` — self-service mentor dashboard (availability, price,
+  bookings, personal meeting link); gated on `Mentor.userId`, not admin
 - `src/app/admin/mentors`, `/admin/generate`, `/admin/reports` — admin-only:
-  mentor onboarding, content-drafting agents, traffic + accounting reports
-  + business inquiries
+  mentor onboarding (name + email + rate, linking their login), content-drafting
+  agents, traffic + accounting reports + business inquiries
 - `src/components/PulseFeed.tsx` — the auto-scrolling news ticker, DB-backed
   with a static fallback
 - `src/components/RagDemo.tsx` — the retrieve-then-generate mini demo on the

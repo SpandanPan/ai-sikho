@@ -40,7 +40,7 @@ export default function MentoringPage() {
       setMessage(data.error ?? "Couldn't book that slot.");
       return;
     }
-    setMessage("Slot reserved — payment collection isn't wired up yet, so this is held as pending.");
+    setMessage("Slot reserved — payment collection isn't wired up yet, so this is held as pending. Once paid, your video call link shows up on your profile.");
     setSlots((prev) => prev.filter((s) => s.id !== slotId));
   }
 

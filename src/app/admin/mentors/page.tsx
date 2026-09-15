@@ -13,7 +13,7 @@ type Mentor = { id: string; name: string; credentials: string; pricePerSessionIn
 export default function AdminMentorsPage() {
   const { data: session, status } = useSession();
   const [mentors, setMentors] = useState<Mentor[]>([]);
-  const [form, setForm] = useState({ name: "", credentials: "", bio: "", pricePerSessionInPaise: "" });
+  const [form, setForm] = useState({ name: "", email: "", credentials: "", bio: "", pricePerSessionInPaise: "" });
   const [slotForm, setSlotForm] = useState<{ mentorId: string; dates: string }>({ mentorId: "", dates: "" });
   const [message, setMessage] = useState<string | null>(null);
 
@@ -41,7 +41,7 @@ export default function AdminMentorsPage() {
       setMessage(data.error ?? "Couldn't create mentor.");
       return;
     }
-    setForm({ name: "", credentials: "", bio: "", pricePerSessionInPaise: "" });
+    setForm({ name: "", email: "", credentials: "", bio: "", pricePerSessionInPaise: "" });
     setMessage(`Added ${data.mentor.name}.`);
     loadMentors();
   }
@@ -94,6 +94,7 @@ export default function AdminMentorsPage() {
       <form onSubmit={createMentor} className="border border-paper-line rounded p-5 flex flex-col gap-2.5 mb-6">
         <h2 className="font-semibold text-sm mb-1">Add a mentor</h2>
         <input placeholder="Name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="border border-paper-line rounded px-3 py-2 text-sm bg-paper" />
+        <input placeholder="Email (they'll sign in with this — same OTP flow as everyone else)" required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="border border-paper-line rounded px-3 py-2 text-sm bg-paper" />
         <input placeholder="Credentials (e.g. Senior AI Engineer, 8 yrs)" required value={form.credentials} onChange={(e) => setForm({ ...form, credentials: e.target.value })} className="border border-paper-line rounded px-3 py-2 text-sm bg-paper" />
         <textarea placeholder="Short bio" required value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} className="border border-paper-line rounded px-3 py-2 text-sm bg-paper" rows={2} />
         <input placeholder="Price per session (₹)" required type="number" min="1" value={form.pricePerSessionInPaise} onChange={(e) => setForm({ ...form, pricePerSessionInPaise: e.target.value })} className="border border-paper-line rounded px-3 py-2 text-sm bg-paper" />

@@ -10,6 +10,8 @@ type Profile = {
   courses: { slug: string; title: string; percent: number; status: "not-started" | "in-progress" | "completed" }[];
   quizAttempts: { score: number; total: number; createdAt: string }[];
   recentlyViewed: { path: string; lastVisited: string }[];
+  isMentor: boolean;
+  mentorBookings: { mentorName: string; startTime: string; meetingJoinUrl: string | null }[];
 };
 
 const STATUS_LABEL: Record<Profile["courses"][number]["status"], string> = {
@@ -42,8 +44,11 @@ export default function ProfilePage() {
       <div className="mb-2">
         <EditableName />
       </div>
-      <p className="text-xs text-ink-soft mb-8">
+      <p className="text-xs text-ink-soft mb-8 flex flex-wrap gap-x-4 gap-y-1">
         <a href="/settings" className="text-accent-ink underline">Account, devices &amp; theme →</a>
+        {profile?.isMentor && (
+          <a href="/mentor" className="text-accent-ink underline">Mentor dashboard →</a>
+        )}
       </p>
 
       {!profile ? (
@@ -63,6 +68,33 @@ export default function ProfilePage() {
               Longest so far: <b className="text-ink">{profile.streak.longest}</b> day{profile.streak.longest === 1 ? "" : "s"}.
             </div>
           </section>
+
+          {profile.mentorBookings.length > 0 && (
+            <section>
+              <h2 className="font-semibold text-sm mb-3">Upcoming mentoring session{profile.mentorBookings.length > 1 ? "s" : ""}</h2>
+              <div className="flex flex-col gap-2">
+                {profile.mentorBookings.map((b, i) => (
+                  <div key={i} className="flex items-center justify-between border border-accent rounded px-4 py-3 flex-wrap gap-2">
+                    <div>
+                      <p className="text-sm font-semibold">{b.mentorName}</p>
+                      <p className="text-xs text-ink-soft">
+                        {new Date(b.startTime).toLocaleString(undefined, {
+                          weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                    {b.meetingJoinUrl ? (
+                      <a href={b.meetingJoinUrl} target="_blank" rel="noreferrer" className="font-mono text-xs bg-ink text-paper rounded px-3 py-1.5">
+                        Join call →
+                      </a>
+                    ) : (
+                      <span className="font-mono text-[10.5px] text-ink-soft uppercase">Link pending</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           <section>
             <h2 className="font-semibold text-sm mb-3">Courses</h2>

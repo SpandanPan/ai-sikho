@@ -10,7 +10,7 @@ export async function GET() {
   const userId = session?.user?.id;
   if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
 
-  const [progressRows, quizAttempts, pageViews] = await Promise.all([
+  const [progressRows, quizAttempts, pageViews, mentorProfile, mentorBookings] = await Promise.all([
     prisma.courseProgress.findMany({ where: { userId } }),
     prisma.quizAttempt.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 10 }),
     prisma.analyticsEvent.findMany({
@@ -18,6 +18,12 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
       select: { path: true, createdAt: true },
       take: 200, // enough history for a meaningful streak without scanning the whole table
+    }),
+    prisma.mentor.findUnique({ where: { userId }, select: { id: true } }),
+    prisma.mentorBooking.findMany({
+      where: { userId, status: "PAID", slot: { startTime: { gte: new Date() } } },
+      include: { mentor: { select: { name: true } }, slot: true },
+      orderBy: { slot: { startTime: "asc" } },
     }),
   ]);
 
@@ -49,5 +55,11 @@ export async function GET() {
     courses: courseStatus,
     quizAttempts: quizAttempts.map((a) => ({ score: a.score, total: a.total, createdAt: a.createdAt })),
     recentlyViewed,
+    isMentor: Boolean(mentorProfile),
+    mentorBookings: mentorBookings.map((b) => ({
+      mentorName: b.mentor.name,
+      startTime: b.slot.startTime,
+      meetingJoinUrl: b.meetingJoinUrl,
+    })),
   });
 }

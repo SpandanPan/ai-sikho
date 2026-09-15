@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { calculatePlatformFee } from "@/lib/ledger";
 import { calculateGenerationCostInPaise } from "@/lib/agentPricing";
 import { gradeAnswer, ContentAgentError } from "@/lib/contentAgent";
+import { createZoomMeeting, isZoomConfigured } from "@/lib/zoom";
 
 // Razorpay calls this after a payment. Verify the signature before trusting
 // anything in the body — otherwise anyone could POST a fake "paid" event
@@ -61,7 +62,10 @@ export async function POST(req: Request) {
       ]);
     }
 
-    const booking = await prisma.mentorBooking.findUnique({ where: { razorpayOrderId: payment.order_id } });
+    const booking = await prisma.mentorBooking.findUnique({
+      where: { razorpayOrderId: payment.order_id },
+      include: { mentor: true, slot: true },
+    });
     if (booking && booking.status !== "PAID") {
       await prisma.$transaction([
         prisma.mentorBooking.update({
@@ -87,6 +91,46 @@ export async function POST(req: Request) {
           },
         }),
       ]);
+
+      // Video link creation is separate from the payment transaction above
+      // on purpose, same reasoning as the grading call below: it's the one
+      // part of this flow that calls an external API and can genuinely
+      // fail or run slow, and that must never look like the payment itself
+      // failed (money was already collected either way).
+      try {
+        if (isZoomConfigured()) {
+          const meeting = await createZoomMeeting(
+            `Mentoring session — ${booking.mentor.name}`,
+            booking.slot.startTime,
+            booking.slot.durationMinutes
+          );
+          await prisma.mentorBooking.update({
+            where: { id: booking.id },
+            data: { meetingJoinUrl: meeting.joinUrl, meetingHostUrl: meeting.hostUrl, meetingProvider: "zoom-api" },
+          });
+        } else if (booking.mentor.personalMeetingUrl) {
+          await prisma.mentorBooking.update({
+            where: { id: booking.id },
+            data: {
+              meetingJoinUrl: booking.mentor.personalMeetingUrl,
+              meetingHostUrl: booking.mentor.personalMeetingUrl,
+              meetingProvider: "personal-link",
+            },
+          });
+        }
+      } catch (err) {
+        console.error(`[zoom] meeting creation failed for booking ${booking.id}:`, err);
+        if (booking.mentor.personalMeetingUrl) {
+          await prisma.mentorBooking.update({
+            where: { id: booking.id },
+            data: {
+              meetingJoinUrl: booking.mentor.personalMeetingUrl,
+              meetingHostUrl: booking.mentor.personalMeetingUrl,
+              meetingProvider: "personal-link",
+            },
+          });
+        }
+      }
     }
 
     // Grading only happens after payment — this is the paid feature, not a

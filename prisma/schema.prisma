@@ -37,6 +37,7 @@ model User {
   mockAnswerSubmissions MockAnswerSubmission[]
   notes           Note[]
   bookmarks       Bookmark[]
+  mentorProfile   Mentor?
 
   createdAt     DateTime  @default(now())
 }
@@ -376,22 +377,31 @@ model Bookmark {
 }
 
 // ---- Mentoring ------------------------------------------------------------
-// Placeholder for a real mentor roster — you (the site owner) onboard
-// mentors and their availability by hand via the admin routes (gated by
-// ADMIN_EMAILS in .env, see src/lib/admin.ts). No self-service mentor
-// signup on purpose, per the "only I can onboard mentors" requirement.
+// Onboarding a mentor (creating this row at all) stays admin-only via the
+// admin routes (gated by ADMIN_EMAILS, see src/lib/admin.ts) — no
+// self-service mentor signup. But once onboarded, the mentor signs in
+// through the site's normal email/phone OTP flow (src/lib/auth.ts) — no
+// separate mentor auth system — and userId links that login to this row, so
+// /mentor (src/app/mentor/page.tsx) can tell "an onboarded mentor" apart
+// from "any other signed-in user." Everything past onboarding — price,
+// bio, availability, a personal meeting link — is self-service from there
+// (see src/app/api/mentor/*).
 
 model Mentor {
   id                String  @id @default(cuid())
+  userId            String? @unique // linked at onboarding by email; null until that user's first sign-in creates the row
   name              String
   credentials       String // e.g. "Senior AI Engineer, 8 yrs, ex-Google"
   bio               String
   photoUrl          String?
   pricePerSessionInPaise Int
+  personalMeetingUrl String? // fallback video link (mentor's own Zoom/Meet/Teams) — used when ZOOM_* env vars aren't set, see src/lib/zoom.ts
   active            Boolean @default(true)
   createdAt         DateTime @default(now())
 
+  user     User?           @relation(fields: [userId], references: [id])
   slots    MentorSlot[]
+  bookings MentorBooking[]
 }
 
 model MentorSlot {
@@ -423,12 +433,22 @@ model MentorBooking {
   status            BookingStatus @default(PENDING)
   razorpayOrderId   String?       @unique
   razorpayPaymentId String?       @unique
+  // Video call link — filled in when the booking flips to PAID (see the
+  // Razorpay webhook). meetingProvider is "zoom-api" (a unique per-session
+  // Zoom meeting, when ZOOM_* env vars are set), "personal-link" (the
+  // mentor's own static link, the free zero-setup fallback), or null (link
+  // creation failed or the mentor set neither — shown as "pending" in the UI).
+  meetingJoinUrl    String? // given to the customer
+  meetingHostUrl    String? // given to the mentor (Zoom's host-only start_url when using the API; same as meetingJoinUrl for a personal link)
+  meetingProvider   String?
   createdAt         DateTime      @default(now())
 
-  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  slot MentorSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mentor Mentor     @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  slot   MentorSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([mentorId])
 }
 
 // ---- Analytics --------------------------------------------------------
