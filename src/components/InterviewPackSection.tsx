@@ -15,9 +15,12 @@ export default function InterviewPackSection() {
       <h2 className="font-display text-xl font-semibold mb-2 flex items-center gap-2">
         Interview Pack <span title="Paid" aria-label="Paid">🔒</span>
       </h2>
-      <p className="text-sm text-ink-soft mb-5 max-w-lg">
+      <p className="text-sm text-ink-soft mb-3 max-w-lg">
         Start at ₹100. If it delivers, the ₹999 Kit and the paid courses are the natural next step —
         not the other way around.
+      </p>
+      <p className="inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-wide text-accent2 border border-paper-line rounded-full px-2.5 py-1 mb-5">
+        ✓ Curated by an AI Engineer with 10+ years of industry experience
       </p>
 
       <div className="flex flex-wrap gap-2 mb-5">

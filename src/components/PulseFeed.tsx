@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getAutoScrollPref } from "./MotionToggle";
 
-type NewsItem = { id: string; source: string; title: string; summary: string; link: string };
+type NewsItem = { id: string; source: string; title: string; summary: string; link: string; takeaway?: string | null };
 
 const SAMPLE: NewsItem[] = [
   { id: "1", source: "New model", title: "A major lab's newest model plans its answer before it starts writing.", summary: "Fewer wrong-but-confident answers on multi-step questions.", link: "#" },
@@ -80,6 +80,9 @@ export default function PulseFeed() {
             <span className="font-mono text-[10.5px] uppercase tracking-wide text-accent-ink">via {item.source}</span>
             <h3 className="text-sm font-semibold leading-snug">{item.title}</h3>
             <p className="text-xs text-ink-soft">{item.summary}</p>
+            {item.takeaway && (
+              <p className="text-[11px] text-ink-soft border-l-2 border-accent pl-2">{item.takeaway}</p>
+            )}
             <span className="text-[11px] text-accent2 mt-auto">Read the full story →</span>
           </a>
         ))}

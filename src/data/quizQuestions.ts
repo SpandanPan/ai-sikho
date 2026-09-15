@@ -89,4 +89,56 @@ export const quizQuestions: QuizQuestion[] = [
     explanation:
       "That's the difference between a context window (what it can see right now) and persistent memory (a separate feature some products bolt on).",
   },
+  {
+    id: "rag",
+    question: "What problem does RAG (Retrieval-Augmented Generation) actually solve?",
+    options: [
+      "It makes a model generate images instead of text",
+      "It lets a model answer using specific documents it wasn't trained on, instead of guessing from memory",
+      "It makes responses generate faster",
+      "It replaces the need for a model entirely",
+    ],
+    correctIdx: 1,
+    explanation:
+      "RAG retrieves relevant text (your docs, a knowledge base) and hands it to the model as context, so answers can be grounded in specific, current information.",
+  },
+  {
+    id: "context-window",
+    question: "What actually happens when a conversation grows past a model's context window?",
+    options: [
+      "The model gets smarter the longer you talk",
+      "The earliest content stops being visible to the model, even though it's still on your screen",
+      "The conversation is saved permanently regardless of length",
+      "Nothing — context windows don't have a limit",
+    ],
+    correctIdx: 1,
+    explanation:
+      "A context window is a hard limit on how much text a model can process per request — older messages effectively \"fall off\" and stop influencing the answer.",
+  },
+  {
+    id: "prompt-injection",
+    question: "What is \"prompt injection\" a real security concern for?",
+    options: [
+      "Only physical robots",
+      "Any AI system that reads untrusted input (a webpage, an email) that could contain hidden instructions",
+      "It's not a real concern, just a theoretical one",
+      "Only fine-tuned models, never prompted ones",
+    ],
+    correctIdx: 1,
+    explanation:
+      "If a model reads text from an untrusted source, that text can contain instructions designed to override its original task — a genuine, documented attack class.",
+  },
+  {
+    id: "fine-tuning-vs-prompting",
+    question: "What's the actual difference between fine-tuning a model and just prompting it?",
+    options: [
+      "There is no difference, they're the same thing",
+      "Fine-tuning further trains the model's weights on your examples; prompting only shapes behavior at request time, no retraining involved",
+      "Prompting is only for images, fine-tuning is only for text",
+      "Fine-tuning is always cheaper than prompting",
+    ],
+    correctIdx: 1,
+    explanation:
+      "Prompting works within a request; fine-tuning changes the model itself by training it further — more expensive and slower, but can bake in behavior a prompt alone can't reliably get.",
+  },
 ];

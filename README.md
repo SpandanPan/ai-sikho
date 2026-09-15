@@ -140,9 +140,16 @@ CI (`.github/workflows/ci.yml`) runs both on every push/PR to `main`.
    route (`src/app/api/webhooks/razorpay/route.ts`) verifies the signature
    before trusting anything — point Razorpay's dashboard at
    `https://yourdomain.com/api/webhooks/razorpay`.
-4. **Daily news automation** — `vercel.json` schedules
-   `/api/cron/fetch-news` once a day once deployed. Set `CRON_SECRET` in
-   Vercel's env vars (same value as `.env.local`).
+4. **News + daily content automation** — `vercel.json` schedules
+   `/api/cron/fetch-news` hourly and `/api/cron/daily-content` (the daily
+   quiz + term of the day, see below) once a day, once deployed. Set
+   `CRON_SECRET` in Vercel's env vars (same value as `.env.local`).
+   **Vercel's Hobby (free) tier has historically only supported daily cron
+   — hourly needs Pro.** This isn't a new cost here specifically: Pro was
+   already the recommended tier for real launch regardless (see
+   `COSTS.md`), for the ToS/commercial-use reason, not this. Confirm
+   current limits in Vercel's docs before relying on this — their cron
+   tiering has changed before and can again.
 
 **Deployment target: Vercel** (decided — not a generic static host and not
 AWS; see the note below for why). Not connected yet, on purpose, since
@@ -431,10 +438,37 @@ graded you, and why the paid tier costs anything — as a deliberate,
 differentiated bit of positioning: most AI interview-prep tools don't
 disclose which model is grading you at all.
 
-Deliberately did **not** add an agent to summarize/rewrite the AI Pulse
-news feed — that would edge back toward the "republishing third-party
-content" risk the headline+excerpt+link design was specifically built to
-avoid (see Content & copyright below).
+**Three fully-automatic agents, no human review at all** — a real
+departure from the rule above, made deliberately because "publishes
+automatically every day/hour" and "a human reviews it first" can't both
+be true:
+- **Daily "getting started" quiz** (`/quiz`, `/api/cron/daily-content`,
+  daily) — a fresh set of exactly 10 questions, `src/lib/dailyQuiz.ts`
+  strictly validating the shape before anything is written. Falls back to
+  the hand-curated 10-question set if generation or validation fails —
+  which genuinely happened on the first live cron run during this build
+  (see AGENT_COSTS.md for what happened and why the fallback is what kept
+  it safe).
+- **AI Pulse takeaway** (`/api/cron/fetch-news`, hourly) — still does
+  **not** summarize or rewrite an article; it writes one independent
+  sentence from only the headline + one-line summary already used
+  elsewhere on the page, never the full article text. That's what keeps
+  it clear of the "republishing third-party content" risk the
+  headline+excerpt+link design was built to avoid (see Content &
+  copyright below) — there's no substantial source text here to derive
+  from in the first place.
+- **Term of the day** (homepage, `/api/cron/daily-content`, daily) — one
+  AI/ML term + a plain-language definition, falls back to a small
+  hand-written evergreen list if generation fails.
+
+`/api/quiz`, `/api/news`, `/api/mentors`, and `/api/term-of-day` all use
+`export const dynamic = "force-dynamic"` — without it, Next.js statically
+freezes a route with no dynamic segment at build time and serves that one
+response to every request in production forever after. This was a real,
+live bug on `/api/news`/`/api/mentors` (caught while building the
+analogous `/api/quiz` route, not by inspection) — the hourly/daily content
+these routes exist to serve would have silently never updated once
+deployed.
 
 Every successful generation or grading run — including the free,
 $0-per-token Ollama ones — auto-logs its exact spend to the accounting

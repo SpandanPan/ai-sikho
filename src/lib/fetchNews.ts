@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { generateTakeaway, ContentAgentError } from "./contentAgent";
 
 const SOURCES: [string, string][] = [
   ["TechCrunch AI", "https://techcrunch.com/category/artificial-intelligence/feed/"],
@@ -88,4 +89,36 @@ export async function fetchAndStoreNews() {
   }
 
   return { fetched: all.length, upserted };
+}
+
+// Backfills NewsItem.takeaway for whatever doesn't have one yet — called
+// right after fetchAndStoreNews from the cron route, not merged into it,
+// so a slow/failed LLM call never blocks the actual news fetch (the more
+// important half of this job) or fails its own unit tests, which stay
+// LLM-free. Each item's failure is independent: one bad generation
+// doesn't stop the rest, it just leaves that item's takeaway null (the UI
+// already treats a missing takeaway as "nothing to show," not an error).
+export async function generateMissingTakeaways(limit = 20): Promise<{ attempted: number; succeeded: number }> {
+  const pending = await prisma.newsItem.findMany({
+    where: { takeaway: null },
+    orderBy: { publishedAt: "desc" },
+    take: limit,
+  });
+
+  let succeeded = 0;
+  for (const item of pending) {
+    try {
+      const result = await generateTakeaway(item.title, item.summary, "ollama");
+      const takeaway = (result.content as { takeaway?: unknown })?.takeaway;
+      if (typeof takeaway === "string" && takeaway.trim().length > 0 && takeaway.length <= 300) {
+        await prisma.newsItem.update({ where: { id: item.id }, data: { takeaway: takeaway.trim() } });
+        succeeded++;
+      }
+    } catch (err) {
+      const message = err instanceof ContentAgentError ? err.message : String(err);
+      console.error(`[takeaway] failed for NewsItem ${item.id}:`, message);
+    }
+  }
+
+  return { attempted: pending.length, succeeded };
 }

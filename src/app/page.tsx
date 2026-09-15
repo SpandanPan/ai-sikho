@@ -7,6 +7,7 @@ import WorkWithMe from "@/components/WorkWithMe";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import MythFactStrip from "@/components/MythFactStrip";
 import InterviewPackSection from "@/components/InterviewPackSection";
+import TermOfDay from "@/components/TermOfDay";
 
 const morePrep = [
   { title: "Go deep on one topic", desc: "RAG, Knowledge Graphs, LLM Observability — short courses with real demos.", price: "From ₹149", href: "/courses", locked: false },
@@ -101,6 +102,10 @@ export default function Home() {
       </section>
 
       <MythFactStrip />
+
+      <div className="border-b border-paper-line py-6">
+        <TermOfDay />
+      </div>
 
       <SoftGate>
         <section id="free" className="border-b border-paper-line py-9">

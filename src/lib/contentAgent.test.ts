@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPrompt, buildGradingPrompt, extractJsonText } from "./contentAgent";
+import { buildPrompt, buildGradingPrompt, buildTakeawayPrompt, buildTermPrompt, extractJsonText } from "./contentAgent";
 
 describe("buildPrompt", () => {
   it("includes the topic in the user message", () => {
@@ -36,6 +36,28 @@ describe("buildGradingPrompt", () => {
     const grading = buildGradingPrompt("x", "x", "x").system;
     const quiz = buildPrompt("QUIZ", "x").system;
     expect(grading).not.toBe(quiz);
+  });
+});
+
+describe("buildTakeawayPrompt", () => {
+  it("includes the headline and summary, never a full article", () => {
+    const { system, user } = buildTakeawayPrompt("Model X ships tool use", "Adds function calling.");
+    expect(user).toContain("Model X ships tool use");
+    expect(user).toContain("Adds function calling.");
+    expect(system.toLowerCase()).toContain("never the full article");
+  });
+});
+
+describe("buildTermPrompt", () => {
+  it("asks the model to avoid terms already covered", () => {
+    const { user } = buildTermPrompt(["RAG", "hallucination"]);
+    expect(user).toContain("RAG");
+    expect(user).toContain("hallucination");
+  });
+
+  it("gives an open prompt when there's no history yet", () => {
+    const { user } = buildTermPrompt([]);
+    expect(user.toLowerCase()).toContain("any genuinely useful term");
   });
 });
 

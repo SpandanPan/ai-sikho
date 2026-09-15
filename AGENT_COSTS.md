@@ -24,17 +24,53 @@ true.
 
 | Agent | What it does | Triggered by | Model (default) | Customer sees raw output? | Free or paid | Cost / ticket |
 |---|---|---|---|---|---|---|
-| Quiz drafting | Writes multiple-choice quiz questions for admin review | Admin, manually, via `/admin/generate` (`POST /api/admin/generate`, `type: "QUIZ"`) | **Ollama** (`gemma4:e4b`, self-hosted) | No — becomes free quiz content only after you copy a reviewed draft into `src/data/quizQuestions.ts` | Feeds a free section | **₹0** (self-hosted); ~₹1–3 if you pick Claude/GPT instead |
-| Article drafting | Writes a plain-language explainer article for admin review | Admin, manually, same endpoint, `type: "ARTICLE"` | **Ollama** | No — same review-then-copy step, into `src/data/articles.ts` | Feeds a free section | **₹0** self-hosted |
-| Roadmap drafting | Writes phases for a learning roadmap for admin review | Admin, manually, same endpoint, `type: "ROADMAP"` | **Ollama** | No — same review-then-copy step | Feeds a free section | **₹0** self-hosted |
-| Mock-interview grading | Grades one candidate's written answer — score, strengths, gaps, one concrete suggestion | Automatically, server-side, the instant a `MockAnswerSubmission` payment is captured (`POST /api/webhooks/razorpay`, `payment.captured`) | **Claude Sonnet 5** (Anthropic) — hardcoded in the webhook, not admin-selectable, on purpose | **Yes — live, unreviewed, this is the ₹149 product** | Paid, ₹149 | ~₹2.80 (worked example below) — roughly **50x margin** at ₹149 |
-| Free-tier mock-interview grading | Same grading task, for a free monthly attempt | **Not built yet** — see backend punch-list; would need a payment-free trigger path, unlike the paid flow above | Would be **Ollama** per the rule above | Yes, once built | Free (1/month, proposed) | **₹0** self-hosted |
+| Quiz/Article/Roadmap drafting | Writes draft content for admin review | Admin, manually, via `/admin/generate` (`POST /api/admin/generate`) | **Ollama** (`gemma4:e4b`) | No — becomes free content only after you copy a reviewed draft into `src/data/*.ts` | Feeds a free section | **₹0** self-hosted |
+| **Daily "getting started" quiz** | Writes a fresh set of exactly 10 quiz questions, once a day | **Automatically**, `/api/cron/daily-content`, once a day (`vercel.json`) | **Ollama** | **Yes — live, unreviewed** (see below for why this is still safe) | Free | **₹0** self-hosted |
+| **AI Pulse takeaway** | One independent sentence on why a fetched headline matters | **Automatically**, `/api/cron/fetch-news`, hourly, for any item without one yet | **Ollama** | Yes — live, unreviewed | Free | **₹0** self-hosted |
+| **Term of the day** | One AI/ML term + a plain-language definition, once a day | **Automatically**, `/api/cron/daily-content`, once a day | **Ollama** | Yes — live, unreviewed | Free | **₹0** self-hosted |
+| Mock-interview grading, paid | Grades one candidate's written answer — score, strengths, gaps, one concrete suggestion | Automatically, the instant a `MockAnswerSubmission` payment is captured (`POST /api/webhooks/razorpay`) | **Claude Sonnet 5** (Anthropic) — hardcoded, not admin-selectable, on purpose | **Yes — live, unreviewed, this is the ₹149 product** | Paid, ₹149 | ~₹2.80 (worked example below) — roughly **50x margin** |
+| Mock-interview grading, free | Same grading task, once a month, free | **User's click**, `POST /api/mock-feedback/free` | **Ollama** | Yes — live, unreviewed | Free, 1/month | **₹0** self-hosted |
 
-Every successful run of the three drafting agents and the paid grading
-agent auto-logs its real cost to the accounting ledger (`LedgerEntry`,
-category `ai_generation`) — visible per-day on `/admin/reports` and in the
-CA export. An Ollama run logs too, at ₹0, so the job history stays
-complete even though there's nothing to bill.
+Every successful run auto-logs its real cost to the accounting ledger
+(`LedgerEntry`, category `ai_generation`) — visible per-day on
+`/admin/reports` and in the CA export. An Ollama run logs too, at ₹0, so
+the job history stays complete even though there's nothing to bill.
+
+### The three fully-automatic agents — how "unreviewed" stays safe anyway
+
+The daily quiz, the Pulse takeaway, and the term of the day are the first
+agents in this app that publish straight to every visitor with **no human
+in the loop at all** — a real departure from the "a human reviews before
+it goes live" rule above, made deliberately, because "changes every day"
+and "someone reviews it every day" can't both be true. What makes it safe
+instead:
+
+- **Strict validation, not trust.** `src/lib/dailyQuiz.ts` rejects
+  anything that isn't exactly 10 well-formed questions (right field types,
+  exactly 4 options, `correctIdx` in range) — a scored "correct" answer
+  being wrong is a real credibility problem, worse than mediocre free
+  feedback, so a malformed generation is treated as a failure, not
+  patched or partially accepted. `src/lib/termOfDay.ts` similarly caps
+  definition length to catch a model that rambled past its instructions.
+- **Fail to reviewed content, never to nothing (or garbage).** If
+  generation or validation fails, the cron simply writes nothing for that
+  day — `GET /api/quiz` and `GET /api/term-of-day` both fall back to a
+  hand-written set on their own read path (the original curated quiz
+  questions, now 10 of them; a small evergreen term list) rather than
+  showing broken or unvalidated content.
+- **This actually happened during this build, not hypothetically:** the
+  very first live cron run's quiz generation failed JSON validation
+  (`gemma4:e4b` on 10 full questions in one response is measurably less
+  reliable than on a single short takeaway or term) — the system correctly
+  fell back to the curated set, logged the failure, and the retry
+  succeeded and wrote a real, good set the second time. That's the
+  validate-and-fall-back design working exactly as intended, caught by
+  testing against the real model rather than assumed.
+- **The Pulse takeaway carries the lowest risk of the three** even without
+  a "correct answer" concept, because it only ever sees a headline +
+  one-line summary, never the full article — there's no substantial
+  source text to misrepresent, and a bad takeaway is an opinion being
+  wrong, not a fact being wrong.
 
 ## Worked cost example (paid grading, the one real per-ticket number that matters for pricing)
 
@@ -56,10 +92,9 @@ metered API. Not the same as free: the real cost is electricity (a few
 paise per run, immaterial) and your own machine's compute time.
 
 **What's running**: `gemma4:e4b` (9.6GB), already pulled and verified
-against this project's actual prompts during this build — both quiz
-drafting and mock-answer grading were run for real against it (grading
-output included below for reference; not used live, since paid grading
-stays on Claude per the rule above). Not necessarily the *best* open-weight
+against this project's actual prompts during this build — quiz drafting,
+free-tier mock-answer grading, the daily quiz, Pulse takeaways, and term
+of the day all genuinely run on it live, not just tested against it. Not necessarily the *best* open-weight
 model for this — Qwen2.5 and DeepSeek's smaller models are also strong,
 sometimes stronger — but there's no reason to spend more disk/bandwidth
 pulling alternatives before a concrete quality gap shows up. `OLLAMA_MODEL`
@@ -74,15 +109,20 @@ bundled into this Next.js app. `OLLAMA_BASE_URL` has to be a URL the
   from `npm run dev` on the same machine that's running Ollama —
   `OLLAMA_BASE_URL=http://localhost:11434` just works, zero extra infra,
   because your dev server and Ollama are on the same box.
-- **Anything triggered from the live Vercel deployment** (the paid grading
-  webhook, or a future free-tier grading path) runs in Vercel's cloud, not
-  on your laptop — it **cannot** reach `localhost` on your machine. That
-  would need Ollama reachable at a real public address: either a small
-  always-on VPS (cheap — a few dollars/month, e.g. Hetzner/DigitalOcean)
-  or a tunnel (Cloudflare Tunnel, free) from your own machine, kept
-  running. This only matters once/if a self-hosted model is wired into a
-  live-traffic path — it isn't today (see the table above: paid grading
-  stays on Claude).
+- **Everything else in the table above — the free grading tier, the daily
+  quiz, Pulse takeaways, term of the day — is triggered from the live
+  deployed site**, either by a real visitor's click or by Vercel Cron.
+  Once this is actually deployed to Vercel, `OLLAMA_BASE_URL` **cannot**
+  be `localhost` — Vercel's serverless functions run in Vercel's cloud,
+  not on your laptop, and cannot reach it. Before deploying any of these
+  live-traffic agents to production, Ollama needs to be reachable at a
+  real public address: either a small always-on VPS (cheap — a few
+  dollars/month, e.g. Hetzner/DigitalOcean) or a tunnel (Cloudflare
+  Tunnel, free) from your own machine, kept running. **This is real,
+  unresolved deployment work, not yet done** — everything above was
+  verified against `localhost` in local dev, which is honest about what
+  was actually tested, but is not the same as working from
+  themodeldesk.com. Do this before relying on any of these in production.
 
 Model weights themselves live in Ollama's own store
 (`~/.ollama/models`), **not inside this repo** — a 9.6GB model file has no
@@ -101,11 +141,8 @@ is the right way to get a model, not committing weights to source control.
 
 ## Planned, not built
 
-- **Free-tier mock-interview grading** — see the table above. Needs a
-  grading trigger that doesn't depend on a Razorpay payment succeeding
-  first (today, grading only ever runs from the payment webhook). Real
-  scope, not started.
-- **"Summarize this topic" / similar lightweight free features** —
-  mentioned as a category worth having; not designed or built. Default
-  assumption if built: Ollama, per the rule above, unless it turns out to
-  need a customer-facing quality bar closer to the paid grading agent.
+- Nothing currently planned beyond what's in the table above. The next
+  candidate for a local-model agent, if one comes up, should get the same
+  treatment as the three fully-automatic ones: strict validation of its
+  output shape, and a defined fallback to reviewed/static content if that
+  validation fails — don't skip that step just because Ollama is free.

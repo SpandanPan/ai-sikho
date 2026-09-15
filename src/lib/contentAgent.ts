@@ -222,3 +222,56 @@ export async function gradeAnswer(
 
   return { content, inputTokens, outputTokens, provider, model: MODEL_PRICING_USD_PER_1M[provider].model };
 }
+
+// ---- AI Pulse takeaway --------------------------------------------------
+// Given ONLY a fetched item's headline + one-line summary — never the full
+// article — writes one short, independent sentence on why it matters. That
+// "never the full article" constraint is deliberate, not incidental: it's
+// what keeps this from crossing into "rewriting/reproducing third-party
+// content," the exact risk the headline+excerpt+link design was built to
+// avoid in the first place (see README). There's no substantial source
+// text here to derive from — just a headline, the same as a human reading
+// a news alert and jotting a one-line reaction.
+const TAKEAWAY_SYSTEM_PROMPT =
+  "You are given only a news headline and a one-sentence summary — never the full article. " +
+  "Write ONE short, plain-language sentence (max 20 words) explaining why this matters to someone " +
+  "learning AI or job-hunting in AI/ML. Do not invent specific facts beyond what the headline and " +
+  "summary already say — if it's not implied by them, leave it out. " +
+  'Return ONLY JSON shaped exactly like: {"takeaway": string}.';
+
+export function buildTakeawayPrompt(title: string, summary: string): { system: string; user: string } {
+  return { system: TAKEAWAY_SYSTEM_PROMPT, user: `Headline: ${title}\n\nSummary: ${summary}` };
+}
+
+export async function generateTakeaway(title: string, summary: string, provider: Provider): Promise<GenerationResult> {
+  const { system, user } = buildTakeawayPrompt(title, summary);
+  const { text, inputTokens, outputTokens } = await callProvider(provider, system, user);
+  const content = parseJsonContent(text, "Takeaway model did not return valid JSON — check the prompt or retry.");
+  return { content, inputTokens, outputTokens, provider, model: MODEL_PRICING_USD_PER_1M[provider].model };
+}
+
+// ---- Term of the day -----------------------------------------------------
+// One AI/ML term + a plain-language definition, refreshed daily by
+// src/lib/termOfDay.ts's cron trigger. recentTerms is passed in so the
+// model is nudged away from repeating what it already covered — no
+// guarantee with a small local model, but it measurably helps.
+const TERM_SYSTEM_PROMPT =
+  "You explain one AI/ML term in plain language for someone new to the field. " +
+  'Return ONLY JSON shaped exactly like: {"term": string, "definition": string (1-2 sentences, no jargon left unexplained)}. ' +
+  "Pick a term genuinely useful for an AI/GenAI interview or general AI literacy — not something obscure or academic-only.";
+
+export function buildTermPrompt(recentTerms: string[]): { system: string; user: string } {
+  return {
+    system: TERM_SYSTEM_PROMPT,
+    user: recentTerms.length
+      ? `Avoid repeating any of these already-covered terms: ${recentTerms.join(", ")}.`
+      : "Pick any genuinely useful term to start with.",
+  };
+}
+
+export async function generateTerm(recentTerms: string[], provider: Provider): Promise<GenerationResult> {
+  const { system, user } = buildTermPrompt(recentTerms);
+  const { text, inputTokens, outputTokens } = await callProvider(provider, system, user);
+  const content = parseJsonContent(text, "Term-of-day model did not return valid JSON — check the prompt or retry.");
+  return { content, inputTokens, outputTokens, provider, model: MODEL_PRICING_USD_PER_1M[provider].model };
+}
