@@ -25,7 +25,7 @@ function inr(paise: number | null) {
 export default function AdminGeneratePage() {
   const { status } = useSession();
   const [type, setType] = useState<Job["type"]>("QUIZ");
-  const [provider, setProvider] = useState<"anthropic" | "openai">("anthropic");
+  const [provider, setProvider] = useState<"anthropic" | "openai" | "ollama">("ollama");
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
   const [job, setJob] = useState<Job | null>(null);
@@ -78,9 +78,10 @@ export default function AdminGeneratePage() {
           <option value="ARTICLE">Article</option>
           <option value="ROADMAP">Roadmap phases</option>
         </select>
-        <select value={provider} onChange={(e) => setProvider(e.target.value as "anthropic" | "openai")} className="border border-paper-line rounded px-3 py-2 text-sm bg-paper">
-          <option value="anthropic">Claude (Anthropic)</option>
-          <option value="openai">GPT (OpenAI)</option>
+        <select value={provider} onChange={(e) => setProvider(e.target.value as "anthropic" | "openai" | "ollama")} className="border border-paper-line rounded px-3 py-2 text-sm bg-paper">
+          <option value="ollama">Self-hosted (Ollama) — free, recommended for drafts</option>
+          <option value="anthropic">Claude (Anthropic) — paid</option>
+          <option value="openai">GPT (OpenAI) — paid</option>
         </select>
         <input
           placeholder="Topic (e.g. 'vector database trade-offs')"

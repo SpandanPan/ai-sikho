@@ -6,11 +6,12 @@ import SoftGate from "@/components/SoftGate";
 import WorkWithMe from "@/components/WorkWithMe";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import MythFactStrip from "@/components/MythFactStrip";
+import InterviewPackSection from "@/components/InterviewPackSection";
 
 const morePrep = [
   { title: "Go deep on one topic", desc: "RAG, Knowledge Graphs, LLM Observability — short courses with real demos.", price: "From ₹149", href: "/courses", locked: false },
   { title: "Time with someone who's done it", desc: "1:1 career guidance, slots open on a rolling 15-day window.", price: "Book a slot", href: "/mentoring", locked: true },
-  { title: "Real feedback on a mock answer", desc: "AI-graded, specific to what you actually wrote — not a generic rubric.", price: "₹149", href: "/mock-feedback", locked: true },
+  { title: "Real feedback on a mock answer", desc: "AI-graded, specific to what you actually wrote. 1 free/month — we even tell you which model graded you.", price: "Free or ₹149", href: "/mock-feedback", locked: false },
 ];
 
 const personas = [
@@ -60,34 +61,7 @@ export default function Home() {
         </div>
       </header>
 
-      <section id="pack" className="border-b border-paper-line py-9">
-        <h2 className="font-display text-xl font-semibold mb-2 flex items-center gap-2">
-          Interview Pack <span title="Paid" aria-label="Paid">🔒</span>
-        </h2>
-        <p className="text-sm text-ink-soft mb-5 max-w-lg">
-          Start at ₹100. If it delivers, the ₹999 Kit and the paid courses are the natural next step —
-          not the other way around.
-        </p>
-        <div className="grid gap-3.5 sm:grid-cols-[1fr_1.3fr]">
-          <div className="border border-paper-line rounded p-5 flex flex-col justify-between">
-            <div>
-              <h3 className="font-semibold mb-1">Starter Pack</h3>
-              <p className="text-sm text-ink-soft">25 questions + 1 checklist. A taste of the full kit.</p>
-            </div>
-            <div className="font-mono text-xl text-accent-ink mt-3">₹100</div>
-          </div>
-          <div className="border border-accent rounded p-5 bg-paper-raised flex flex-col justify-between">
-            <div>
-              <h3 className="font-semibold mb-1">Senior GenAI Engineer Interview Kit</h3>
-              <p className="text-sm text-ink-soft">100 questions, 30 system-design scenarios, 10 diagrams, 5 checklists.</p>
-            </div>
-            <div className="font-mono text-xl text-accent-ink mt-3">₹999</div>
-          </div>
-        </div>
-        <p className="text-sm mt-4">
-          Want a deeper dive on one topic instead? <a href="/courses" className="text-accent-ink underline">See the ₹149–199 courses →</a>
-        </p>
-      </section>
+      <InterviewPackSection />
 
       <section className="border-b border-paper-line py-9">
         <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">More ways to prep</p>

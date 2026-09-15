@@ -3,15 +3,29 @@
 // an internal admin tool. Kept as pure math, separate from the API call
 // itself, so the pricing logic is testable and auditable on its own.
 
-export type Provider = "anthropic" | "openai";
+export type Provider = "anthropic" | "openai" | "ollama";
 
 // USD per 1,000,000 tokens — same figures already shown on the homepage's
 // "What It Costs" section, kept in sync deliberately (one product, one set
 // of numbers). Re-check against the provider's current pricing page before
 // relying on this for real invoicing; API pricing changes.
+//
+// "ollama" is $0 per token by construction — there's no per-request bill,
+// it's your own hardware. That's not the same as free: see AGENT_COSTS.md
+// for the real trade-off (weaker model quality, plus it must actually be
+// reachable from wherever the calling code runs — see contentAgent.ts).
+//
+// Default model is gemma4:e4b, not because it's necessarily the best
+// open-weight option (Qwen2.5 and DeepSeek's smaller models are also
+// strong, sometimes stronger, choices) but because it's the one already
+// pulled and verified against this project's actual prompts — no reason to
+// spend more disk/bandwidth speculatively pulling alternatives before
+// there's a concrete quality gap to fix. Override with OLLAMA_MODEL if you
+// pull something else later.
 export const MODEL_PRICING_USD_PER_1M: Record<Provider, { input: number; output: number; model: string }> = {
   anthropic: { input: 2, output: 10, model: process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5" },
   openai: { input: 5, output: 30, model: process.env.OPENAI_MODEL ?? "gpt-6" },
+  ollama: { input: 0, output: 0, model: process.env.OLLAMA_MODEL ?? "gemma4:e4b" },
 };
 
 // Approximate, and it moves daily — this is a planning estimate for margin

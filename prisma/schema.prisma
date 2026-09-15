@@ -224,6 +224,7 @@ model Purchase {
   userId            String
   product           ProductSlug
   courseSlug        String? // set when product = COURSE, references Course.slug
+  packTrack         String? // set when product = STARTER_PACK or INTERVIEW_KIT, references interviewPacks.ts's slug (e.g. "agentic-ai")
   amountInPaise     Int // store money as integer paise/cents, never floats
   currency          String         @default("INR")
   status            PurchaseStatus @default(PENDING)
@@ -330,7 +331,8 @@ model MockAnswerSubmission {
   category       String // e.g. "system-design", "behavioral", "rag"
   question       String
   answerText     String
-  priceInPaise   Int            @default(14900) // ₹149
+  isFree         Boolean        @default(false) // one free, self-hosted-model grading per user per calendar month — see src/lib/mockFeedbackQuota.ts
+  priceInPaise   Int            @default(14900) // ₹149; 0 when isFree
   status         FeedbackStatus @default(PENDING)
   provider       String? // which LLM graded it
   feedbackJson   Json? // {score, strengths[], gaps[], suggestion}

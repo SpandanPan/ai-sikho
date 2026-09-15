@@ -5,13 +5,30 @@
 // rest of this product holds itself to — an AI-generated draft doesn't get
 // to skip that review just because a machine wrote it first.
 //
-// Two providers on purpose (Claude via Anthropic, GPT via OpenAI) — pick
-// whichever the admin prefers per job, useful for comparing quality/cost or
-// having a fallback if one provider is down. Requires ANTHROPIC_API_KEY
-// and/or OPENAI_API_KEY. Neither is set in this environment, so this code
-// path is unverified — written against each provider's documented API
-// contract, but not actually run against a real key. Test it once a key is
-// available before trusting its output.
+// Three providers (Claude via Anthropic, GPT via OpenAI, or a self-hosted
+// open-source model via Ollama/vLLM) — pick whichever fits the job. See
+// AGENT_COSTS.md for which tasks are actually good fits for the free
+// self-hosted option vs. which genuinely need a frontier model.
+//
+// Ollama's OpenAI-compatible endpoint (/v1/chat/completions) is reused here
+// rather than its native /api/chat, so it's the same request/response
+// shape as callOpenAi below — one real constraint either way: OLLAMA_BASE_URL
+// must be a URL this code can actually reach *at the moment it runs*.
+//   - Content drafting (generateContent) runs only from /admin/generate,
+//     triggered by hand — run it from `npm run dev` on the same machine
+//     that's running Ollama and OLLAMA_BASE_URL=http://localhost:11434
+//     just works, no tunnel needed.
+//   - Grading (gradeAnswer) runs from the Razorpay webhook in production,
+//     any time a real customer pays — if you want *that* on a self-hosted
+//     model, OLLAMA_BASE_URL needs a real public address (a small always-on
+//     VPS, or a tunnel like Cloudflare Tunnel), because Vercel's serverless
+//     functions cannot reach "localhost" on your laptop.
+//
+// Requires ANTHROPIC_API_KEY, OPENAI_API_KEY, and/or OLLAMA_BASE_URL. None
+// are set in this environment, so none of these three code paths are
+// verified against a real endpoint — each written against its documented
+// API contract, not actually run. Test whichever you use before trusting
+// its output.
 import { MODEL_PRICING_USD_PER_1M, type Provider } from "./agentPricing";
 
 export type GenerationType = "QUIZ" | "ARTICLE" | "ROADMAP";
@@ -108,18 +125,67 @@ async function callOpenAi(system: string, user: string): Promise<{ text: string;
   };
 }
 
+async function callOllama(system: string, user: string): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
+  const baseUrl = process.env.OLLAMA_BASE_URL;
+  if (!baseUrl) throw new ContentAgentError("OLLAMA_BASE_URL is not set.");
+
+  const res = await fetch(`${baseUrl.replace(/\/$/, "")}/v1/chat/completions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: MODEL_PRICING_USD_PER_1M.ollama.model,
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new ContentAgentError(`Ollama request to ${baseUrl} failed (${res.status}): ${body.slice(0, 300)}`);
+  }
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (typeof text !== "string") throw new ContentAgentError("Unexpected response shape from Ollama.");
+  return {
+    text,
+    // Not every Ollama version reports token usage on this endpoint — cost
+    // is $0 either way (see agentPricing.ts), so a missing count only
+    // means the ledger's "tokens used" figure reads 0, not an error.
+    inputTokens: data?.usage?.prompt_tokens ?? 0,
+    outputTokens: data?.usage?.completion_tokens ?? 0,
+  };
+}
+
+function callProvider(provider: Provider, system: string, user: string) {
+  if (provider === "anthropic") return callAnthropic(system, user);
+  if (provider === "openai") return callOpenAi(system, user);
+  return callOllama(system, user);
+}
+
+// Every prompt in this file asks for "ONLY JSON, no prose" — OpenAI's
+// response_format:json_object enforces that itself, but Anthropic and
+// (verified against a real local instance) Ollama both sometimes wrap the
+// answer in a ```json ... ``` markdown fence anyway. Stripped here, once,
+// rather than duplicated in generateContent and gradeAnswer below.
+export function extractJsonText(text: string): string {
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  return (fenced ? fenced[1] : text).trim();
+}
+
+function parseJsonContent(text: string, errorMessage: string): unknown {
+  try {
+    return JSON.parse(extractJsonText(text));
+  } catch {
+    throw new ContentAgentError(errorMessage);
+  }
+}
+
 export async function generateContent(type: GenerationType, topic: string, provider: Provider): Promise<GenerationResult> {
   const { system, user } = buildPrompt(type, topic);
 
-  const { text, inputTokens, outputTokens } =
-    provider === "anthropic" ? await callAnthropic(system, user) : await callOpenAi(system, user);
-
-  let content: unknown;
-  try {
-    content = JSON.parse(text);
-  } catch {
-    throw new ContentAgentError("Model did not return valid JSON — check the prompt or retry.");
-  }
+  const { text, inputTokens, outputTokens } = await callProvider(provider, system, user);
+  const content = parseJsonContent(text, "Model did not return valid JSON — check the prompt or retry.");
 
   return { content, inputTokens, outputTokens, provider, model: MODEL_PRICING_USD_PER_1M[provider].model };
 }
@@ -151,15 +217,8 @@ export async function gradeAnswer(
 ): Promise<GenerationResult> {
   const { system, user } = buildGradingPrompt(category, question, answerText);
 
-  const { text, inputTokens, outputTokens } =
-    provider === "anthropic" ? await callAnthropic(system, user) : await callOpenAi(system, user);
-
-  let content: unknown;
-  try {
-    content = JSON.parse(text);
-  } catch {
-    throw new ContentAgentError("Grading model did not return valid JSON — check the prompt or retry.");
-  }
+  const { text, inputTokens, outputTokens } = await callProvider(provider, system, user);
+  const content = parseJsonContent(text, "Grading model did not return valid JSON — check the prompt or retry.");
 
   return { content, inputTokens, outputTokens, provider, model: MODEL_PRICING_USD_PER_1M[provider].model };
 }

@@ -349,6 +349,21 @@ also expanded from a single copyright line into a real sitemap — Explore /
 Prep / Company columns linking to every page on the site, not just the
 three legal ones.
 
+## Interview Pack tracks (`src/data/interviewPacks.ts`)
+
+The Pack used to be one hardcoded GenAI Engineer Starter/Kit pair. It's now
+data-driven (`InterviewPackSection.tsx`, a small client component for the
+track picker) across four tracks — GenAI Engineer, Agentic AI, Data
+Scientist, Data Engineering — each with its own Starter (₹100) and Kit
+(₹999). Pricing is deliberately uniform across tracks rather than charging
+more for a "hotter" track like Agentic AI: there's no actual difference in
+content depth between tracks yet to justify a different price, and pricing
+by hype without substance behind it is the kind of thing that reads as a
+bait-and-switch once someone actually buys it. `Purchase.packTrack` records
+which track a real purchase was for — added now, ahead of the checkout flow
+itself, so that plumbing doesn't need a second migration once checkout is
+built.
+
 ## Analytics & reporting (`/admin/reports`)
 
 Self-hosted, minimal-PII traffic tracking — one table (`AnalyticsEvent`),
@@ -376,35 +391,63 @@ inquiries (see below) — traffic, leads, and money, one screen.
 
 ## Content-generation agents
 
-Two kinds, deliberately different shapes because they're different jobs:
+See `AGENT_COSTS.md` for the full map: every agent in this app, what it
+does, how it's triggered, which model it runs on and why, and what one use
+costs. Short version:
+
+**Three providers** (`src/lib/contentAgent.ts`, `src/lib/agentPricing.ts`):
+Claude (Anthropic), GPT (OpenAI), and Ollama — a self-hosted, open-weight
+model, $0 per token because it's your own hardware, not a metered API.
+Ollama was actually run against this project's real prompts during this
+build (`gemma4:e4b`, already pulled) — genuinely verified, not just written
+against a spec, unlike the Claude/GPT paths (no API key in this
+environment). The rule for which agent gets which tier: **anything a human
+reviews before it goes live can safely use the free model; anything that
+ships straight to a paying customer, unreviewed, keeps the frontier
+model** — see AGENT_COSTS.md for why.
 
 **Drafting agents** (`/admin/generate`, admin-only) — QUIZ, ARTICLE, or
-ROADMAP drafts, either Claude or GPT (`src/lib/contentAgent.ts`). Never
-auto-published: a human reviews `resultJson` and copies what's good into
-the real content files by hand, same standard as everything else here
+ROADMAP drafts, any of the three providers, Ollama the recommended default.
+Never auto-published: a human reviews `resultJson` and copies what's good
+into the real content files by hand, same standard as everything else here
 ("written fresh, not copied," now applying to AI-written drafts too).
 
-**Grading agent** (`/mock-feedback`, ₹149, paid) — the one genuinely
-agent-native paid feature: someone submits a real written interview
-answer, and an LLM grades it against what a strong answer to *that
-specific question* would cover — not a generic rubric. Deliberately did
-**not** add an agent to summarize/rewrite the AI Pulse news feed — that
-would edge back toward the "republishing third-party content" risk the
-headline+excerpt+link design was specifically built to avoid (see
-Content & copyright below).
+**Grading agent** (`/mock-feedback`) — the one genuinely agent-native
+customer-facing feature, and the one place the free-vs-paid tiering
+actually matters: someone submits a real written interview answer, and an
+LLM grades it against what a strong answer to *that specific question*
+would cover — not a generic rubric. Two tiers:
+- **Free, 1/month** (`POST /api/mock-feedback/free`) — graded immediately,
+  live, on Ollama. This is the one agent in the app actually triggered by
+  a user's click rather than by an admin or a payment webhook, and it was
+  run for real end-to-end during this build (quota-blocked on a second
+  attempt in the same month, verified against the live DB).
+- **Paid, ₹149, unlimited** (`/mock-feedback` → `POST /api/webhooks/razorpay`)
+  — graded on Claude Sonnet 5 once payment is confirmed, same webhook
+  pattern as everything else that costs money.
 
-Both cost real money per call — every successful generation or grading run
-auto-logs its exact API spend (real token counts, not an estimate) to the
-accounting ledger under category `ai_generation`, visible in
-`/admin/reports`. `src/lib/agentPricing.ts` (unit-tested) computes cost
-from the actual token usage each provider returns, and a suggested retail
-price at 3x cost, rounded to a clean ₹10. See `COSTS.md` for the worked
-example, current per-token rates, and how to get API keys for either
-provider — neither is set in this environment, so this is real plumbing
-against each provider's documented API contract, unverified end-to-end.
+The mock-feedback page itself states this tiering openly — which model
+graded you, and why the paid tier costs anything — as a deliberate,
+differentiated bit of positioning: most AI interview-prep tools don't
+disclose which model is grading you at all.
 
-Grading only runs after payment (same webhook pattern as everything else
-that costs money) — nobody gets free grading by submitting without paying.
+Deliberately did **not** add an agent to summarize/rewrite the AI Pulse
+news feed — that would edge back toward the "republishing third-party
+content" risk the headline+excerpt+link design was specifically built to
+avoid (see Content & copyright below).
+
+Every successful generation or grading run — including the free,
+$0-per-token Ollama ones — auto-logs its exact spend to the accounting
+ledger under category `ai_generation`, visible in `/admin/reports`.
+`src/lib/agentPricing.ts` (unit-tested) computes cost from the actual token
+usage each provider returns, and a suggested retail price at 3x cost,
+rounded to a clean ₹10, for the two paid providers. See `COSTS.md` for the
+worked example and how to get Anthropic/OpenAI API keys; see
+`AGENT_COSTS.md` for the Ollama setup and — importantly — the one real
+constraint on it: Ollama has to be reachable from wherever the calling
+code actually runs, and "wherever the calling code runs" is your own
+machine only for the admin drafting flow, not for anything triggered from
+the deployed Vercel site.
 
 ## Refunds
 
@@ -475,9 +518,12 @@ especially regarding India's DPDP Act and any GST obligations.
 
 ## Project shape
 
-- `src/app/page.tsx` — homepage (hero, Interview Pack, "more ways to
-  prep" cross-promo, personas, Run It Free + Pulse behind the soft gate,
-  newsletter signup, Work With Me)
+- `src/app/page.tsx` — homepage (hero, Interview Pack track picker, "more
+  ways to prep" cross-promo, personas, myth-vs-fact strip, Run It Free +
+  Pulse behind the soft gate, newsletter signup, Work With Me)
+- `src/components/InterviewPackSection.tsx` / `src/data/interviewPacks.ts`
+  — the four Interview Pack tracks (GenAI Engineer, Agentic AI, Data
+  Scientist, Data Engineering) and their pricing
 - `src/app/quiz`, `/courses`, `/articles`, `/mentoring`, `/mock-feedback`,
   `/profile`, `/signin`, `/settings`, `/privacy`, `/terms`,
   `/refund-policy` — the rest of the pages

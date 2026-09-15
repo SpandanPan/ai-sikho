@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPrompt, buildGradingPrompt } from "./contentAgent";
+import { buildPrompt, buildGradingPrompt, extractJsonText } from "./contentAgent";
 
 describe("buildPrompt", () => {
   it("includes the topic in the user message", () => {
@@ -36,5 +36,21 @@ describe("buildGradingPrompt", () => {
     const grading = buildGradingPrompt("x", "x", "x").system;
     const quiz = buildPrompt("QUIZ", "x").system;
     expect(grading).not.toBe(quiz);
+  });
+});
+
+describe("extractJsonText", () => {
+  it("strips a ```json fenced block, as returned by a real local Ollama model", () => {
+    const raw = '```json\n[{"question": "x"}]\n```';
+    expect(extractJsonText(raw)).toBe('[{"question": "x"}]');
+  });
+
+  it("strips a bare fence with no language tag", () => {
+    const raw = '```\n{"a": 1}\n```';
+    expect(extractJsonText(raw)).toBe('{"a": 1}');
+  });
+
+  it("passes unfenced JSON through unchanged, aside from trimming", () => {
+    expect(extractJsonText('  {"a": 1}  ')).toBe('{"a": 1}');
   });
 });

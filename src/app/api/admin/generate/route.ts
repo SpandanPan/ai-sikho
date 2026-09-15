@@ -7,12 +7,15 @@ import { generateContent, ContentAgentError, type GenerationType } from "@/lib/c
 import { calculateGenerationCostInPaise, suggestedPriceInPaise, type Provider } from "@/lib/agentPricing";
 
 const VALID_TYPES: GenerationType[] = ["QUIZ", "ARTICLE", "ROADMAP"];
-const VALID_PROVIDERS: Provider[] = ["anthropic", "openai"];
+const VALID_PROVIDERS: Provider[] = ["anthropic", "openai", "ollama"];
 
 // Kicks off a draft — never publishes directly. See ContentGenerationJob
 // in prisma/schema.prisma and the review note in src/lib/contentAgent.ts.
-// Unverified end to end: requires ANTHROPIC_API_KEY or OPENAI_API_KEY,
-// neither set in this environment.
+// anthropic/openai are unverified end to end here (no API key in this
+// environment); ollama was run for real against a local instance during
+// this build (see AGENT_COSTS.md) and is the recommended default for this
+// admin-only, human-reviewed drafting step — free, and quality-checked by
+// you before anything goes live either way.
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!isAdminEmail(session?.user?.email)) {
@@ -23,7 +26,7 @@ export async function POST(req: Request) {
   const { type, topic, provider } = body ?? {};
 
   if (!VALID_TYPES.includes(type) || typeof topic !== "string" || !topic.trim() || !VALID_PROVIDERS.includes(provider)) {
-    return NextResponse.json({ error: "type (QUIZ/ARTICLE/ROADMAP), provider (anthropic/openai), and topic are required" }, { status: 400 });
+    return NextResponse.json({ error: "type (QUIZ/ARTICLE/ROADMAP), provider (anthropic/openai/ollama), and topic are required" }, { status: 400 });
   }
 
   const job = await prisma.contentGenerationJob.create({
