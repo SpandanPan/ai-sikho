@@ -32,7 +32,7 @@ export default function Home() {
     <div className="mx-auto max-w-6xl px-5">
       <FunFactLoader />
 
-      <header className="relative -mx-5 sm:mx-0 sm:rounded-b-lg overflow-hidden min-h-[260px] sm:min-h-[300px] flex items-end">
+      <header className="relative -mx-5 sm:mx-0 sm:rounded-b-lg overflow-hidden h-[190px] sm:h-[220px] flex items-end">
         <Image
           src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1600&q=80"
           alt="A person working at a laptop"
@@ -40,26 +40,26 @@ export default function Home() {
           priority
           className="object-cover -z-20"
         />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/75 to-ink/25" />
-        <div className="relative px-6 sm:px-10 py-8 text-paper">
-          <p className="font-mono text-xs uppercase tracking-widest text-spark mb-3">Democratizing AI</p>
-          <h1 className="font-display text-3xl sm:text-5xl font-semibold max-w-2xl text-balance leading-tight">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/80 to-ink/30" />
+        <div className="relative px-5 sm:px-8 py-4 text-paper">
+          <p className="font-mono text-[10.5px] uppercase tracking-widest text-spark mb-1.5">Democratizing AI</p>
+          <h1 className="font-display text-xl sm:text-2xl font-semibold max-w-xl text-balance leading-tight">
             AI shouldn&apos;t be a black box only a few people understand.
           </h1>
-          <p className="mt-4 max-w-xl text-paper/85">
-            A plain-language read on what&apos;s actually happening in AI, what each model costs to
-            run, and a structured way to prep for a GenAI or Agentic AI interview — starting at ₹100,
-            on purpose.
-          </p>
           <TrackedLink
             href="/quiz"
             label="hero-quiz-cta"
-            className="inline-block mt-6 rounded bg-spark text-ink font-mono text-sm font-semibold px-5 py-3"
+            className="inline-block mt-2.5 rounded bg-spark text-ink font-mono text-xs font-semibold px-4 py-2"
           >
             Take the free 60-second AI quiz →
           </TrackedLink>
         </div>
       </header>
+      <p className="text-sm text-ink-soft max-w-xl mt-3 mb-6">
+        A plain-language read on what&apos;s actually happening in AI, what each model costs to run,
+        and a structured way to prep for a GenAI or Agentic AI interview — starting at ₹100, on
+        purpose.
+      </p>
 
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
         {/* AI Pulse as a persistent left sidebar on desktop — sticky below
