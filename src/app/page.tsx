@@ -32,15 +32,19 @@ export default function Home() {
     <div className="mx-auto max-w-6xl px-5">
       <FunFactLoader />
 
-      <header className="relative -mx-5 sm:mx-0 sm:rounded-b-lg overflow-hidden h-[190px] sm:h-[220px] flex items-end">
+      <header className="relative -mx-5 sm:mx-0 rounded-b-lg overflow-hidden h-[190px] sm:h-[220px] flex items-end">
         <Image
-          src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1600&q=80"
-          alt="A person working at a laptop"
+          src="https://images.unsplash.com/photo-1715167886555-01552c3369c7?w=1600&q=80"
+          alt="A tea stall in India — people gathered around, having chai"
           fill
           priority
           className="object-cover -z-20"
         />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/80 to-ink/30" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/75 to-ink/20" />
+        {/* Fades the image's hard bottom edge into the page background
+            instead of cutting straight from photo to solid paper color —
+            the "abrupt" seam this replaces. */}
+        <div className="absolute inset-x-0 bottom-0 h-6 -z-10 bg-gradient-to-t from-paper to-transparent" />
         <div className="relative px-5 sm:px-8 py-4 text-paper">
           <p className="font-mono text-[10.5px] uppercase tracking-widest text-spark mb-1.5">Democratizing AI</p>
           <h1 className="font-display text-xl sm:text-2xl font-semibold max-w-xl text-balance leading-tight">
