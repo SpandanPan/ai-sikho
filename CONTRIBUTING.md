@@ -2,7 +2,7 @@
 
 ## Current state: public, protection enforced
 
-The repo (`github.com/SpandanPan/the-model-desk`) is **public** and branch
+The repo (`github.com/SpandanPan/ai-sikho`) is **public** and branch
 protection on `main` is **live** — applied and verified working (see below).
 Before flipping to public, the entire git history was scanned for secrets
 (`git log --all -p` against the known credential strings) and came back
@@ -23,7 +23,7 @@ The command that applied this, kept here in case it ever needs re-applying
 (e.g. after transferring ownership):
 
 ```bash
-gh api repos/SpandanPan/the-model-desk/branches/main/protection -X PUT \
+gh api repos/SpandanPan/ai-sikho/branches/main/protection -X PUT \
   -H "Accept: application/vnd.github+json" \
   -F 'required_status_checks[strict]=true' \
   -f 'required_status_checks[contexts][]=test' \

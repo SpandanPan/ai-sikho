@@ -94,6 +94,11 @@ export default function CoursesPage() {
           </div>
         ))}
       </div>
+      {visible.some((c) => c.priceInPaise > 0) && (
+        <p className="text-[10.5px] text-ink-soft mt-4">
+          Paid courses are non-refundable once purchased — see <a href="/refund-policy" className="underline">refund policy</a>.
+        </p>
+      )}
     </main>
   );
 }

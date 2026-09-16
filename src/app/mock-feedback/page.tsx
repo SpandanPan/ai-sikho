@@ -117,7 +117,7 @@ export default function MockFeedbackPage() {
           self-hosted open model — genuinely useful, genuinely free, no catch. The <b>₹149</b> option
           runs on Claude Sonnet 5, a frontier model, for a sharper, more reliable grade — that
           difference is the entire reason it costs anything. See the exact numbers in{" "}
-          <a href="https://github.com/SpandanPan/the-model-desk/blob/main/AGENT_COSTS.md" target="_blank" rel="noreferrer" className="text-accent-ink underline">
+          <a href="https://github.com/SpandanPan/ai-sikho/blob/main/AGENT_COSTS.md" target="_blank" rel="noreferrer" className="text-accent-ink underline">
             AGENT_COSTS.md
           </a>.
         </p>
@@ -159,6 +159,9 @@ export default function MockFeedbackPage() {
             Submit for feedback — ₹149 (Claude Sonnet 5)
           </button>
         </div>
+        <p className="text-[10.5px] text-ink-soft mt-2">
+          The ₹149 option is non-refundable once submitted — see <a href="/refund-policy" className="underline">refund policy</a>.
+        </p>
       </form>
 
       {message && <p className="text-sm text-accent-ink mb-8">{message}</p>}

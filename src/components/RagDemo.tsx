@@ -6,10 +6,10 @@ import { rankDocs } from "@/lib/ragScore";
 // A fixed, clearly-fake "knowledge base" — this is a teaching demo, not a
 // real support system.
 const DOCS = [
-  { id: "refunds", text: "Refunds: digital products (the Interview Kit, Starter Pack, and courses) are refundable within 7 days if you haven't downloaded the content." },
+  { id: "refunds", text: "Refunds: all sales are final on every paid product (Interview Kit, Starter Pack, courses, mentoring, mock feedback) — see the real refund policy for the narrow exceptions." },
   { id: "access", text: "Course access: once purchased, a course is available permanently — no subscription, no expiry." },
   { id: "payments", text: "Payment methods: we accept UPI, cards, and net banking via Razorpay." },
-  { id: "support", text: "Support: email hello@yourdomain.com — typical response time is under 24 hours on weekdays." },
+  { id: "support", text: "Support: use the /help contact form — typical response time is under 24 hours on weekdays." },
   { id: "free", text: "Free content: the AI Pulse news feed, Model Costs, and Run It Free guide are free and always will be." },
 ];
 

@@ -25,7 +25,7 @@ export default function Nav() {
       <div className="mx-auto max-w-5xl px-5 py-3.5 flex items-center justify-between gap-4">
         <a href="/" className="flex items-center gap-2 flex-none">
           <Logo />
-          <span className="font-display text-lg font-semibold">The Model Desk</span>
+          <span className="font-display text-lg font-semibold">AI Sikho</span>
         </a>
 
         <div className="hidden lg:flex items-center gap-5 flex-wrap">

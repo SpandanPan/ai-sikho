@@ -64,7 +64,7 @@ export function buildInvoiceData(opts: {
   totalPaidInPaise: number; // what was actually charged, after any coupon
   discountInPaise: number;
 }): InvoiceData {
-  const sellerName = process.env.BUSINESS_LEGAL_NAME ?? "The Model Desk";
+  const sellerName = process.env.BUSINESS_LEGAL_NAME ?? "AI Sikho";
   const sellerAddress = process.env.BUSINESS_ADDRESS ?? "";
   const gstin = process.env.GST_NUMBER ?? null;
 

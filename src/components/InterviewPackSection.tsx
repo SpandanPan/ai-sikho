@@ -120,6 +120,9 @@ export default function InterviewPackSection() {
       <p className="text-sm mt-4">
         Want a deeper dive on one topic instead? <a href="/courses" className="text-accent-ink underline">See the courses →</a>
       </p>
+      <p className="text-[10.5px] text-ink-soft mt-2">
+        All sales are final on every product above — see <a href="/refund-policy" className="underline">refund policy</a>.
+      </p>
     </section>
   );
 }

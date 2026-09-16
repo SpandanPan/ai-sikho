@@ -89,7 +89,7 @@ export default function CartPage() {
       amount: data.amountInPaise,
       currency: "INR",
       order_id: data.orderId,
-      name: "The Model Desk",
+      name: "AI Sikho",
       prefill: { email: session?.user?.email ?? undefined },
       handler: () => {
         // Success here only means Razorpay reported it client-side — the
@@ -161,6 +161,9 @@ export default function CartPage() {
           >
             {checkingOut ? "Starting checkout…" : "Checkout →"}
           </button>
+          <p className="text-[10.5px] text-ink-soft mt-2">
+            All sales are final — see <a href="/refund-policy" className="underline">the refund policy</a>.
+          </p>
         </>
       )}
     </main>

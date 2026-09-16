@@ -18,7 +18,7 @@ export default function DeleteAccount() {
     setError(null);
     const res = await fetch("/api/account", { method: "DELETE" });
     if (!res.ok) {
-      setError("Couldn't delete your account — try again or email hello@yourdomain.com.");
+      setError("Couldn't delete your account — try again or reach out via /help.");
       setLoading(false);
       return;
     }

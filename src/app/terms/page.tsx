@@ -1,4 +1,9 @@
+import { EMAIL_ADDRESSES } from "@/lib/email";
+
 export default function TermsPage() {
+  const sellerName = process.env.BUSINESS_LEGAL_NAME ?? "AI Sikho";
+  const sellerAddress = process.env.BUSINESS_ADDRESS ?? "";
+
   return (
     <main className="mx-auto max-w-2xl px-5 py-12 text-sm leading-relaxed">
       <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-2">Terms of Service</p>
@@ -28,12 +33,26 @@ export default function TermsPage() {
         <section>
           <h2 className="font-semibold mb-2">Refunds</h2>
           <p className="text-ink-soft">
-            Digital products (Starter Pack, Interview Kit, courses) are refundable within 7 days of
-            purchase if you haven&apos;t downloaded or accessed the content. Once accessed, purchases
-            are final — this is a content product, not a physical good, and access can&apos;t be
-            "returned." Mentoring session bookings can be cancelled or rescheduled up to 24 hours
-            before the scheduled time for a full refund; cancellations after that are non-refundable
-            unless the mentor cancels.
+            All sales are final — the Starter Pack, any Interview Kit, the Everything Bundle, paid
+            courses, mentoring sessions, and paid mock-interview feedback are non-refundable once
+            payment is completed. The narrow exceptions consumer law doesn&apos;t let a &quot;no
+            refunds&quot; policy waive — genuinely not receiving what you paid for, or a
+            duplicate/unauthorized charge — are handled case by case; see{" "}
+            <a href="/refund-policy" className="text-accent-ink underline">/refund-policy</a> for how
+            to raise one.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-semibold mb-2">Eligibility</h2>
+          <p className="text-ink-soft">
+            You must be at least 18 years old to create an account or make a purchase. If
+            you&apos;re under 18, a parent or legal guardian must create the account and be the one
+            who transacts — the DPDP Act treats a minor&apos;s personal data as requiring verifiable
+            parental consent, and we don&apos;t currently have a technical way to verify age or
+            guardian consent at sign-up. Said plainly rather than silently assumed: this is a real
+            gap, not a solved problem, and it should be addressed (an age-affirmation step, at
+            minimum) before actively marketing to a school-age audience.
           </p>
         </section>
 
@@ -66,6 +85,21 @@ export default function TermsPage() {
         </section>
 
         <section>
+          <h2 className="font-semibold mb-2">Seller information &amp; grievance officer</h2>
+          <p className="text-ink-soft">
+            Under the Consumer Protection (E-Commerce) Rules, this information has to be
+            disclosed, not just available on request: this service is operated as{" "}
+            <b>{sellerName}</b>{sellerAddress ? `, ${sellerAddress}` : ""}. For any complaint about
+            an order, a page, or these terms, email{" "}
+            <a href={`mailto:${EMAIL_ADDRESSES.support}`} className="text-accent-ink underline">
+              {EMAIL_ADDRESSES.support}
+            </a>{" "}
+            — see <a href="/privacy" className="text-accent-ink underline">/privacy</a> for our
+            response-time commitment.
+          </p>
+        </section>
+
+        <section>
           <h2 className="font-semibold mb-2">Governing law</h2>
           <p className="text-ink-soft">These terms are governed by the laws of India.</p>
         </section>
@@ -73,8 +107,15 @@ export default function TermsPage() {
         <section className="border border-paper-line rounded p-4 text-xs text-ink-soft">
           <p>
             <b>Honest note:</b> this page accurately describes the product&apos;s actual policies as of
-            today — it isn&apos;t template filler. It has not been reviewed by a lawyer. Have it checked
-            by one before relying on it for a real launch with paying customers.
+            today — it isn&apos;t template filler. It has not been reviewed by a lawyer. One specific
+            thing to resolve before real launch: the site owner has explicitly asked that no
+            personal names be shown publicly (see <code className="font-mono">AboutUs.tsx</code>),
+            but consumer law generally expects a real legal name and address for the operating
+            entity to be disclosed somewhere. If no business entity is registered yet, that
+            disclosure defaults to a personal name/address — worth resolving with a CA (e.g., by
+            registering an LLP or Pvt Ltd whose name isn&apos;t a personal one) rather than left
+            unresolved. <code className="font-mono">BUSINESS_LEGAL_NAME</code> above currently falls
+            back to the product name, which itself may not satisfy this requirement.
           </p>
         </section>
       </div>

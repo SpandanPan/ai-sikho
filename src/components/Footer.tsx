@@ -35,7 +35,7 @@ export default function Footer() {
       <div className="mx-auto max-w-5xl px-5 py-10">
         <div className="grid gap-8 sm:grid-cols-[1.3fr_1fr_1fr_1fr]">
           <div>
-            <span className="font-display text-lg font-semibold">The Model Desk</span>
+            <span className="font-display text-lg font-semibold">AI Sikho</span>
             <p className="text-sm text-ink-soft mt-2 max-w-[24ch]">
               All things AI — explained, priced, and interview-ready.
             </p>
@@ -54,7 +54,7 @@ export default function Footer() {
           ))}
         </div>
         <p className="font-mono text-[11px] text-ink-soft mt-10 pt-6 border-t border-paper-line">
-          © {new Date().getFullYear()} The Model Desk
+          © {new Date().getFullYear()} AI Sikho
         </p>
       </div>
     </footer>

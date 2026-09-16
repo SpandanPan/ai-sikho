@@ -108,6 +108,11 @@ export default function MentoringPage() {
                     ))}
                   </div>
                 )}
+                {slots.length > 0 && (
+                  <p className="text-[10.5px] text-ink-soft mt-3">
+                    All sales are final — see <a href="/refund-policy" className="underline">refund policy</a>.
+                  </p>
+                )}
                 {message && <p className="text-xs mt-3 text-accent-ink">{message}</p>}
               </div>
             )}

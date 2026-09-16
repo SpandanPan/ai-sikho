@@ -142,8 +142,8 @@ bundled into this Next.js app. `OLLAMA_BASE_URL` has to be a URL the
   Tunnel, free) from your own machine, kept running. **This is real,
   unresolved deployment work, not yet done** — everything above was
   verified against `localhost` in local dev, which is honest about what
-  was actually tested, but is not the same as working from
-  themodeldesk.com. Do this before relying on any of these in production.
+  was actually tested, but is not the same as working from your real,
+  deployed domain. Do this before relying on any of these in production.
 
 Model weights themselves live in Ollama's own store
 (`~/.ollama/models`), **not inside this repo** — a 9.6GB model file has no

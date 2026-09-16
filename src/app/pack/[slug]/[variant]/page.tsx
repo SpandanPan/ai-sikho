@@ -45,6 +45,9 @@ export default function PackDetailPage({ params }: { params: { slug: string; var
             className="font-mono text-sm bg-ink text-paper rounded px-4 py-2.5"
           />
         </div>
+        <p className="text-[10.5px] text-ink-soft mt-2 text-right">
+          All sales are final — see <a href="/refund-policy" className="underline">refund policy</a>.
+        </p>
       </div>
 
       <CrossSell excludeKey={`pack-${params.variant}:${pack.slug}`} />

@@ -141,7 +141,7 @@ export default function QuizPage() {
                 Retake quiz
               </button>
               <a href="/" className="font-mono text-sm bg-ink text-paper rounded px-4 py-2">
-                Back to The Model Desk
+                Back to AI Sikho
               </a>
             </div>
           </div>

@@ -242,7 +242,7 @@ model Purchase {
   discountInPaise   Int?           @default(0) // how much the coupon knocked off; amountInPaise + discountInPaise = the pre-discount price
   currency          String         @default("INR")
   status            PurchaseStatus @default(PENDING)
-  contentAccessed   Boolean        @default(false) // set true once a download/course-open endpoint exists; see src/lib/refunds.ts
+  contentAccessed   Boolean        @default(false) // no longer used by refund eligibility (policy is now no refunds — see src/lib/refunds.ts); kept for potential future analytics on whether a purchase was ever opened
   // NOT unique — a cart checkout creates one Purchase row per item, all
   // sharing one Razorpay order (and, once paid, one payment) for the
   // whole cart. The webhook (src/app/api/webhooks/razorpay) looks these

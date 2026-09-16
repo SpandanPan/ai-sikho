@@ -7,8 +7,8 @@ import AnalyticsBeacon from "@/components/AnalyticsBeacon";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "The Model Desk",
-  description: "AI news, model costs, and a paid interview-prep pack for GenAI engineers.",
+  title: "AI Sikho — Learn AI, Prep for GenAI Interviews",
+  description: "AI news, model costs, AI fluency for beginners, and an interview-prep pack for GenAI engineers, starting at ₹100.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

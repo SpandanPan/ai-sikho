@@ -1,4 +1,4 @@
-# The Model Desk
+# AI Sikho
 
 Free AI news + explainers, a ₹100→₹999 interview-prep ladder, paid short courses,
 1:1 mentoring, paid AI-graded mock-interview feedback, a signed-in profile with
@@ -597,18 +597,38 @@ code actually runs, and "wherever the calling code runs" is your own
 machine only for the admin drafting flow, not for anything triggered from
 the deployed Vercel site.
 
-## Refunds
+## Refunds — policy changed to "no refunds," by request
 
-`src/lib/refunds.ts` (unit-tested) enforces exactly the two rules stated in
-`/refund-policy`: a purchase can't be refunded twice (status must be
-`PAID`, not already `REFUNDED`), and it can't be refunded past the 7-day
-window from purchase, or after its content has been accessed
-(`Purchase.contentAccessed`). `GET /api/admin/purchases/[id]/refund` checks
-eligibility without changing anything; `POST` on the same route actually
-refunds (admin-only — the refund policy tells buyers to email support, so
-this is the check-then-act step once you've read that email). Razorpay's
-actual refund API call is a TODO in that route, marked clearly, until real
-payments are live.
+`src/lib/refunds.ts` (unit-tested) now enforces a no-refunds-by-default
+policy: an ordinary check on any `PAID` purchase always comes back
+ineligible. The only way past that is an explicit `overrideReason` string
+passed to `checkRefundEligibility` / `POST /api/admin/purchases/[id]/refund`
+— for the narrow cases a stated "no refunds" policy can't actually waive
+under Indian consumer law (non-delivery, a duplicate/unauthorized charge)
+or a deliberate goodwill exception. The reason is stored on the ledger
+entry itself, so every override is auditable — this is meant to be rare,
+not a quieter second refund window. A purchase still can't be refunded
+twice regardless of any override. `GET` on the same route checks
+eligibility (always "ineligible" for an ordinary request) without
+changing anything; Razorpay's actual refund API call is a TODO in that
+route, marked clearly, until real payments are live.
+
+The old 7-day-window / content-accessed policy is gone — every paid
+product page, the cart, and the mentoring/mock-feedback purchase points
+now show a short "all sales are final" note pointing at `/refund-policy`,
+which itself, along with `/terms` and `/privacy`, was rewritten around
+this: `/refund-policy` states the no-refunds policy and its narrow
+exceptions plainly; `/terms` adds an 18+ eligibility clause (the DPDP Act
+treats a minor's data as requiring verifiable parental consent, which
+this app doesn't currently check) and the Consumer Protection E-Commerce
+Rules' seller-information/grievance-officer disclosure; `/privacy` was
+expanded with purpose-specific data collection notes, the DPDP Act's
+actual Data Principal rights (access, correction, erasure, consent
+withdrawal, grievance redressal, nomination), a children's-data section,
+a data-retention statement, and a grievance contact. None of this
+replaces a lawyer's review — each page says so — but it's grounded in the
+DPDP Act's and E-Commerce Rules' actual requirements, not generic
+template text.
 
 ## Cart, checkout, and coupons
 

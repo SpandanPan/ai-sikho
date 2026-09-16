@@ -5,9 +5,10 @@ import { isAdminEmail } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { checkRefundEligibility } from "@/lib/refunds";
 
-// Read-only eligibility check — lets an admin (or a future self-service
-// refund-request UI) see whether a purchase currently qualifies, without
-// actually refunding it.
+// Read-only eligibility check — for an ordinary purchase this always
+// reports ineligible (policy: no refunds, see /refund-policy). Doesn't
+// accept an override reason itself; this is "what would happen with no
+// exception," not a way to preview one.
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!isAdminEmail(session?.user?.email)) {
@@ -20,21 +21,32 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
   return NextResponse.json(checkRefundEligibility(purchase));
 }
 
-// Refunds are admin-triggered (the refund policy tells buyers to email
-// support), not self-service — this is the check-then-act step once you've
-// read that email. Enforces both things asked for explicitly: a purchase
-// can't be refunded twice, and it can't be refunded outside the stated
-// window (src/lib/refunds.ts holds the actual rule, unit-tested).
-export async function POST(_req: Request, { params }: { params: { id: string } }) {
+// Refunding at all now requires an explicit overrideReason in the body —
+// there's no more "within the window" self-service case, only the narrow
+// exceptions a "no refunds" policy can't actually waive under Indian
+// consumer law (non-delivery, a duplicate/unauthorized charge) or a
+// deliberate goodwill call you're making. The reason is stored on the
+// ledger entry itself, so every override is auditable after the fact —
+// this is meant to be rare, not a quieter second refund window.
+export async function POST(req: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!isAdminEmail(session?.user?.email)) {
     return NextResponse.json({ error: "Admin only" }, { status: 403 });
   }
 
+  const body = await req.json().catch(() => null);
+  const overrideReason = typeof body?.overrideReason === "string" ? body.overrideReason.trim() : "";
+  if (!overrideReason) {
+    return NextResponse.json(
+      { error: "overrideReason is required — policy is no refunds; state why this is an exception." },
+      { status: 400 }
+    );
+  }
+
   const purchase = await prisma.purchase.findUnique({ where: { id: params.id } });
   if (!purchase) return NextResponse.json({ error: "Purchase not found" }, { status: 404 });
 
-  const eligibility = checkRefundEligibility(purchase);
+  const eligibility = checkRefundEligibility(purchase, overrideReason);
   if (!eligibility.eligible) {
     return NextResponse.json({ error: eligibility.reason }, { status: 409 });
   }
@@ -52,7 +64,7 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
         type: "REFUND",
         amountInPaise: purchase.amountInPaise,
         category: "refund",
-        description: `Refund for purchase ${purchase.id}`,
+        description: `Refund for purchase ${purchase.id} — admin exception: ${overrideReason}`,
         userId: purchase.userId,
         purchaseId: purchase.id,
       },
