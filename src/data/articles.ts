@@ -12,6 +12,14 @@ export type Article = {
   summary: string;
   level: Level;
   status: "coming-soon" | "published";
+  // True for genuinely evergreen pieces that stay accurate for a long
+  // time (a concept explainer, not something tied to this month's news or
+  // a specific model's current pricing). Shown in a separate Archive
+  // section on /articles instead of alongside newer/current-affairs
+  // pieces at the same level, so a reader browsing "what's new" doesn't
+  // wade through old-but-still-true content to find it, and a reader who
+  // wants the durable foundations knows exactly where to look.
+  archived?: boolean;
 };
 
 export const levelInfo: Record<Level, { label: string; tagline: string }> = {

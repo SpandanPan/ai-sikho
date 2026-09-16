@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import CartIcon from "./CartIcon";
+import Logo from "./Logo";
 
 // Trimmed to real pages only — the previous list also had #pulse/#free/#pack
 // homepage-anchor shortcuts, which just duplicated what's already the first
@@ -23,9 +24,7 @@ export default function Nav() {
     <nav className="sticky top-0 z-40 bg-paper border-b border-paper-line">
       <div className="mx-auto max-w-5xl px-5 py-3.5 flex items-center justify-between gap-4">
         <a href="/" className="flex items-center gap-2 flex-none">
-          <span className="w-6 h-6 rounded bg-ink text-paper font-display text-sm font-semibold flex items-center justify-center">
-            M
-          </span>
+          <Logo />
           <span className="font-display text-lg font-semibold">The Model Desk</span>
         </a>
 
@@ -40,15 +39,6 @@ export default function Nav() {
               )}
             </a>
           ))}
-          {status === "authenticated" ? (
-            <a href="/profile" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
-              Profile
-            </a>
-          ) : (
-            <a href="/signin" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
-              Sign in
-            </a>
-          )}
           <a href="/settings" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
             Settings
           </a>
@@ -60,8 +50,17 @@ export default function Nav() {
           </a>
         </div>
 
-        <div className="flex items-center gap-1 flex-none">
+        <div className="flex items-center gap-3 flex-none">
           <CartIcon />
+          {status === "authenticated" ? (
+            <a href="/profile" className="hidden lg:inline font-mono text-xs text-ink-soft hover:text-accent-ink">
+              Profile
+            </a>
+          ) : (
+            <a href="/signin" className="hidden lg:inline font-mono text-xs text-ink-soft hover:text-accent-ink">
+              Sign in
+            </a>
+          )}
           <button
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Close menu" : "Open menu"}

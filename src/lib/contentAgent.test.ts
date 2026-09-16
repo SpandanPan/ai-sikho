@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPrompt, buildGradingPrompt, buildTakeawayPrompt, buildTermPrompt, extractJsonText } from "./contentAgent";
+import { buildPrompt, buildGradingPrompt, buildTakeawayPrompt, buildTermPrompt, buildProductDescriptionPrompt, extractJsonText } from "./contentAgent";
 
 describe("buildPrompt", () => {
   it("includes the topic in the user message", () => {
@@ -58,6 +58,25 @@ describe("buildTermPrompt", () => {
   it("gives an open prompt when there's no history yet", () => {
     const { user } = buildTermPrompt([]);
     expect(user.toLowerCase()).toContain("any genuinely useful term");
+  });
+});
+
+describe("buildProductDescriptionPrompt", () => {
+  it("uses plain-English framing for a layman audience", () => {
+    const { system } = buildProductDescriptionPrompt("Starter Pack", "25 questions", "layman");
+    expect(system.toLowerCase()).toContain("plain english");
+    expect(system.toLowerCase()).toContain("zero jargon");
+  });
+
+  it("uses a technical framing for a technical audience", () => {
+    const { system } = buildProductDescriptionPrompt("RAG Basics", "a live demo", "technical");
+    expect(system.toLowerCase()).toContain("technical terms");
+  });
+
+  it("includes the product name and context in the user message", () => {
+    const { user } = buildProductDescriptionPrompt("Agentic AI Kit", "90 questions, 25 scenarios", "technical");
+    expect(user).toContain("Agentic AI Kit");
+    expect(user).toContain("90 questions, 25 scenarios");
   });
 });
 

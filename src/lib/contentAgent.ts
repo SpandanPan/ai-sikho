@@ -275,3 +275,52 @@ export async function generateTerm(recentTerms: string[], provider: Provider): P
   const content = parseJsonContent(text, "Term-of-day model did not return valid JSON — check the prompt or retry.");
   return { content, inputTokens, outputTokens, provider, model: MODEL_PRICING_USD_PER_1M[provider].model };
 }
+
+// ---- Product description drafting ---------------------------------------
+// One-off content generation for the product detail pages (/pack/[slug]/
+// [variant], /courses) — run via scripts/generate-product-descriptions.ts,
+// reviewed by hand, then pasted into src/data/interviewPacks.ts and
+// src/data/courses.ts as static content. Same "admin reviews before it
+// ships" standard as the QUIZ/ARTICLE/ROADMAP drafting agents above, not
+// a live per-request generator — a product description shouldn't reword
+// itself on every page load.
+//
+// No tool/MCP access: this draws only on the model's own knowledge, not a
+// live web search or any external lookup — there's no search API wired
+// into this app (no key available in this environment). Said plainly
+// rather than implied, since "give it tool access" was the actual ask.
+const PRODUCT_DESCRIPTION_SYSTEM_PROMPT = {
+  layman:
+    "You write a short product description for a complete beginner to AI — someone who has never " +
+    "written code and may not know what a 'model' even is. Plain English, zero jargon, focus on what " +
+    "they'll actually be able to do afterward, not the topics covered. " +
+    'Return ONLY JSON shaped exactly like: {"description": string (3-4 sentences)}.',
+  technical:
+    "You write a short product description for someone already working toward an AI/GenAI engineering " +
+    "role — comfortable with technical terms. Be specific about what's covered and why it matters for " +
+    "an actual interview or job, not generic marketing language. " +
+    'Return ONLY JSON shaped exactly like: {"description": string (3-4 sentences)}.',
+};
+
+export function buildProductDescriptionPrompt(
+  name: string,
+  context: string,
+  audience: "layman" | "technical"
+): { system: string; user: string } {
+  return {
+    system: PRODUCT_DESCRIPTION_SYSTEM_PROMPT[audience],
+    user: `Product: ${name}\n\nWhat it actually contains: ${context}`,
+  };
+}
+
+export async function generateProductDescription(
+  name: string,
+  context: string,
+  audience: "layman" | "technical",
+  provider: Provider
+): Promise<GenerationResult> {
+  const { system, user } = buildProductDescriptionPrompt(name, context, audience);
+  const { text, inputTokens, outputTokens } = await callProvider(provider, system, user);
+  const content = parseJsonContent(text, "Product-description model did not return valid JSON — check the prompt or retry.");
+  return { content, inputTokens, outputTokens, provider, model: MODEL_PRICING_USD_PER_1M[provider].model };
+}

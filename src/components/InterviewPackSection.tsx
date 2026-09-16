@@ -5,6 +5,7 @@ import { interviewPacks, formatPackPrice } from "@/data/interviewPacks";
 import { courses } from "@/data/courses";
 import { useCart } from "@/components/CartContext";
 import AddToCartButton from "@/components/AddToCartButton";
+import TrackIcon from "@/components/TrackIcon";
 
 const bundleCourses = courses.filter((c) => c.category === "technical" && c.priceInPaise > 0);
 const bundleCoursesTotal = bundleCourses.reduce((sum, c) => sum + c.priceInPaise, 0);
@@ -56,12 +57,17 @@ export default function InterviewPackSection() {
         ))}
       </div>
 
-      <p className="text-sm text-ink-soft mb-4 max-w-lg">{pack.summary}</p>
+      <p className="text-sm text-ink-soft mb-4 max-w-lg flex items-center gap-2">
+        <TrackIcon slug={pack.slug} />
+        {pack.summary}
+      </p>
 
       <div className="grid gap-3.5 sm:grid-cols-3">
         <div className="border border-paper-line rounded p-5 flex flex-col justify-between">
           <div>
-            <h3 className="font-semibold mb-1">Starter Pack</h3>
+            <h3 className="font-semibold mb-1">
+              <a href={`/pack/${pack.slug}/starter`} className="hover:text-accent-ink">Starter Pack</a>
+            </h3>
             <p className="text-sm text-ink-soft">25 questions + 1 checklist. A taste of the full kit.</p>
           </div>
           <div className="flex items-center justify-between mt-3">
@@ -75,7 +81,9 @@ export default function InterviewPackSection() {
 
         <div className="border border-accent rounded p-5 bg-paper-raised flex flex-col justify-between">
           <div>
-            <h3 className="font-semibold mb-1">{pack.title} Interview Kit</h3>
+            <h3 className="font-semibold mb-1">
+              <a href={`/pack/${pack.slug}/kit`} className="hover:text-accent-ink">{pack.title} Interview Kit</a>
+            </h3>
             <p className="text-sm text-ink-soft">{pack.kitContents}.</p>
           </div>
           <div className="flex items-center justify-between mt-3">

@@ -70,3 +70,42 @@ body {
 .animate-loaderbar {
   animation: loaderbar 1.3s linear forwards;
 }
+
+/* Topic-based animations on the Interview Pack cards (TrackIcon.tsx) — one
+   per track, evoking what that track is actually about rather than
+   decoration for its own sake. Applied via Tailwind's motion-safe: variant
+   at the call site, so prefers-reduced-motion:reduce disables all of them
+   automatically with no JS check needed. */
+@keyframes cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+.animate-cursor-blink {
+  animation: cursor-blink 1s step-end infinite;
+}
+
+@keyframes step-dot {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+.animate-step-dot {
+  animation: step-dot 1.4s ease-in-out infinite;
+}
+
+@keyframes bar-grow {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+.animate-bar-grow {
+  animation: bar-grow 1.6s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+@keyframes pipeline-flow {
+  0% { transform: translateX(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(600%); opacity: 0; }
+}
+.animate-pipeline-flow {
+  animation: pipeline-flow 2s linear infinite;
+}

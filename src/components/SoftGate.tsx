@@ -10,7 +10,7 @@ import { useSession } from "next-auth/react";
 //
 // The timer is per page-load, not cumulative across visits — resets on
 // refresh. A signed-in visitor never sees the gate at all.
-export default function SoftGate({ children, seconds = 60 }: { children: React.ReactNode; seconds?: number }) {
+export default function SoftGate({ children, seconds = 150 }: { children: React.ReactNode; seconds?: number }) {
   const { status } = useSession();
   const [expired, setExpired] = useState(false);
 
@@ -31,7 +31,7 @@ export default function SoftGate({ children, seconds = 60 }: { children: React.R
       </div>
       <div className="absolute inset-0 flex items-center justify-center px-5">
         <div className="bg-paper border border-accent rounded-lg p-6 text-center max-w-xs shadow-lg">
-          <p className="font-semibold text-sm mb-1">You've been exploring for a minute.</p>
+          <p className="font-semibold text-sm mb-1">You've been exploring for a couple of minutes.</p>
           <p className="text-xs text-ink-soft mb-4">Sign in — free, 10 seconds — to keep reading.</p>
           <a
             href="/signin?callbackUrl=/"

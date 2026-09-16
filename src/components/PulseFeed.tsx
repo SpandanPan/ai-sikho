@@ -15,7 +15,12 @@ const SAMPLE: NewsItem[] = [
 // Fetches live items from Postgres via /api/news (populated by the daily
 // fetch-news cron job). Falls back to sample cards if the table is empty —
 // so the page never looks broken before the DB is wired up.
-export default function PulseFeed() {
+//
+// "vertical" powers the sticky left sidebar (auto-scrolls scrollTop, not
+// scrollLeft, inside a height-bounded column); "horizontal" is the
+// original ticker, used as the mobile fallback where there's no room for
+// a persistent sidebar. Same data, same auto-scroll preference either way.
+export default function PulseFeed({ orientation = "horizontal" }: { orientation?: "horizontal" | "vertical" }) {
   const [items, setItems] = useState<NewsItem[]>(SAMPLE);
   const [live, setLive] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -41,16 +46,64 @@ export default function PulseFeed() {
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
+    const vertical = orientation === "vertical";
     const id = setInterval(() => {
       if (hoveredRef.current || !enabledRef.current) return;
-      if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 2) {
-        track.scrollLeft = 0;
+      if (vertical) {
+        if (track.scrollTop + track.clientHeight >= track.scrollHeight - 2) {
+          track.scrollTop = 0;
+        } else {
+          track.scrollTop += 1;
+        }
       } else {
-        track.scrollLeft += 1;
+        if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 2) {
+          track.scrollLeft = 0;
+        } else {
+          track.scrollLeft += 1;
+        }
       }
     }, 20);
     return () => clearInterval(id);
-  }, [items]);
+  }, [items, orientation]);
+
+  const pauseHandlers = {
+    onMouseEnter: () => (hoveredRef.current = true),
+    onMouseLeave: () => (hoveredRef.current = false),
+    onTouchStart: () => (hoveredRef.current = true),
+    onTouchEnd: () => (hoveredRef.current = false),
+  };
+
+  if (orientation === "vertical") {
+    return (
+      <section className="w-full">
+        <div className="flex items-baseline justify-between gap-2 mb-3">
+          <h2 className="font-display text-sm font-semibold">AI Pulse</h2>
+          <span className="font-mono text-[9px] uppercase tracking-wide text-accent2 bg-accent2/15 rounded-full px-1.5 py-0.5">
+            {live ? "Live" : "Sample"}
+          </span>
+        </div>
+        <div
+          ref={trackRef}
+          {...pauseHandlers}
+          className="flex flex-col gap-2.5 overflow-y-auto no-scrollbar max-h-[65vh] pr-1"
+        >
+          {items.map((item) => (
+            <a
+              key={item.id}
+              href={item.link}
+              className="flex-none border border-paper-line rounded bg-paper-raised p-3 flex flex-col gap-1.5"
+            >
+              <span className="font-mono text-[9px] uppercase tracking-wide text-accent-ink">via {item.source}</span>
+              <h3 className="text-xs font-semibold leading-snug">{item.title}</h3>
+              {item.takeaway && (
+                <p className="text-[10.5px] text-ink-soft border-l-2 border-accent pl-1.5">{item.takeaway}</p>
+              )}
+            </a>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="pulse" className="border-b border-paper-line py-9">
@@ -63,14 +116,7 @@ export default function PulseFeed() {
           {live ? "Live" : "Sample content"}
         </span>
       </div>
-      <div
-        ref={trackRef}
-        onMouseEnter={() => (hoveredRef.current = true)}
-        onMouseLeave={() => (hoveredRef.current = false)}
-        onTouchStart={() => (hoveredRef.current = true)}
-        onTouchEnd={() => (hoveredRef.current = false)}
-        className="flex gap-3.5 overflow-x-auto no-scrollbar"
-      >
+      <div ref={trackRef} {...pauseHandlers} className="flex gap-3.5 overflow-x-auto no-scrollbar">
         {items.map((item) => (
           <a
             key={item.id}
