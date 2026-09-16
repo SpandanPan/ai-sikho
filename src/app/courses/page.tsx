@@ -15,7 +15,7 @@ const TABS: { key: Course["category"]; label: string; blurb: string }[] = [
   {
     key: "technical",
     label: "For AI/GenAI Engineers",
-    blurb: "The foundations are free. The parts that actually differentiate an AI Engineer — RAG, graphs, and production observability — are nominally priced.",
+    blurb: "The foundations cost nothing. The parts that actually differentiate an AI Engineer — RAG, graphs, and production observability — are nominally priced.",
   },
 ];
 
@@ -59,24 +59,27 @@ export default function CoursesPage() {
                   )}
                 </h2>
                 <p className="text-sm text-ink-soft mt-1 max-w-lg">{c.summary}</p>
-                <button
-                  onClick={() => setExpanded(expanded === c.slug ? null : c.slug)}
-                  className="font-mono text-[10.5px] text-accent-ink underline mt-1.5"
-                >
-                  {expanded === c.slug ? "Show less" : "More about this course →"}
-                </button>
+                <div className="flex items-center gap-3 mt-1.5">
+                  <button
+                    onClick={() => setExpanded(expanded === c.slug ? null : c.slug)}
+                    className="font-mono text-[10.5px] text-accent-ink underline"
+                  >
+                    {expanded === c.slug ? "Show less" : "More about this course →"}
+                  </button>
+                  <a href={`/courses/${c.slug}`} className="font-mono text-[10.5px] text-accent-ink underline">
+                    {c.slug === "ai-fluency-basics" ? "Start course →" : "Open course →"}
+                  </a>
+                </div>
                 {expanded === c.slug && (
                   <p className="text-sm text-ink-soft mt-2 max-w-lg border-l-2 border-accent pl-3">{c.description}</p>
                 )}
               </div>
               <div className="flex flex-col items-end gap-1.5">
-                <span
-                  className={`font-mono text-sm whitespace-nowrap ${
-                    c.priceInPaise === 0 ? "text-accent2" : "text-accent-ink"
-                  }`}
-                >
-                  {formatPrice(c.priceInPaise)}
-                </span>
+                {c.priceInPaise > 0 && (
+                  <span className="font-mono text-sm whitespace-nowrap text-accent-ink">
+                    {formatPrice(c.priceInPaise)}
+                  </span>
+                )}
                 {c.priceInPaise > 0 && (
                   <AddToCartButton
                     item={{ key: `course:${c.slug}`, type: "course", slug: c.slug, label: c.title, amountInPaise: c.priceInPaise }}
