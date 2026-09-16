@@ -356,6 +356,65 @@ also expanded from a single copyright line into a real sitemap — Explore /
 Prep / Company columns linking to every page on the site, not just the
 three legal ones.
 
+## Homepage decluttering + interactive demos
+
+The homepage had grown to 9+ stacked sections through incremental
+additions across this build — genuinely too many, with real duplication
+(a stock-photo "Who this is for" personas section that mostly repeated
+"More ways to prep"; a Myth-vs-Fact strip and a Term-of-the-Day widget
+sitting separately despite doing the same job — a quick free educational
+nugget). Cleaned up:
+- **Cut** the personas section outright — generic stock photos, lowest
+  signal of anything on the page.
+- **Merged** Myth-vs-Fact and Term of the Day into one "Today, for free"
+  section, side by side.
+- **Moved** the newsletter signup out of the middle of the page and into
+  the footer, next to Work With Me and a new About Us block.
+- **Consolidated** the cart from duplicated text links (nav + a "View
+  cart" link inside the Pack section) into one bag-icon `CartIcon.tsx`,
+  top-right, with an item-count badge — the standard e-commerce
+  placement, one entry point instead of several.
+- Nav's own link list was trimmed to real pages only — it previously also
+  had `#pulse`/`#free`/`#pack` homepage-anchor shortcuts, which just
+  duplicated what's already the first thing you see landing on `/`.
+
+**Two live, interactive demos** replace "explain it in text" for the two
+things people ask about most:
+- **`TokenizerDemo.tsx`** — real tokenization (the `gpt-tokenizer`
+  package, cl100k_base/GPT-4-family encoding), not an approximation.
+  Type anything, see the actual token boundaries, entirely client-side.
+- **`AgentWorkflowDemo.tsx`** — a scripted, step-through walkthrough of
+  the one thing that actually separates an agent from a chatbot (tool use
+  + reasoning over a real result), clearly labeled as illustrative rather
+  than a live model call.
+
+**A real bundle offer**, the thing repeatedly flagged as missing:
+"Everything Bundle" in `InterviewPackSection.tsx` adds the Kit + all paid
+courses to the cart in one click; a real `BUNDLE10` coupon (10%, created
+via the coupon system already built) is the actual discount mechanism —
+not a fake "was ₹X now ₹Y" price.
+
+## Indic-language translation (`/api/translate`)
+
+A second, deliberately different local model: `translategemma`, pulled
+specifically because Ollama's general default (`gemma4:e4b`) isn't a
+translation specialist — "use a task-specific model where one clearly
+fits" applied for real, not just stated as a principle. The homepage demo
+(`IndicLanguageSection.tsx`) translates into Hindi, Telugu, Bengali,
+Marathi, Tamil, Kannada, Gujarati, or Malayalam — verified for real
+against four of those during this build, all came back correct. Same
+reachability rule as every other Ollama-backed agent (see
+`AGENT_COSTS.md`): works from local dev, needs a publicly reachable
+Ollama before this works from the deployed site.
+
+## About us (`AboutUs.tsx`)
+
+Two people, no names or personal emails shown (the site owner's explicit
+choice) — a short description of the team's background and why the
+Starter Pack is priced at ₹100 on purpose (the "democratize AI" framing
+now also in the hero copy), plus a mailto link for anyone wanting to
+become a mentor.
+
 ## Interview Pack tracks (`src/data/interviewPacks.ts`)
 
 The Pack used to be one hardcoded GenAI Engineer Starter/Kit pair. It's now

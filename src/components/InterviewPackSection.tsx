@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { interviewPacks, formatPackPrice } from "@/data/interviewPacks";
+import { courses } from "@/data/courses";
+import { useCart } from "@/components/CartContext";
 import AddToCartButton from "@/components/AddToCartButton";
+
+const bundleCourses = courses.filter((c) => c.category === "technical" && c.priceInPaise > 0);
+const bundleCoursesTotal = bundleCourses.reduce((sum, c) => sum + c.priceInPaise, 0);
 
 // Client component only because picking a track needs state — the rest of
 // the homepage stays a server component. Same #pack anchor as before, so
@@ -10,6 +15,17 @@ import AddToCartButton from "@/components/AddToCartButton";
 export default function InterviewPackSection() {
   const [selected, setSelected] = useState(interviewPacks[0].slug);
   const pack = interviewPacks.find((p) => p.slug === selected) ?? interviewPacks[0];
+  const { add } = useCart();
+  const [bundleAdded, setBundleAdded] = useState(false);
+
+  const bundleTotal = pack.kitPriceInPaise + bundleCoursesTotal;
+
+  function addBundle() {
+    add({ key: `pack-kit:${pack.slug}`, type: "pack-kit", slug: pack.slug, label: `${pack.title} — Interview Kit`, amountInPaise: pack.kitPriceInPaise });
+    bundleCourses.forEach((c) => add({ key: `course:${c.slug}`, type: "course", slug: c.slug, label: c.title, amountInPaise: c.priceInPaise }));
+    setBundleAdded(true);
+    setTimeout(() => setBundleAdded(false), 2000);
+  }
 
   return (
     <section id="pack" className="border-b border-paper-line py-9">
@@ -42,7 +58,7 @@ export default function InterviewPackSection() {
 
       <p className="text-sm text-ink-soft mb-4 max-w-lg">{pack.summary}</p>
 
-      <div className="grid gap-3.5 sm:grid-cols-[1fr_1.3fr]">
+      <div className="grid gap-3.5 sm:grid-cols-3">
         <div className="border border-paper-line rounded p-5 flex flex-col justify-between">
           <div>
             <h3 className="font-semibold mb-1">Starter Pack</h3>
@@ -56,6 +72,7 @@ export default function InterviewPackSection() {
             />
           </div>
         </div>
+
         <div className="border border-accent rounded p-5 bg-paper-raised flex flex-col justify-between">
           <div>
             <h3 className="font-semibold mb-1">{pack.title} Interview Kit</h3>
@@ -69,12 +86,31 @@ export default function InterviewPackSection() {
             />
           </div>
         </div>
+
+        <div className="border border-spark rounded p-5 bg-paper-raised flex flex-col justify-between">
+          <div>
+            <h3 className="font-semibold mb-1 flex items-center gap-1.5">
+              Everything Bundle
+              <span className="font-mono text-[9px] uppercase bg-spark text-ink rounded-full px-1.5 py-0.5">Save 10%</span>
+            </h3>
+            <p className="text-sm text-ink-soft">
+              The Kit + all {bundleCourses.length} paid short courses ({bundleCourses.map((c) => c.title).join(", ")}).
+            </p>
+          </div>
+          <div className="mt-3">
+            <div className="font-mono text-xl text-accent-ink">{formatPackPrice(bundleTotal)}</div>
+            <p className="text-[10.5px] text-ink-soft mb-2">
+              Apply code <b className="font-mono">BUNDLE10</b> at checkout for 10% off.
+            </p>
+            <button onClick={addBundle} className="font-mono text-[10.5px] bg-ink text-paper rounded px-2.5 py-1.5">
+              {bundleAdded ? "Added ✓" : "Add bundle to cart"}
+            </button>
+          </div>
+        </div>
       </div>
+
       <p className="text-sm mt-4">
-        <a href="/cart" className="text-accent-ink underline">View cart →</a>
-      </p>
-      <p className="text-sm mt-4">
-        Want a deeper dive on one topic instead? <a href="/courses" className="text-accent-ink underline">See the ₹149–199 courses →</a>
+        Want a deeper dive on one topic instead? <a href="/courses" className="text-accent-ink underline">See the courses →</a>
       </p>
     </section>
   );

@@ -30,6 +30,7 @@ true.
 | **Term of the day** | One AI/ML term + a plain-language definition, once a day | **Automatically**, `/api/cron/daily-content`, once a day | **Ollama** | Yes — live, unreviewed | Free | **₹0** self-hosted |
 | Mock-interview grading, paid | Grades one candidate's written answer — score, strengths, gaps, one concrete suggestion | Automatically, the instant a `MockAnswerSubmission` payment is captured (`POST /api/webhooks/razorpay`) | **Claude Sonnet 5** (Anthropic) — hardcoded, not admin-selectable, on purpose | **Yes — live, unreviewed, this is the ₹149 product** | Paid, ₹149 | ~₹2.80 (worked example below) — roughly **50x margin** |
 | Mock-interview grading, free | Same grading task, once a month, free | **User's click**, `POST /api/mock-feedback/free` | **Ollama** | Yes — live, unreviewed | Free, 1/month | **₹0** self-hosted |
+| **Indic-language translation** | Translates a short passage into Hindi/Telugu/Bengali/Marathi/Tamil/Kannada/Gujarati/Malayalam | **User's click**, homepage demo, `POST /api/translate` | **`translategemma`** — a different local model than the default, chosen because it's built specifically for translation (see below) | Yes — live, unreviewed, but it's a translation demo, not a scored answer | Free | **₹0** self-hosted |
 
 Every successful run auto-logs its real cost to the accounting ledger
 (`LedgerEntry`, category `ai_generation`) — visible per-day on
@@ -91,14 +92,33 @@ elsewhere (₹500–2,000+).
 metered API. Not the same as free: the real cost is electricity (a few
 paise per run, immaterial) and your own machine's compute time.
 
-**What's running**: `gemma4:e4b` (9.6GB), already pulled and verified
-against this project's actual prompts during this build — quiz drafting,
-free-tier mock-answer grading, the daily quiz, Pulse takeaways, and term
-of the day all genuinely run on it live, not just tested against it. Not necessarily the *best* open-weight
-model for this — Qwen2.5 and DeepSeek's smaller models are also strong,
-sometimes stronger — but there's no reason to spend more disk/bandwidth
-pulling alternatives before a concrete quality gap shows up. `OLLAMA_MODEL`
-overrides this if you do pull something else later.
+**What's running — two models, not one, on purpose**: `gemma4:e4b`
+(9.6GB) is the general default for the drafting/grading/daily-content
+agents above. **It is not used for Indic-language translation** —
+`translategemma` (3.3GB) is pulled specifically for that, because it's a
+model actually built for translation rather than a general chat model
+asked to translate as a side skill. This is the concrete case of "use a
+task-specific model where one clearly fits, don't force the general
+default onto everything" — verified for real: Hindi, Telugu, Bengali, and
+Marathi translations all came back correct and natural during this build
+(`POST /api/translate`, homepage demo).
+
+Neither model is necessarily the *single best* open-weight option for its
+job — Qwen2.5/DeepSeek are also strong general choices, and other
+translation-specialist models exist — but there's no reason to spend more
+disk/bandwidth pulling alternatives before a concrete quality gap shows
+up. `OLLAMA_MODEL`/`TRANSLATE_MODEL` override either if you do pull
+something else later.
+
+**Pulling a model isn't always a one-shot success — real, observed
+during this build**: `ollama pull translategemma` (3.3GB) failed twice
+with a TLS/connection timeout partway through, on an otherwise fine
+network (a direct request to the same CDN host connected instantly) —
+almost certainly instability on one sustained large transfer, not a
+blocked host. The third attempt succeeded outright. `ollama list`
+afterward is the only trustworthy way to confirm a pull actually landed —
+the command can report success-shaped output, or fail outright, and
+either way you should verify directly rather than assume.
 
 **The constraint that actually matters — reachability, not model
 quality**: Ollama is a separate always-running service, not something
@@ -110,8 +130,9 @@ bundled into this Next.js app. `OLLAMA_BASE_URL` has to be a URL the
   `OLLAMA_BASE_URL=http://localhost:11434` just works, zero extra infra,
   because your dev server and Ollama are on the same box.
 - **Everything else in the table above — the free grading tier, the daily
-  quiz, Pulse takeaways, term of the day — is triggered from the live
-  deployed site**, either by a real visitor's click or by Vercel Cron.
+  quiz, Pulse takeaways, term of the day, Indic translation — is
+  triggered from the live deployed site**, either by a real visitor's
+  click or by Vercel Cron.
   Once this is actually deployed to Vercel, `OLLAMA_BASE_URL` **cannot**
   be `localhost` — Vercel's serverless functions run in Vercel's cloud,
   not on your laptop, and cannot reach it. Before deploying any of these

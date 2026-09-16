@@ -8,18 +8,15 @@ import NewsletterSignup from "@/components/NewsletterSignup";
 import MythFactStrip from "@/components/MythFactStrip";
 import InterviewPackSection from "@/components/InterviewPackSection";
 import TermOfDay from "@/components/TermOfDay";
+import TokenizerDemo from "@/components/TokenizerDemo";
+import AgentWorkflowDemo from "@/components/AgentWorkflowDemo";
+import IndicLanguageSection from "@/components/IndicLanguageSection";
+import AboutUs from "@/components/AboutUs";
 
 const morePrep = [
-  { title: "Go deep on one topic", desc: "RAG, Knowledge Graphs, LLM Observability — short courses with real demos.", price: "From ₹149", href: "/courses", locked: false },
+  { title: "Go deep on one topic", desc: "RAG, Knowledge Graphs, LLM Observability, and a no-code AI Fluency track — short courses with real demos.", price: "From ₹99", href: "/courses", locked: false },
   { title: "Time with someone who's done it", desc: "1:1 career guidance, slots open on a rolling 15-day window.", price: "Book a slot", href: "/mentoring", locked: true },
   { title: "Real feedback on a mock answer", desc: "AI-graded, specific to what you actually wrote. 1 free/month — we even tell you which model graded you.", price: "Free or ₹149", href: "/mock-feedback", locked: false },
-];
-
-const personas = [
-  { photo: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80", label: "Career switcher", detail: "No CS degree — now shipping RAG apps" },
-  { photo: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=200&q=80", label: "Fresh graduate", detail: "Landed a first AI Engineer role" },
-  { photo: "https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?w=200&q=80", label: "Junior professional", detail: "2-3 years in, moved into an AI-adjacent role at the same company" },
-  { photo: "https://images.unsplash.com/photo-1573164713988-8665fc963095?w=200&q=80", label: "Small business owner", detail: "Automated support with one weekend build" },
 ];
 
 const freeTools = [
@@ -45,13 +42,14 @@ export default function Home() {
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/75 to-ink/25" />
         <div className="relative px-6 sm:px-10 py-12 text-paper">
-          <p className="font-mono text-xs uppercase tracking-widest text-spark mb-3">All things AI</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-spark mb-3">Democratizing AI</p>
           <h1 className="font-display text-3xl sm:text-5xl font-semibold max-w-2xl text-balance leading-tight">
-            The future is here. AI is already changing how we work, learn, and build.
+            AI shouldn&apos;t be a black box only a few people understand.
           </h1>
           <p className="mt-4 max-w-xl text-paper/85">
-            A daily read on what&apos;s actually happening in AI, what each model costs to run, and a
-            structured way to prep for a GenAI or Agentic AI interview.
+            A plain-language read on what&apos;s actually happening in AI, what each model costs to
+            run, and a structured way to prep for a GenAI or Agentic AI interview — starting at ₹100,
+            on purpose.
           </p>
           <TrackedLink
             href="/quiz"
@@ -81,32 +79,24 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-b border-paper-line py-8">
-        <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">Who this is for</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {personas.map((p) => (
-            <div key={p.label} className="flex items-center gap-3">
-              <Image
-                src={p.photo}
-                alt=""
-                width={52}
-                height={52}
-                className="rounded-full object-cover w-[52px] h-[52px]"
-              />
-              <div>
-                <p className="text-sm font-semibold">{p.label}</p>
-                <p className="text-xs text-ink-soft">{p.detail}</p>
-              </div>
-            </div>
-          ))}
+      <section className="border-b border-paper-line py-9">
+        <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">Today, for free</p>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <MythFactStrip />
+          <TermOfDay />
         </div>
       </section>
 
-      <MythFactStrip />
+      <section className="border-b border-paper-line py-9">
+        <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-1">See it, don&apos;t just read about it</p>
+        <h2 className="font-display text-xl font-semibold mb-5">Two things everyone asks about, live in your browser.</h2>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <TokenizerDemo />
+          <AgentWorkflowDemo />
+        </div>
+      </section>
 
-      <div className="border-b border-paper-line py-6">
-        <TermOfDay />
-      </div>
+      <IndicLanguageSection />
 
       <SoftGate>
         <section id="free" className="border-b border-paper-line py-9">
@@ -126,19 +116,19 @@ export default function Home() {
         <PulseFeed />
       </SoftGate>
 
-      <section className="border-b border-paper-line py-9">
-        <h2 className="font-display text-lg font-semibold mb-1">Get the free digest</h2>
-        <p className="text-sm text-ink-soft mb-4 max-w-md">
-          The plain-language version of what actually happened in AI this week — no spam, unsubscribe
-          any time.
-        </p>
-        <NewsletterSignup source="homepage" />
-      </section>
-
-      <footer id="work" className="py-10">
+      <footer id="work" className="py-10 flex flex-col gap-6">
         <div className="border border-paper-line rounded p-6">
           <WorkWithMe />
         </div>
+        <div className="border border-paper-line rounded p-6">
+          <h2 className="font-display text-lg font-semibold mb-1">Get the free digest</h2>
+          <p className="text-sm text-ink-soft mb-4 max-w-md">
+            The plain-language version of what actually happened in AI this week — no spam,
+            unsubscribe any time.
+          </p>
+          <NewsletterSignup source="homepage" />
+        </div>
+        <AboutUs />
       </footer>
     </main>
   );

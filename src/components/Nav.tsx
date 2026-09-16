@@ -2,26 +2,21 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { useCart } from "./CartContext";
+import CartIcon from "./CartIcon";
 
+// Trimmed to real pages only — the previous list also had #pulse/#free/#pack
+// homepage-anchor shortcuts, which just duplicated what's already the first
+// thing you see landing on "/". A nav should get you somewhere new.
 const links = [
   { href: "/quiz", label: "Quiz" },
-  { href: "/#pulse", label: "Pulse" },
-  { href: "/#free", label: "Run It Free" },
   { href: "/articles", label: "Articles" },
   { href: "/courses", label: "Courses" },
   { href: "/mentoring", label: "Mentoring", locked: true },
   { href: "/mock-feedback", label: "Mock Feedback" },
-  { href: "/#pack", label: "Interview Pack", locked: true },
 ];
 
-// A flat link list stopped fitting once Mentoring/Mock Feedback/Interview
-// Pack were added on top of the original set — this collapses into a
-// hamburger below ~900px instead of wrapping into a second and third row,
-// which was the actual "hard to find things" problem on a phone.
 export default function Nav() {
   const { status } = useSession();
-  const { items } = useCart();
   const [open, setOpen] = useState(false);
 
   return (
@@ -60,22 +55,22 @@ export default function Nav() {
           <a href="/help" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
             Help
           </a>
-          <a href="/cart" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
-            Cart{items.length > 0 && ` (${items.length})`}
-          </a>
           <a href="/#work" className="font-mono text-xs bg-ink text-paper rounded px-3 py-1.5">
             Work With Me
           </a>
         </div>
 
-        <button
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          className="lg:hidden font-mono text-xs border border-paper-line rounded px-2.5 py-1.5 flex-none"
-        >
-          {open ? "Close" : "Menu"}
-        </button>
+        <div className="flex items-center gap-1 flex-none">
+          <CartIcon />
+          <button
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            className="lg:hidden font-mono text-xs border border-paper-line rounded px-2.5 py-1.5"
+          >
+            {open ? "Close" : "Menu"}
+          </button>
+        </div>
       </div>
 
       {open && (
@@ -104,9 +99,6 @@ export default function Nav() {
           </a>
           <a href="/help" onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
             Help
-          </a>
-          <a href="/cart" onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
-            Cart{items.length > 0 && ` (${items.length})`}
           </a>
           <a href="/#work" onClick={() => setOpen(false)} className="font-mono text-sm bg-ink text-paper rounded px-3 py-2 self-start">
             Work With Me
