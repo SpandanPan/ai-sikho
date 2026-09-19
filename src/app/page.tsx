@@ -18,43 +18,97 @@ const morePrep = [
   { title: "Real feedback on a mock answer", desc: "AI-graded, specific to what you actually wrote. 1/month, no charge — we even tell you which grader graded you.", price: "1/month + ₹149", href: "/mock-feedback", locked: false },
 ];
 
+const heroFeatures = [
+  { label: "Learn\nat your pace", color: "bg-accent2/20 text-accent2", icon: "people" as const },
+  { label: "Real-world\nexamples", color: "bg-accent-ink/20 text-accent-ink", icon: "book" as const },
+  { label: "Career-ready\nskills", color: "bg-accent/25 text-accent-ink", icon: "cap" as const },
+  { label: "Built for\ncurious minds", color: "bg-rust/20 text-rust", icon: "people" as const },
+];
+
+function HeroFeatureIcon({ icon }: { icon: "people" | "book" | "cap" }) {
+  if (icon === "book") {
+    return (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+      </svg>
+    );
+  }
+  if (icon === "cap") {
+    return (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M22 10 12 5 2 10l10 5 10-5Z" />
+        <path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5" />
+      </svg>
+    );
+  }
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
 export default function Home() {
   return (
     <div className="mx-auto max-w-6xl px-5">
       <FunFactLoader />
 
-      <header className="relative -mx-5 sm:mx-0 rounded-b-lg overflow-hidden h-[190px] sm:h-[220px] flex items-end">
-        <Image
-          src="https://images.unsplash.com/photo-1715167886555-01552c3369c7?w=1600&q=80"
-          alt="A tea stall in India — people gathered around, having chai"
-          fill
-          priority
-          className="object-cover -z-20"
-        />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/75 to-ink/20" />
-        {/* Fades the image's hard bottom edge into the page background
-            instead of cutting straight from photo to solid paper color —
-            the "abrupt" seam this replaces. */}
-        <div className="absolute inset-x-0 bottom-0 h-6 -z-10 bg-gradient-to-t from-paper to-transparent" />
-        <div className="relative px-5 sm:px-8 py-4 text-paper">
-          <p className="font-mono text-[10.5px] uppercase tracking-widest text-spark mb-1.5">Democratizing AI</p>
-          <h1 className="font-display text-xl sm:text-2xl font-semibold max-w-xl text-balance leading-tight">
-            AI shouldn&apos;t be a black box only a few people understand.
-          </h1>
-          <TrackedLink
-            href="/quiz"
-            label="hero-quiz-cta"
-            className="inline-block mt-2.5 rounded bg-spark text-ink font-mono text-xs font-semibold px-4 py-2"
-          >
-            Take the 60-second AI quiz →
-          </TrackedLink>
+      <header className="relative -mx-5 sm:mx-0 rounded-b-lg overflow-hidden bg-ink text-paper">
+        <div className="relative grid lg:grid-cols-[1.1fr_1fr] gap-6 items-center px-5 sm:px-8 py-8 sm:py-10">
+          <div>
+            <p className="font-mono text-[10.5px] uppercase tracking-widest text-spark mb-2 font-semibold">Democratizing AI</p>
+            <h1 className="font-display text-3xl sm:text-4xl font-semibold text-balance leading-tight mb-3">
+              AI for Everyone, Not Just a Few.
+            </h1>
+            <p className="text-sm sm:text-[15px] text-paper/75 max-w-md leading-relaxed mb-5">
+              Practical, easy-to-understand resources to help you learn AI, build real skills, and
+              open new opportunities — no fancy jargon, no prior experience required.
+            </p>
+            <div className="flex items-center gap-4 flex-wrap mb-6">
+              <TrackedLink
+                href="/quiz"
+                label="hero-quiz-cta"
+                className="inline-block rounded bg-spark text-ink font-mono text-xs font-semibold px-4 py-2.5"
+              >
+                Take the 60-second AI quiz →
+              </TrackedLink>
+              {/* No actual video exists yet — points at /about (the real
+                  "who we are" page) rather than faking a video destination. */}
+              <a href="/about" className="inline-flex items-center gap-2 font-mono text-xs text-paper/80 hover:text-paper">
+                <span className="w-6 h-6 rounded-full border border-paper/40 flex items-center justify-center flex-none" aria-hidden>
+                  ▶
+                </span>
+                Watch 1-min intro
+              </a>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3">
+              {heroFeatures.map((f) => (
+                <div key={f.label} className="flex items-center gap-2">
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center flex-none ${f.color}`}>
+                    <HeroFeatureIcon icon={f.icon} />
+                  </span>
+                  <span className="font-mono text-[10.5px] text-paper/75 leading-tight whitespace-pre-line">{f.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative hidden lg:block">
+            <Image
+              src="/home/hero-illustration.png"
+              alt="A diverse group learning AI together around a laptop, with a glowing lightbulb reading 'AI for a brighter tomorrow' above them."
+              width={793}
+              height={505}
+              priority
+              className="w-full h-auto"
+            />
+          </div>
         </div>
       </header>
-      <p className="text-sm text-ink-soft max-w-xl mt-3 mb-6">
-        A plain-language read on what&apos;s actually happening in AI, what each model costs to run,
-        and a structured way to prep for a GenAI or Agentic AI interview — starting at ₹100, on
-        purpose.
-      </p>
 
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
         {/* AI Pulse as a persistent left sidebar on desktop — sticky below
