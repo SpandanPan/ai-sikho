@@ -50,7 +50,8 @@ export default function WorkWithMe() {
     <div>
       <h2 className="font-display text-xl font-semibold mb-1">Running a business? Bring me the busywork.</h2>
       <p className="text-sm text-ink-soft mb-6 max-w-lg">
-        Pick what you need automated, leave a way to reach you, and we&apos;ll follow up with a quote.
+        Have a repetitive process you&apos;d like to automate? Tell me what it is. I&apos;ll help you figure out
+        whether AI can actually solve it.
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2 mb-6">

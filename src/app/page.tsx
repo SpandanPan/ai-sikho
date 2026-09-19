@@ -11,9 +11,15 @@ import TermOfDay from "@/components/TermOfDay";
 import TokenizerDemo from "@/components/TokenizerDemo";
 import AgentWorkflowDemo from "@/components/AgentWorkflowDemo";
 import IndicLanguageSection from "@/components/IndicLanguageSection";
+import StartHere from "@/components/StartHere";
+import LearnAiPath from "@/components/LearnAiPath";
 
-const morePrep = [
-  { title: "Go deep on one topic", desc: "RAG, Knowledge Graphs, LLM Observability, and a no-code AI Fluency track — short courses with real demos.", price: "From ₹99", href: "/courses", locked: false },
+// Same order as the site's Mentoring nav dropdown (Nav.tsx) — mentoring
+// itself, plus its companion mock-feedback offer. "Go deep on one topic"
+// (the short paid courses) used to live in this grid too; it's covered
+// now by the "I want to build with AI" card in StartHere instead, so
+// Courses isn't duplicated as its own homepage section.
+const mentoringOffers = [
   { title: "Time with someone who's done it", desc: "1:1 career guidance, slots open on a rolling 15-day window.", price: "Book a slot", href: "/mentoring", locked: true },
   { title: "Real feedback on a mock answer", desc: "AI-graded, specific to what you actually wrote. 1/month, no charge — we even tell you which grader graded you.", price: "1/month + ₹149", href: "/mock-feedback", locked: false },
 ];
@@ -57,6 +63,7 @@ export default function Home() {
     <div className="mx-auto max-w-6xl px-5">
       <FunFactLoader />
 
+      {/* HERO */}
       <header className="relative -mx-5 sm:mx-0 rounded-b-lg overflow-hidden bg-ink text-paper">
         <div className="relative grid lg:grid-cols-[1.1fr_1fr] gap-6 items-center px-5 sm:px-8 py-8 sm:py-10">
           <div>
@@ -64,27 +71,25 @@ export default function Home() {
             <h1 className="font-display text-3xl sm:text-4xl font-semibold text-balance leading-tight mb-3">
               AI for Everyone, Not Just a Few.
             </h1>
+            <p className="text-base font-semibold text-paper mb-1.5">Learn AI without the jargon.</p>
             <p className="text-sm sm:text-[15px] text-paper/75 max-w-md leading-relaxed mb-5">
-              Practical, easy-to-understand resources to help you learn AI, build real skills, and
-              open new opportunities — no fancy jargon, no prior experience required.
+              Plain-English explainers, interactive demos, practical guides, and career resources —
+              built for people starting from zero.
             </p>
             <div className="flex items-center gap-4 flex-wrap mb-6">
+              <a
+                href="#start-here"
+                className="inline-block rounded bg-spark text-ink font-mono text-xs font-semibold px-4 py-2.5"
+              >
+                Start Learning AI →
+              </a>
               <TrackedLink
                 href="/quiz"
                 label="hero-quiz-cta"
-                className="inline-block rounded bg-spark text-ink font-mono text-xs font-semibold px-4 py-2.5"
+                className="font-mono text-xs text-paper/80 hover:text-paper"
               >
                 Take the 60-second AI quiz →
               </TrackedLink>
-              {/* No actual video exists yet — /intro is a real placeholder
-                  page (not a fake anchor) so this is plumbed correctly and
-                  just needs the actual video swapped in later. */}
-              <a href="/intro" className="inline-flex items-center gap-2 font-mono text-xs text-paper/80 hover:text-paper">
-                <span className="w-6 h-6 rounded-full border border-paper/40 flex items-center justify-center flex-none" aria-hidden>
-                  ▶
-                </span>
-                Watch 1-min intro
-              </a>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3">
               {heroFeatures.map((f) => (
@@ -111,80 +116,79 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 mt-8">
-        {/* AI Pulse as a persistent left sidebar on desktop — sticky below
-            the nav, auto-scrolling vertically. On mobile there's no room
-            for a permanent sidebar, so this moves to the end of the page
-            (order-last) and the horizontal ticker fallback further down
-            is what mobile visitors actually see. */}
-        <aside className="order-last lg:order-none lg:w-72 lg:flex-none">
-          <div className="lg:sticky lg:top-20">
-            <SoftGate>
-              <PulseFeed orientation="vertical" />
-            </SoftGate>
+      <main className="mt-2">
+        {/* START HERE */}
+        <StartHere />
+
+        {/* LEARN AI */}
+        <LearnAiPath />
+
+        <section className="border-b border-paper-line py-9">
+          <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">Today&apos;s dose</p>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <MythFactStrip />
+            <TermOfDay />
           </div>
-        </aside>
+        </section>
 
-        <main className="flex-1 min-w-0">
+        {/* TRY AI */}
+        <section className="border-b border-paper-line py-9">
+          <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-1">Don&apos;t just read about AI</p>
+          <h2 className="font-display text-xl font-semibold mb-5">Try it.</h2>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <TokenizerDemo />
+            <AgentWorkflowDemo />
+          </div>
+        </section>
+
+        <IndicLanguageSection />
+
+        {/* AI PULSE — a normal section now, not a tall sticky sidebar */}
+        <SoftGate>
+          <PulseFeed orientation="horizontal" />
+        </SoftGate>
+
+        {/* CAREER / INTERVIEW */}
+        <section id="career">
           <InterviewPackSection />
+        </section>
 
-          <section className="border-b border-paper-line py-9">
-            <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">More ways to prep</p>
-            <div className="grid gap-3.5 sm:grid-cols-3">
-              {morePrep.map((m) => (
-                <a key={m.title} href={m.href} className="border border-paper-line rounded p-4 hover:border-accent transition-colors">
-                  <h3 className="font-semibold text-sm mb-1 flex items-center gap-1.5">
-                    {m.title}
-                    {m.locked && <span title="Paid" aria-label="Paid">🔒</span>}
-                  </h3>
-                  <p className="text-sm text-ink-soft mb-3">{m.desc}</p>
-                  <span className="font-mono text-xs text-accent-ink">{m.price} →</span>
-                </a>
-              ))}
-            </div>
-          </section>
+        {/* MENTORING */}
+        <section className="border-b border-paper-line py-9">
+          <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">Want to talk to someone who&apos;s done it?</p>
+          <div className="grid gap-3.5 sm:grid-cols-2">
+            {mentoringOffers.map((m) => (
+              <a key={m.title} href={m.href} className="border border-paper-line rounded p-4 hover:border-accent transition-colors">
+                <h3 className="font-semibold text-sm mb-1 flex items-center gap-1.5">
+                  {m.title}
+                  {m.locked && <span title="Paid" aria-label="Paid">🔒</span>}
+                </h3>
+                <p className="text-sm text-ink-soft mb-3">{m.desc}</p>
+                <span className="font-mono text-xs text-accent-ink">{m.price} →</span>
+              </a>
+            ))}
+          </div>
+        </section>
 
-          <section className="border-b border-paper-line py-9">
-            <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">Today's dose</p>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <MythFactStrip />
-              <TermOfDay />
-            </div>
-          </section>
+        {/* BUSINESS / WORK WITH ME */}
+        <section id="work" className="border-b border-paper-line py-9">
+          <div className="border border-paper-line rounded p-6">
+            <WorkWithMe />
+          </div>
+        </section>
 
-          <section className="border-b border-paper-line py-9">
-            <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-1">See it, don&apos;t just read about it</p>
-            <h2 className="font-display text-xl font-semibold mb-5">Two things everyone asks about, live in your browser.</h2>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <TokenizerDemo />
-              <AgentWorkflowDemo />
-            </div>
-          </section>
-
-          <IndicLanguageSection />
-
-          <SoftGate>
-            {/* Mobile-only fallback — the sidebar above is desktop-only (lg+) */}
-            <div id="pulse" className="lg:hidden">
-              <PulseFeed orientation="horizontal" />
-            </div>
-          </SoftGate>
-
-          <footer id="work" className="py-10 flex flex-col gap-6">
-            <div className="border border-paper-line rounded p-6">
-              <WorkWithMe />
-            </div>
-            <div className="border border-paper-line rounded p-6">
-              <h2 className="font-display text-lg font-semibold mb-1">Get the digest</h2>
-              <p className="text-sm text-ink-soft mb-4 max-w-md">
-                The plain-language version of what actually happened in AI this week — no spam,
-                unsubscribe any time.
-              </p>
-              <NewsletterSignup source="homepage" />
-            </div>
-          </footer>
-        </main>
-      </div>
+        {/* NEWSLETTER */}
+        <section className="py-10">
+          <div className="border border-paper-line rounded p-6">
+            <h2 className="font-display text-lg font-semibold mb-1">Get the digest</h2>
+            <p className="text-sm text-ink-soft mb-4 max-w-md">
+              The plain-language version of what actually happened in AI this week — no spam,
+              unsubscribe any time.
+            </p>
+            <NewsletterSignup source="homepage" />
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

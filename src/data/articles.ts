@@ -30,6 +30,59 @@ export const levelInfo: Record<Level, { label: string; tagline: string }> = {
 
 export const articles: Article[] = [
   // -- Starter: true beginners, no prior AI vocabulary assumed --
+  // The next 7 are stubs for the homepage's "Learn AI from zero" numbered
+  // path (see LearnAiPath.tsx) — steps 01, 03, 04, 05, 08, 09, 10. Three
+  // other steps in that same path (02, 06, 07) already exist below as
+  // real published pieces (ai-vs-ml-vs-dl, prompting-101, chatbot-or-agent).
+  {
+    slug: "what-is-ai",
+    title: "What Is AI?",
+    summary: "The one-paragraph answer, before any of the jargon that usually comes with it.",
+    level: "starter",
+    status: "coming-soon",
+  },
+  {
+    slug: "what-is-generative-ai",
+    title: "What Is Generative AI?",
+    summary: "The difference between AI that decides and AI that creates.",
+    level: "starter",
+    status: "coming-soon",
+  },
+  {
+    slug: "what-is-an-llm",
+    title: "What Is an LLM?",
+    summary: "The three letters behind ChatGPT, Claude, and Gemini, explained plainly.",
+    level: "starter",
+    status: "coming-soon",
+  },
+  {
+    slug: "how-chatgpt-works",
+    title: "How Does ChatGPT Actually Work?",
+    summary: "What happens between you hitting enter and the words appearing on screen.",
+    level: "starter",
+    status: "coming-soon",
+  },
+  {
+    slug: "what-is-rag",
+    title: "What Is RAG?",
+    summary: "How an AI answers questions about documents it was never trained on.",
+    level: "starter",
+    status: "coming-soon",
+  },
+  {
+    slug: "what-are-ai-agents",
+    title: "What Are AI Agents?",
+    summary: "The building blocks behind a system that can plan, use tools, and take action.",
+    level: "starter",
+    status: "coming-soon",
+  },
+  {
+    slug: "how-ai-is-changing-jobs",
+    title: "How AI Is Changing Jobs",
+    summary: "What's actually shifting in day-to-day work, beyond the headlines.",
+    level: "starter",
+    status: "coming-soon",
+  },
   {
     slug: "ai-vs-ml-vs-dl",
     title: "AI vs. Machine Learning vs. Deep Learning",
