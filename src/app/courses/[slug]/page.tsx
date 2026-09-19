@@ -8,14 +8,14 @@ import LessonAnimation from "@/components/LessonAnimation";
 import AiTimeline from "@/components/AiTimeline";
 import AiDialogue from "@/components/AiDialogue";
 import AiFluencyCheatSheet from "@/components/AiFluencyCheatSheet";
+import GoDeeper from "@/components/GoDeeper";
+import { DataGrowthDiagram, TokenDiagram } from "@/components/ConceptDiagrams";
 import {
-  AiNestingDiagram,
-  AttentionDiagram,
-  DataGrowthDiagram,
-  TokenDiagram,
-  HallucinationDiagram,
-  TransformerDiagram,
-} from "@/components/ConceptDiagrams";
+  NestedLayersDiagram,
+  AttentionSentenceDemo,
+  TransformerCompareDiagram,
+  ConfidenceComparisonDiagram,
+} from "@/components/PriorityVisuals";
 
 // Each course's content lives in its own file under src/data/lessons/ —
 // merged here into one lookup keyed by course slug, same shape either way.
@@ -103,12 +103,12 @@ export default function CourseLessonPage({ params }: { params: { slug: string } 
               )}
               {s.component === "ai-nesting" && (
                 <div className="mb-6">
-                  <AiNestingDiagram />
+                  <NestedLayersDiagram />
                 </div>
               )}
               {s.component === "attention" && (
                 <div className="mb-6">
-                  <AttentionDiagram />
+                  <AttentionSentenceDemo />
                 </div>
               )}
               {s.component === "data-growth" && (
@@ -123,12 +123,12 @@ export default function CourseLessonPage({ params }: { params: { slug: string } 
               )}
               {s.component === "hallucination" && (
                 <div className="mb-6">
-                  <HallucinationDiagram />
+                  <ConfidenceComparisonDiagram />
                 </div>
               )}
               {s.component === "transformer" && (
                 <div className="mb-6">
-                  <TransformerDiagram />
+                  <TransformerCompareDiagram />
                 </div>
               )}
               {s.component === "cheatsheet" && (
@@ -162,6 +162,7 @@ export default function CourseLessonPage({ params }: { params: { slug: string } 
                   );
                 })}
               </div>
+              {s.deeper && s.deeper.length > 0 && <GoDeeper paragraphs={s.deeper} />}
               {(s.myth || s.fact) && (
                 <div className="mt-4 grid gap-2 sm:grid-cols-2">
                   {s.myth && (

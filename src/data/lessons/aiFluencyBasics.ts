@@ -9,6 +9,8 @@ export type LessonSection = {
   kind?: LessonAnimationKind;
   component?: "timeline" | "dialogue" | "ai-nesting" | "attention" | "data-growth" | "token" | "hallucination" | "transformer" | "cheatsheet";
   body: string[];
+  /** Extra detail tucked behind a "Go deeper" toggle instead of always-visible body copy. */
+  deeper?: string[];
   url?: string;
   myth?: string;
   fact?: string;
@@ -39,11 +41,14 @@ export const lessons: Record<string, Lesson> = {
         heading: "The three layers of AI",
         component: "ai-nesting",
         body: [
-          "People use \"AI\" to mean almost anything with a screen and a vaguely futuristic glow. In reality, it is a broad label covering several nested ideas. The diagram above shows the relationship.",
-          "Artificial Intelligence is the big umbrella: computer systems performing tasks we associate with human intelligence, such as recognizing speech, recommending a movie, spotting fraud, translating text, or playing chess. Your map app estimating traffic is AI. Your email filtering spam is AI. Your robot vacuum repeatedly eating the same charging cable is, sadly, also operating in the AI-adjacent universe.",
-          "Machine Learning is the most common way modern AI is built. Instead of writing every rule manually — \"if an email contains this phrase, call it spam\" — people give a system many examples of spam and non-spam. The system learns statistical patterns that help it make a guess about new emails.",
-          "Deep Learning is a powerful type of machine learning built from many connected layers, often called neural networks. It is especially good at dealing with messy, enormous kinds of information: language, audio, images, video, and code.",
-          "ChatGPT, Claude, Gemini, and similar tools are Large Language Models, or LLMs. They are deep-learning systems trained on huge amounts of text and code. They can perform many language tasks in one place — drafting, summarizing, translating, explaining, brainstorming — but that flexibility does not mean they understand the world in the same way a person does.",
+          "People use \"AI\" to mean almost anything with a screen and a vaguely futuristic glow. In reality it is four nested ideas, each one narrower than the last. Tap a ring above to see what actually lives there.",
+          "The short version: AI is the whole field. Machine learning is the most common way it gets built. Deep learning is one powerful kind of machine learning. And an LLM — what ChatGPT and Claude actually are — is deep learning trained specifically on text.",
+        ],
+        deeper: [
+          "Artificial Intelligence is the big umbrella: computer systems performing tasks we associate with human intelligence — recognizing speech, recommending a movie, spotting fraud, translating text, playing chess. Your map app estimating traffic is AI. So is your email's spam filter.",
+          "Machine Learning is the most common way modern AI is built. Instead of writing every rule by hand — \"if an email contains this phrase, call it spam\" — you give a system many examples of spam and non-spam, and it learns the statistical patterns itself.",
+          "Deep Learning is a powerful type of machine learning built from many connected layers, often called neural networks. It is especially good at messy, enormous kinds of information: language, audio, images, video, code.",
+          "LLMs are deep-learning systems trained on huge amounts of text and code. They can perform many language tasks in one place — drafting, summarizing, translating, explaining — but that flexibility does not mean they understand the world the way a person does.",
         ],
         myth: "AI, machine learning, deep learning, and ChatGPT are different names for the same thing.",
         fact: "They are nested. AI is the broad field. Machine learning is a common approach. Deep learning is one kind of machine learning. ChatGPT is one product built with a type of deep-learning model called an LLM.",
@@ -64,11 +69,12 @@ export const lessons: Record<string, Lesson> = {
         heading: "The paper that changed everything",
         component: "attention",
         body: [
-          "In 2017, researchers published a paper with an unusually confident title: \"Attention Is All You Need.\" The title was not literally true — researchers still needed data, chips, electricity, money, and probably coffee — but the core idea changed the direction of AI.",
-          "The key idea was attention. When people read a sentence, we do not give every word equal importance. In \"The bank raised interest rates,\" the word \"bank\" probably means a financial institution because of \"raised,\" \"interest,\" and \"rates.\" In \"We sat on the bank of the river,\" the surrounding words point somewhere completely different.",
-          "Older systems processed sentences more sequentially, like reading through a tiny drinking straw. Transformers can compare relationships among many parts of a passage at once and learn which connections matter. This makes it easier to handle long, complex language and much faster to train on powerful hardware.",
+          "Toggle the sentence above. Same word, \"bank\" — completely different meaning, depending only on which nearby words it pays attention to. That trick, called attention, is the core idea behind a 2017 paper called \"Attention Is All You Need.\"",
+          "Older systems read one word at a time, like reading through a drinking straw. Attention lets a model weigh every word against every other word at once, which is both faster to train and far better at tracking meaning across a long sentence.",
+        ],
+        deeper: [
           "That architecture is called a Transformer. GPT means Generative Pre-trained Transformer: a model trained in advance to generate likely text. Many modern systems build on Transformer ideas, even when the products and model names differ.",
-          "The breakthrough was not that AI suddenly began \"thinking\" like a human. It gained a far better way to model relationships in data at enormous scale. That is less cinematic than a robot awakening, but much more useful.",
+          "The breakthrough was not that AI suddenly began \"thinking\" like a human. It gained a far better way to model relationships in data at enormous scale. Less cinematic than a robot awakening, but much more useful.",
         ],
         myth: "AI improved only because computers became faster.",
         fact: "Faster hardware mattered, but the Transformer architecture was a major unlock because it let models learn from huge datasets more efficiently.",
@@ -77,9 +83,11 @@ export const lessons: Record<string, Lesson> = {
         heading: "The breakthrough visualization",
         component: "transformer",
         body: [
-          "The old approach treated language mostly as a line: first word, then second word, then third word. That works for short phrases, but important context may be far away. By the end of a long sentence, an older model could lose track of the beginning — a relatable experience for anyone reading a legal contract.",
-          "A Transformer looks for connections across the text. It learns that some words strongly affect the meaning of others, then gives those relationships more weight. This is why a modern model can often follow a detailed instruction, summarize a long passage, or keep track of a topic across several paragraphs.",
-          "Attention is not human concentration. The model is not staring thoughtfully out of a rainy window. It is a mathematical way to score which pieces of information are most useful for predicting the next piece.",
+          "Side by side: the old way read language as a line, one word after another, losing track of the beginning by the end of a long sentence — a relatable experience for anyone reading a legal contract. The new way looks at the whole sentence every time.",
+          "That single change is most of why a modern model can follow a detailed instruction, summarize a long passage, or keep track of a topic across several paragraphs.",
+        ],
+        deeper: [
+          "Attention is not human concentration. The model is not staring thoughtfully out of a rainy window. It is a mathematical way to score which pieces of information are most useful for predicting the next piece of text.",
         ],
       },
       {
@@ -121,11 +129,13 @@ export const lessons: Record<string, Lesson> = {
         heading: "Where it quietly fails",
         component: "hallucination",
         body: [
-          "AI can sound composed, detailed, and completely wrong. This is one of its most important limits because the writing style does not reliably signal whether an answer is true.",
-          "A model may invent a citation, a statistic, a product feature, a court case, a quote, or the name of a restaurant that absolutely does not exist. It is not usually trying to deceive you. It is doing the thing it was trained to do: produce a plausible continuation. Sometimes the most plausible-looking continuation is fiction wearing a sensible blazer.",
-          "It can also make mistakes in arithmetic, logic, counting, dates, and precise instructions. Some AI tools can use calculators or code to improve these tasks, but you should still verify important results.",
-          "Be especially careful with information that is specific, current, expensive, legal, medical, financial, safety-related, or likely to affect another person. For those tasks, use trusted sources and appropriate experts. AI can help you prepare questions or summarize verified material; it should not be your final authority.",
-          "The practical rule is simple: use AI freely for drafts and ideas. Verify facts, figures, quotes, sources, and consequential decisions.",
+          "Hit \"Check the sources\" above. Before you did, both answers looked equally sure — same tone, same confidence. That is the actual danger: fluency is not evidence. A model can state a wrong answer exactly as confidently as a right one.",
+          "This is called a hallucination — not a lie, just a plausible-sounding guess with nothing behind it. It shows up most with citations, statistics, dates, and arithmetic. The fix isn't distrust everything; it's verify the specific, checkable claims.",
+        ],
+        deeper: [
+          "A model may invent a citation, a statistic, a product feature, a court case, a quote, or a restaurant that does not exist. It is not usually trying to deceive you — it is doing what it was trained to do: produce a plausible continuation. Sometimes the most plausible-looking continuation is fiction wearing a sensible blazer.",
+          "Be especially careful with information that is specific, current, expensive, legal, medical, financial, safety-related, or likely to affect another person. AI can help you prepare questions or summarize verified material; it should not be your final authority.",
+          "The practical rule: use AI freely for drafts and ideas. Verify facts, figures, quotes, sources, and consequential decisions.",
         ],
         myth: "If an answer is detailed and confident, it is probably reliable.",
         fact: "Fluency is not evidence. A model can express a correct answer and an invented answer in the same confident tone.",
