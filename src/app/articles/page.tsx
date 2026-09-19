@@ -6,17 +6,23 @@ const levelStyle: Record<Level, string> = {
   architect: "text-rust bg-rust/15",
 };
 
-function ArticleCard({ title, summary, status }: { title: string; summary: string; status: "coming-soon" | "published" }) {
-  return (
-    <div className="border border-paper-line rounded p-4 flex items-start justify-between gap-4">
+function ArticleCard({ slug, title, summary, status }: { slug: string; title: string; summary: string; status: "coming-soon" | "published" }) {
+  const content = (
+    <div className="border border-paper-line rounded p-4 flex items-start justify-between gap-4 hover:border-accent-ink transition-colors">
       <div>
         <h3 className="font-semibold text-sm">{title}</h3>
         <p className="text-sm text-ink-soft mt-1">{summary}</p>
       </div>
       <span className="font-mono text-[10.5px] uppercase text-ink-soft whitespace-nowrap mt-1">
-        {status === "coming-soon" ? "Coming soon" : "Read"}
+        {status === "coming-soon" ? "Coming soon" : "Read →"}
       </span>
     </div>
+  );
+  if (status !== "published") return content;
+  return (
+    <a href={`/articles/${slug}`} className="block">
+      {content}
+    </a>
   );
 }
 
@@ -33,7 +39,7 @@ function LevelSection({ level }: { level: Level }) {
       </div>
       <p className="text-sm text-ink-soft mb-4 max-w-lg">{info.tagline}</p>
       <div className="flex flex-col gap-2">
-        {items.map((a) => <ArticleCard key={a.slug} title={a.title} summary={a.summary} status={a.status} />)}
+        {items.map((a) => <ArticleCard key={a.slug} slug={a.slug} title={a.title} summary={a.summary} status={a.status} />)}
       </div>
     </div>
   );
@@ -57,7 +63,7 @@ function ArchiveSection() {
         Older, but still accurate — concepts that don&apos;t go stale, kept separate from newer pieces.
       </p>
       <div className="flex flex-col gap-2">
-        {items.map((a) => <ArticleCard key={a.slug} title={a.title} summary={a.summary} status={a.status} />)}
+        {items.map((a) => <ArticleCard key={a.slug} slug={a.slug} title={a.title} summary={a.summary} status={a.status} />)}
       </div>
     </div>
   );

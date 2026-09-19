@@ -13,19 +13,19 @@ const columns = [
     links: [
       { href: "/#pack", label: "Interview Pack" },
       { href: "/courses", label: "Courses" },
-      { href: "/mentoring", label: "Mentoring" },
-      { href: "/mock-feedback", label: "Mock Feedback" },
+      { href: "/mentoring", label: "Mentoring (+ Mock Feedback)" },
     ],
   },
   {
+    // Settings/Help/legal moved out of here into the "≡" overflow menu in
+    // Nav.tsx (see moreLinks there) — this column used to hold them, but
+    // duplicating the same links in both places defeats the point of
+    // moving them, so Company now only keeps the two things worth a
+    // permanent footer slot.
     heading: "Company",
     links: [
       { href: "/about", label: "About" },
       { href: "/#work", label: "Work With Me" },
-      { href: "/help", label: "Help" },
-      { href: "/privacy", label: "Privacy" },
-      { href: "/terms", label: "Terms" },
-      { href: "/refund-policy", label: "Refunds" },
     ],
   },
 ];

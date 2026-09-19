@@ -35,7 +35,7 @@ export const articles: Article[] = [
     title: "AI vs. Machine Learning vs. Deep Learning",
     summary: "The three terms people use interchangeably, and why they actually nest inside each other.",
     level: "starter",
-    status: "coming-soon",
+    status: "published",
   },
   {
     slug: "chatbot-or-agent",

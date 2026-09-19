@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import CartIcon from "./CartIcon";
 import Logo from "./Logo";
@@ -12,10 +12,110 @@ const links = [
   { href: "/quiz", label: "Quiz" },
   { href: "/articles", label: "Articles" },
   { href: "/courses", label: "Courses" },
-  { href: "/mentoring", label: "Mentoring", locked: true },
-  { href: "/mock-feedback", label: "Mock Feedback" },
   { href: "/about", label: "About" },
 ];
+
+// Mock Feedback lives under Mentoring now instead of as its own top-level
+// tab — it's a companion offer to mentoring, not a separate destination.
+const mentoringLinks = [
+  { href: "/mentoring", label: "1:1 Mentoring", locked: true },
+  { href: "/mock-feedback", label: "Mock Feedback" },
+];
+
+// Low-frequency utility links, pulled out of the always-visible nav (and,
+// for the legal ones, out of the footer) into one "More" overflow menu —
+// settings/help/legal are things people look for occasionally, not on
+// every visit, so they don't need permanent top-bar real estate.
+const moreLinks = [
+  { href: "/settings", label: "Settings" },
+  { href: "/help", label: "Help" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+  { href: "/refund-policy", label: "Refunds" },
+];
+
+function useOutsideClick(onOutside: () => void) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) onOutside();
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [onOutside]);
+  return ref;
+}
+
+function MentoringDropdown() {
+  const [open, setOpen] = useState(false);
+  const ref = useOutsideClick(() => setOpen(false));
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="font-mono text-xs text-ink-soft hover:text-accent-ink inline-flex items-center gap-1"
+      >
+        Mentoring
+        <span className="text-[9px]" aria-hidden>
+          {open ? "▲" : "▼"}
+        </span>
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full mt-2 w-44 border border-paper-line rounded bg-paper shadow-lg py-1.5 z-50">
+          {mentoringLinks.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              onClick={() => setOpen(false)}
+              className="block px-3 py-2 font-mono text-xs text-ink-soft hover:text-accent-ink hover:bg-paper-line/20"
+            >
+              {l.label}
+              {l.locked && (
+                <span className="ml-1" title="Paid" aria-label="Paid">
+                  🔒
+                </span>
+              )}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MoreDropdown() {
+  const [open, setOpen] = useState(false);
+  const ref = useOutsideClick(() => setOpen(false));
+
+  return (
+    <div className="relative hidden lg:block" ref={ref}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-label={open ? "Close more menu" : "Open more menu"}
+        aria-expanded={open}
+        className="font-mono text-sm text-ink-soft hover:text-accent-ink px-1.5 py-1 rounded hover:bg-paper-line/30"
+      >
+        ≡
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-40 border border-paper-line rounded bg-paper shadow-lg py-1.5 z-50">
+          {moreLinks.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              onClick={() => setOpen(false)}
+              className="block px-3 py-2 font-mono text-xs text-ink-soft hover:text-accent-ink hover:bg-paper-line/20"
+            >
+              {l.label}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Nav() {
   const { status } = useSession();
@@ -30,21 +130,18 @@ export default function Nav() {
         </a>
 
         <div className="hidden lg:flex items-center gap-5 flex-wrap">
-          {links.map((l) => (
-            <a key={l.href} href={l.href} className="font-mono text-xs text-ink-soft hover:text-accent-ink">
-              {l.label}
-              {l.locked && (
-                <span className="ml-1" title="Paid" aria-label="Paid">
-                  🔒
-                </span>
-              )}
-            </a>
-          ))}
-          <a href="/settings" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
-            Settings
+          <a href="/quiz" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
+            Quiz
           </a>
-          <a href="/help" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
-            Help
+          <a href="/articles" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
+            Articles
+          </a>
+          <a href="/courses" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
+            Courses
+          </a>
+          <MentoringDropdown />
+          <a href="/about" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
+            About
           </a>
           <a href="/#work" className="font-mono text-xs bg-ink text-paper rounded px-3 py-1.5">
             Work With Me
@@ -52,6 +149,7 @@ export default function Nav() {
         </div>
 
         <div className="flex items-center gap-3 flex-none">
+          <MoreDropdown />
           <CartIcon />
           {status === "authenticated" ? (
             <a href="/profile" className="hidden lg:inline font-mono text-xs text-ink-soft hover:text-accent-ink">
@@ -78,13 +176,20 @@ export default function Nav() {
           {links.map((l) => (
             <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
               {l.label}
-              {l.locked && (
-                <span className="ml-1" title="Paid" aria-label="Paid">
-                  🔒
-                </span>
-              )}
             </a>
           ))}
+          <div className="flex flex-col gap-3 pl-3 border-l border-paper-line">
+            {mentoringLinks.map((l) => (
+              <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
+                {l.label}
+                {l.locked && (
+                  <span className="ml-1" title="Paid" aria-label="Paid">
+                    🔒
+                  </span>
+                )}
+              </a>
+            ))}
+          </div>
           {status === "authenticated" ? (
             <a href="/profile" onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
               Profile
@@ -94,15 +199,17 @@ export default function Nav() {
               Sign in
             </a>
           )}
-          <a href="/settings" onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
-            Settings
-          </a>
-          <a href="/help" onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
-            Help
-          </a>
           <a href="/#work" onClick={() => setOpen(false)} className="font-mono text-sm bg-ink text-paper rounded px-3 py-2 self-start">
             Work With Me
           </a>
+          <div className="pt-3 border-t border-paper-line flex flex-col gap-3">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-ink-soft">More</p>
+            {moreLinks.map((l) => (
+              <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
+                {l.label}
+              </a>
+            ))}
+          </div>
         </div>
       )}
     </nav>
