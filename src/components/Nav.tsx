@@ -144,7 +144,7 @@ export default function Nav() {
             About
           </a>
           <a href="/#work" className="font-mono text-xs bg-ink text-paper rounded px-3 py-1.5">
-            Work With Me
+            Work With Us
           </a>
         </div>
 
@@ -200,7 +200,7 @@ export default function Nav() {
             </a>
           )}
           <a href="/#work" onClick={() => setOpen(false)} className="font-mono text-sm bg-ink text-paper rounded px-3 py-2 self-start">
-            Work With Me
+            Work With Us
           </a>
           <div className="pt-3 border-t border-paper-line flex flex-col gap-3">
             <p className="font-mono text-[10px] uppercase tracking-widest text-ink-soft">More</p>
