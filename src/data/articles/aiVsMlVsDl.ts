@@ -12,7 +12,7 @@ export type ArticleBlock =
   | { type: "callout"; text: string }
   | { type: "image"; src: string; alt: string; caption?: string };
 
-export const heroImage = { src: "/articles/ai-vs-ml-vs-dl/hero.png", alt: "AI vs. Machine Learning vs. Deep Learning, shown as one mountain seen from three altitudes — AI at the base, Machine Learning partway up, Deep Learning at the summit." };
+export const heroImage = { src: "/articles/ai-vs-ml-vs-dl/hero.png", alt: "AI vs. Machine Learning vs. Deep Learning, shown as one mountain seen from three altitudes — AI at the base, Machine Learning partway up, Deep Learning at the summit.", width: 1024, height: 1536 };
 
 export const blocks: ArticleBlock[] = [
   { type: "p", text: "If you have spent any time reading about technology, you have probably encountered these three terms: Artificial Intelligence (AI), Machine Learning (ML), Deep Learning (DL)." },

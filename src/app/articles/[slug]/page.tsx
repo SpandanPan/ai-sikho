@@ -2,12 +2,14 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { articles } from "@/data/articles";
 import { blocks as aiVsMlVsDlBlocks, heroImage as aiVsMlVsDlHero, type ArticleBlock } from "@/data/articles/aiVsMlVsDl";
+import { blocks as chatbotOrAgentBlocks, heroImage as chatbotOrAgentHero } from "@/data/articles/chatbotOrAgent";
 
 // Content lookup by slug — only articles with status "published" in
 // src/data/articles.ts have an entry here. Same pattern as the courses
 // lessons lookup in src/app/courses/[slug]/page.tsx.
-const articleContent: Record<string, { blocks: ArticleBlock[]; hero: { src: string; alt: string } }> = {
+const articleContent: Record<string, { blocks: ArticleBlock[]; hero: { src: string; alt: string; width: number; height: number } }> = {
   "ai-vs-ml-vs-dl": { blocks: aiVsMlVsDlBlocks, hero: aiVsMlVsDlHero },
+  "chatbot-or-agent": { blocks: chatbotOrAgentBlocks, hero: chatbotOrAgentHero },
 };
 
 export function generateStaticParams() {
@@ -114,7 +116,7 @@ export default function ArticleDetailPage({ params }: { params: { slug: string }
         <>
           <figure className="mb-8 -mx-5 sm:mx-0">
             <div className="relative w-full rounded-lg overflow-hidden border border-paper-line">
-              <Image src={content.hero.src} alt={content.hero.alt} width={1024} height={1536} className="w-full h-auto" priority />
+              <Image src={content.hero.src} alt={content.hero.alt} width={content.hero.width} height={content.hero.height} className="w-full h-auto" priority />
             </div>
           </figure>
 

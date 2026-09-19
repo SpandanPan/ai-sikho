@@ -42,7 +42,7 @@ export const articles: Article[] = [
     title: "Chatbot or Agent? The Difference That Actually Matters",
     summary: "One replies. The other takes multi-step actions on its own. Here's how to tell which you're using.",
     level: "starter",
-    status: "coming-soon",
+    status: "published",
   },
   {
     slug: "prompting-101",

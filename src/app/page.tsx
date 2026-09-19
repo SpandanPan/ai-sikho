@@ -76,9 +76,10 @@ export default function Home() {
               >
                 Take the 60-second AI quiz →
               </TrackedLink>
-              {/* No actual video exists yet — points at /about (the real
-                  "who we are" page) rather than faking a video destination. */}
-              <a href="/about" className="inline-flex items-center gap-2 font-mono text-xs text-paper/80 hover:text-paper">
+              {/* No actual video exists yet — /intro is a real placeholder
+                  page (not a fake anchor) so this is plumbed correctly and
+                  just needs the actual video swapped in later. */}
+              <a href="/intro" className="inline-flex items-center gap-2 font-mono text-xs text-paper/80 hover:text-paper">
                 <span className="w-6 h-6 rounded-full border border-paper/40 flex items-center justify-center flex-none" aria-hidden>
                   ▶
                 </span>
@@ -110,7 +111,7 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 mt-8">
         {/* AI Pulse as a persistent left sidebar on desktop — sticky below
             the nav, auto-scrolling vertically. On mobile there's no room
             for a permanent sidebar, so this moves to the end of the page
