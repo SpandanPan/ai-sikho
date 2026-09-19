@@ -3,6 +3,7 @@ import Image from "next/image";
 import { articles } from "@/data/articles";
 import { blocks as aiVsMlVsDlBlocks, heroImage as aiVsMlVsDlHero, type ArticleBlock } from "@/data/articles/aiVsMlVsDl";
 import { blocks as chatbotOrAgentBlocks, heroImage as chatbotOrAgentHero } from "@/data/articles/chatbotOrAgent";
+import { blocks as prompting101Blocks, heroImage as prompting101Hero } from "@/data/articles/prompting101";
 
 // Content lookup by slug — only articles with status "published" in
 // src/data/articles.ts have an entry here. Same pattern as the courses
@@ -10,6 +11,7 @@ import { blocks as chatbotOrAgentBlocks, heroImage as chatbotOrAgentHero } from 
 const articleContent: Record<string, { blocks: ArticleBlock[]; hero: { src: string; alt: string; width: number; height: number } }> = {
   "ai-vs-ml-vs-dl": { blocks: aiVsMlVsDlBlocks, hero: aiVsMlVsDlHero },
   "chatbot-or-agent": { blocks: chatbotOrAgentBlocks, hero: chatbotOrAgentHero },
+  "prompting-101": { blocks: prompting101Blocks, hero: prompting101Hero },
 };
 
 export function generateStaticParams() {

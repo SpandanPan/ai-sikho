@@ -49,7 +49,7 @@ export const articles: Article[] = [
     title: "Prompting 101: How to Actually Get Good Answers",
     summary: "The handful of habits that separate a useless reply from a genuinely useful one.",
     level: "starter",
-    status: "coming-soon",
+    status: "published",
   },
   {
     slug: "ai-glossary",
