@@ -24,7 +24,7 @@ export default function MythFactStrip() {
         label="myth-fact-quiz-cta"
         className="inline-block mt-4 font-mono text-xs text-accent-ink underline"
       >
-        Take the free quiz →
+        Take the quiz →
       </TrackedLink>
     </div>
   );

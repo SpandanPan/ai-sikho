@@ -105,9 +105,20 @@ export const courses: Course[] = [
     category: "fluency",
     description: "Unsure what to trust when talking to a chatbot? This course gives you the essential skills to use AI confidently and safely — the real mistakes people actually make, like sharing private information or believing bad advice, and exactly how to check an AI's answer before you rely on it.",
   },
+  {
+    slug: "ai-tools-to-try",
+    title: "AI Tools You Can Start Using Today",
+    summary: "Five real tools, no cost to try any of them, with exact steps to get started and a concrete way to use each one for your own work.",
+    priceInPaise: 0,
+    hasDemo: false,
+    category: "fluency",
+    description: "A hands-on tour of five genuinely useful AI tools you can start using in the next ten minutes, at no cost — what each one is actually best at, the exact steps to get set up, and one concrete example of using it for real work, not a toy demo.",
+  },
 ];
 
+// Returns "" for 0 — the site doesn't label things "Free"; the absence of
+// a price and the absence of a 🔒 lock icon together say it plainly enough.
 export function formatPrice(paise: number) {
-  if (paise === 0) return "Free";
+  if (paise === 0) return "";
   return `₹${(paise / 100).toFixed(0)}`;
 }

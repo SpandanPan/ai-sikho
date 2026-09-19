@@ -11,20 +11,11 @@ import TermOfDay from "@/components/TermOfDay";
 import TokenizerDemo from "@/components/TokenizerDemo";
 import AgentWorkflowDemo from "@/components/AgentWorkflowDemo";
 import IndicLanguageSection from "@/components/IndicLanguageSection";
-import AboutUs from "@/components/AboutUs";
 
 const morePrep = [
   { title: "Go deep on one topic", desc: "RAG, Knowledge Graphs, LLM Observability, and a no-code AI Fluency track — short courses with real demos.", price: "From ₹99", href: "/courses", locked: false },
   { title: "Time with someone who's done it", desc: "1:1 career guidance, slots open on a rolling 15-day window.", price: "Book a slot", href: "/mentoring", locked: true },
-  { title: "Real feedback on a mock answer", desc: "AI-graded, specific to what you actually wrote. 1 free/month — we even tell you which model graded you.", price: "Free or ₹149", href: "/mock-feedback", locked: false },
-];
-
-const freeTools = [
-  { name: "Ollama", best: "local & private", desc: "Runs open models (Llama, Mistral, Gemma, Qwen, DeepSeek) fully on your own machine — no account, no bill." },
-  { name: "Hugging Face", best: "exploring models", desc: "Free-tier inference, thousands of downloadable open weights, and live demo Spaces." },
-  { name: "LM Studio", best: "no command line", desc: "A desktop app for running local models — same idea as Ollama with a GUI." },
-  { name: "Google AI Studio", best: "fast prototyping", desc: "A generous free daily quota on Gemini Flash and Flash-Lite." },
-  { name: "Groq", best: "speed", desc: "A free API tier serving open models at unusually high inference speed." },
+  { title: "Real feedback on a mock answer", desc: "AI-graded, specific to what you actually wrote. 1/month, no charge — we even tell you which grader graded you.", price: "1/month + ₹149", href: "/mock-feedback", locked: false },
 ];
 
 export default function Home() {
@@ -55,7 +46,7 @@ export default function Home() {
             label="hero-quiz-cta"
             className="inline-block mt-2.5 rounded bg-spark text-ink font-mono text-xs font-semibold px-4 py-2"
           >
-            Take the free 60-second AI quiz →
+            Take the 60-second AI quiz →
           </TrackedLink>
         </div>
       </header>
@@ -69,8 +60,8 @@ export default function Home() {
         {/* AI Pulse as a persistent left sidebar on desktop — sticky below
             the nav, auto-scrolling vertically. On mobile there's no room
             for a permanent sidebar, so this moves to the end of the page
-            (order-last) and the horizontal ticker fallback inside "Run It
-            Free" below is what mobile visitors actually see. */}
+            (order-last) and the horizontal ticker fallback further down
+            is what mobile visitors actually see. */}
         <aside className="order-last lg:order-none lg:w-72 lg:flex-none">
           <div className="lg:sticky lg:top-20">
             <SoftGate>
@@ -99,7 +90,7 @@ export default function Home() {
           </section>
 
           <section className="border-b border-paper-line py-9">
-            <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">Today, for free</p>
+            <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-4">Today's dose</p>
             <div className="grid gap-4 lg:grid-cols-2">
               <MythFactStrip />
               <TermOfDay />
@@ -118,20 +109,6 @@ export default function Home() {
           <IndicLanguageSection />
 
           <SoftGate>
-            <section id="free" className="border-b border-paper-line py-9">
-              <h2 className="font-display text-xl font-semibold mb-1">Run It Free</h2>
-              <p className="text-sm text-ink-soft mb-5">No API key charges — good enough to learn and prototype on.</p>
-              <div className="grid gap-3.5 sm:grid-cols-3">
-                {freeTools.map((t) => (
-                  <div key={t.name} className="border border-paper-line rounded p-4">
-                    <h3 className="font-semibold text-sm mb-1.5">{t.name}</h3>
-                    <p className="text-sm text-ink-soft">{t.desc}</p>
-                    <span className="mt-2 inline-block font-mono text-[10.5px] uppercase text-accent2">Best for: {t.best}</span>
-                  </div>
-                ))}
-              </div>
-            </section>
-
             {/* Mobile-only fallback — the sidebar above is desktop-only (lg+) */}
             <div id="pulse" className="lg:hidden">
               <PulseFeed orientation="horizontal" />
@@ -143,14 +120,13 @@ export default function Home() {
               <WorkWithMe />
             </div>
             <div className="border border-paper-line rounded p-6">
-              <h2 className="font-display text-lg font-semibold mb-1">Get the free digest</h2>
+              <h2 className="font-display text-lg font-semibold mb-1">Get the digest</h2>
               <p className="text-sm text-ink-soft mb-4 max-w-md">
                 The plain-language version of what actually happened in AI this week — no spam,
                 unsubscribe any time.
               </p>
               <NewsletterSignup source="homepage" />
             </div>
-            <AboutUs />
           </footer>
         </main>
       </div>

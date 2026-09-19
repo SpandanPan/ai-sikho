@@ -16,9 +16,9 @@ type Submission = {
 };
 
 const MODEL_LABEL: Record<string, string> = {
-  ollama: "Gemma 4 (self-hosted, free tier)",
-  anthropic: "Claude Sonnet 5 (paid tier)",
-  openai: "GPT (paid tier)",
+  ollama: "Standard grader",
+  anthropic: "Claude Sonnet 5 (frontier)",
+  openai: "GPT (frontier)",
 };
 
 function usedFreeAttemptThisMonth(submissions: Submission[]): boolean {
@@ -81,7 +81,7 @@ export default function MockFeedbackPage() {
     const data = await res.json();
     setGradingFree(false);
     if (!res.ok) {
-      setMessage(data.error ?? "Couldn't grade that for free.");
+      setMessage(data.error ?? "Couldn't grade that.");
       return;
     }
     setMessage("Graded — see it below.");
@@ -103,7 +103,7 @@ export default function MockFeedbackPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-5 py-12">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-2">Free tier available · Paid · ₹149</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-2">1/month · ₹149 🔒</p>
       <h1 className="font-display text-2xl font-semibold mb-1">Get real feedback on a mock answer.</h1>
       <p className="text-ink-soft mb-4 max-w-xl">
         Write your answer to a real interview question. An AI grader scores it, names what's
@@ -113,13 +113,10 @@ export default function MockFeedbackPage() {
       <div className="border border-accent rounded p-4 mb-8 max-w-xl">
         <p className="font-mono text-[10.5px] uppercase text-accent2 mb-1.5">Unlike most AI interview tools</p>
         <p className="text-sm text-ink-soft">
-          We tell you which model actually graded you, and why. Your <b>free</b> attempt runs on a
-          self-hosted open model — genuinely useful, genuinely free, no catch. The <b>₹149</b> option
-          runs on Claude Sonnet 5, a frontier model, for a sharper, more reliable grade — that
-          difference is the entire reason it costs anything. See the exact numbers in{" "}
-          <a href="https://github.com/SpandanPan/ai-sikho/blob/main/AGENT_COSTS.md" target="_blank" rel="noreferrer" className="text-accent-ink underline">
-            AGENT_COSTS.md
-          </a>.
+          We tell you which grader actually graded you, and why. Your first attempt each month
+          uses our standard grader — genuinely useful, no catch. The <b>₹149</b> option runs on
+          Claude Sonnet 5, a frontier model, for a sharper, more reliable grade — that difference
+          is the entire reason it costs anything.
         </p>
       </div>
 
@@ -150,10 +147,10 @@ export default function MockFeedbackPage() {
             type="button"
             onClick={submitFree}
             disabled={freeUsed || gradingFree}
-            title={freeUsed ? "You've used this month's free grading" : "Graded by a self-hosted open model"}
+            title={freeUsed ? "You've used this month's attempt" : "Graded by our standard grader"}
             className="font-mono text-xs border border-paper-line rounded px-3.5 py-2 disabled:opacity-40"
           >
-            {gradingFree ? "Grading…" : freeUsed ? "Free grading used this month" : "Grade it free (1/month)"}
+            {gradingFree ? "Grading…" : freeUsed ? "This month's attempt used" : "Grade it (1/month)"}
           </button>
           <button type="submit" className="font-mono text-xs bg-ink text-paper rounded px-3.5 py-2">
             Submit for feedback — ₹149 (Claude Sonnet 5)

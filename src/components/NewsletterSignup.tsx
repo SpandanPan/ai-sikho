@@ -46,7 +46,7 @@ export default function NewsletterSignup({ source = "homepage" }: { source?: str
           disabled={status === "sending"}
           className="font-mono text-sm bg-ink text-paper rounded px-4 py-2.5 whitespace-nowrap disabled:opacity-50"
         >
-          {status === "sending" ? "Signing up…" : "Get the free digest →"}
+          {status === "sending" ? "Signing up…" : "Get the digest →"}
         </button>
       </form>
       {error && <p className="text-xs text-rust mt-2">{error}</p>}

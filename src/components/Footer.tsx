@@ -5,7 +5,7 @@ const columns = [
       { href: "/quiz", label: "AI Quiz" },
       { href: "/articles", label: "Articles" },
       { href: "/#pulse", label: "AI Pulse" },
-      { href: "/#free", label: "Run It Free" },
+      { href: "/courses/ai-tools-to-try", label: "AI Tools to Try" },
     ],
   },
   {
@@ -20,6 +20,7 @@ const columns = [
   {
     heading: "Company",
     links: [
+      { href: "/about", label: "About" },
       { href: "/#work", label: "Work With Me" },
       { href: "/help", label: "Help" },
       { href: "/privacy", label: "Privacy" },

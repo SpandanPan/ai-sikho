@@ -66,7 +66,7 @@ function ArchiveSection() {
 export default function ArticlesPage() {
   return (
     <main className="mx-auto max-w-3xl px-5 py-12">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-2">Free, always</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-2">No charge, ever</p>
       <h1 className="font-display text-2xl font-semibold mb-2">Concepts, explained. Research, translated.</h1>
       <p className="text-ink-soft mb-8 max-w-xl">
         Three levels, same ladder as everything else here: <b>Starter</b> assumes nothing,{" "}

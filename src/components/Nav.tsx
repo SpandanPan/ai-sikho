@@ -14,6 +14,7 @@ const links = [
   { href: "/courses", label: "Courses" },
   { href: "/mentoring", label: "Mentoring", locked: true },
   { href: "/mock-feedback", label: "Mock Feedback" },
+  { href: "/about", label: "About" },
 ];
 
 export default function Nav() {

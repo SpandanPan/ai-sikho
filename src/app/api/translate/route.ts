@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
-import { translateText, isIndicLanguage } from "@/lib/translate";
+import { translateText, answerInLanguage, isIndicLanguage } from "@/lib/translate";
 
-// Public, no auth — a free demo, not a metered paid feature (self-hosted
-// model, $0 marginal cost either way). Same reachability constraint as
-// every other Ollama-backed route: works where OLLAMA_BASE_URL is
-// actually reachable, verified in local dev, not yet from a live
-// deployment — see AGENT_COSTS.md.
+// Public, no auth — a demo feature, not a metered paid one. Same
+// reachability constraint as every other locally-run agent route: works
+// where the model backend is actually reachable, verified in local dev,
+// not yet from a live deployment.
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
-  const { text, targetLanguage } = body ?? {};
+  const { text, targetLanguage, mode } = body ?? {};
 
   if (typeof text !== "string" || !text.trim() || text.length > 300) {
     return NextResponse.json({ error: "text (max 300 characters) is required" }, { status: 400 });
@@ -18,10 +17,13 @@ export async function POST(req: Request) {
   }
 
   try {
-    const translated = await translateText(text.trim(), targetLanguage);
-    return NextResponse.json({ translated });
+    const result =
+      mode === "chat"
+        ? await answerInLanguage(text.trim(), targetLanguage)
+        : await translateText(text.trim(), targetLanguage);
+    return NextResponse.json({ result });
   } catch (err) {
     console.error("[translate] failed:", err);
-    return NextResponse.json({ error: "Translation is temporarily unavailable — try again shortly." }, { status: 502 });
+    return NextResponse.json({ error: "Temporarily unavailable — try again shortly." }, { status: 502 });
   }
 }

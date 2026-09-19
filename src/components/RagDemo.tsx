@@ -10,7 +10,7 @@ const DOCS = [
   { id: "access", text: "Course access: once purchased, a course is available permanently — no subscription, no expiry." },
   { id: "payments", text: "Payment methods: we accept UPI, cards, and net banking via Razorpay." },
   { id: "support", text: "Support: use the /help contact form — typical response time is under 24 hours on weekdays." },
-  { id: "free", text: "Free content: the AI Pulse news feed, Model Costs, and Run It Free guide are free and always will be." },
+  { id: "open-access", text: "Open content: the AI Pulse news feed and Model Costs page cost nothing to read, permanently." },
 ];
 
 export default function RagDemo() {
