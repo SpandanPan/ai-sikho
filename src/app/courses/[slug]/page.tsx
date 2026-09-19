@@ -4,18 +4,24 @@ import { lessons as fluencyLessons } from "@/data/lessons/aiFluencyBasics";
 import { lesson as toolsLesson } from "@/data/lessons/aiToolsToTry";
 import CourseTracker from "@/components/CourseTracker";
 import CrossSell from "@/components/CrossSell";
-import LessonAnimation from "@/components/LessonAnimation";
-import AiTimeline from "@/components/AiTimeline";
 import AiDialogue from "@/components/AiDialogue";
 import AiFluencyCheatSheet from "@/components/AiFluencyCheatSheet";
 import GoDeeper from "@/components/GoDeeper";
-import { DataGrowthDiagram, TokenDiagram } from "@/components/ConceptDiagrams";
 import {
   NestedLayersDiagram,
   AttentionSentenceDemo,
   TransformerCompareDiagram,
   ConfidenceComparisonDiagram,
 } from "@/components/PriorityVisuals";
+import {
+  IngredientsConvergeChart,
+  TimelinePathVisual,
+  NextWordPredictor,
+  BeforeAfterCards,
+  MemoryChatTimeline,
+  TermFlipCards,
+  DecisionMap,
+} from "@/components/PriorityVisualsPhase2";
 
 // Each course's content lives in its own file under src/data/lessons/ —
 // merged here into one lookup keyed by course slug, same shape either way.
@@ -75,27 +81,20 @@ export default function CourseLessonPage({ params }: { params: { slug: string } 
               <p className="font-mono text-[10.5px] text-accent2 mb-1">
                 {String(i + 1).padStart(2, "0")}
               </p>
-              <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
-                <h2 className="font-display text-lg font-semibold">
-                  {s.url ? (
-                    <a
-                      href={s.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-accent-ink underline decoration-paper-line hover:decoration-accent-ink"
-                    >
-                      {s.heading} ↗
-                    </a>
-                  ) : (
-                    s.heading
-                  )}
-                </h2>
-                {s.kind && (
-                  <div className="w-full sm:w-48 flex-none">
-                    <LessonAnimation kind={s.kind} />
-                  </div>
+              <h2 className="font-display text-lg font-semibold mb-3">
+                {s.url ? (
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent-ink underline decoration-paper-line hover:decoration-accent-ink"
+                  >
+                    {s.heading} ↗
+                  </a>
+                ) : (
+                  s.heading
                 )}
-              </div>
+              </h2>
               {s.component === "dialogue" && (
                 <div className="mb-6">
                   <AiDialogue />
@@ -113,12 +112,7 @@ export default function CourseLessonPage({ params }: { params: { slug: string } 
               )}
               {s.component === "data-growth" && (
                 <div className="mb-6">
-                  <DataGrowthDiagram />
-                </div>
-              )}
-              {s.component === "token" && (
-                <div className="mb-6">
-                  <TokenDiagram />
+                  <IngredientsConvergeChart />
                 </div>
               )}
               {s.component === "hallucination" && (
@@ -131,14 +125,39 @@ export default function CourseLessonPage({ params }: { params: { slug: string } 
                   <TransformerCompareDiagram />
                 </div>
               )}
+              {s.component === "timeline" && (
+                <div className="mb-6">
+                  <TimelinePathVisual />
+                </div>
+              )}
+              {s.component === "predictor" && (
+                <div className="mb-6">
+                  <NextWordPredictor />
+                </div>
+              )}
+              {s.component === "before-after" && (
+                <div className="mb-6">
+                  <BeforeAfterCards />
+                </div>
+              )}
+              {s.component === "memory-chat" && (
+                <div className="mb-6">
+                  <MemoryChatTimeline />
+                </div>
+              )}
+              {s.component === "terms-flip" && (
+                <div className="mb-6">
+                  <TermFlipCards />
+                </div>
+              )}
+              {s.component === "decision-map" && (
+                <div className="mb-6">
+                  <DecisionMap />
+                </div>
+              )}
               {s.component === "cheatsheet" && (
                 <div className="mb-6">
                   <AiFluencyCheatSheet />
-                </div>
-              )}
-              {s.component === "timeline" && (
-                <div className="mb-4">
-                  <AiTimeline />
                 </div>
               )}
               <div className="flex flex-col gap-3">

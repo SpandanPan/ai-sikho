@@ -5,6 +5,8 @@ import { useState } from "react";
 type DialogueStep = {
   character: "learner" | "guide";
   text: string;
+  /** A short, playful aside shown under this line — the "reaction" beat. */
+  reaction?: string;
 };
 
 const DIALOGUE: DialogueStep[] = [
@@ -19,6 +21,7 @@ const DIALOGUE: DialogueStep[] = [
   {
     character: "learner",
     text: "Like... how?",
+    reaction: "That sounds suspiciously like Google.",
   },
   {
     character: "guide",
@@ -35,6 +38,7 @@ const DIALOGUE: DialogueStep[] = [
   {
     character: "learner",
     text: "But wait, doesn't ChatGPT actually understand things?",
+    reaction: "It sure talks like it does.",
   },
   {
     character: "guide",
@@ -47,6 +51,7 @@ const DIALOGUE: DialogueStep[] = [
   {
     character: "guide",
     text: "Yep. And that's actually why it's so useful — you can use it for writing, brainstorming, learning. But also why you shouldn't trust every fact it says without checking.",
+    reaction: "Helpful co-pilot, not a fact machine.",
   },
   {
     character: "learner",
@@ -58,12 +63,28 @@ const DIALOGUE: DialogueStep[] = [
   },
 ];
 
+// A hand-rolled one-shot reveal, not Tailwind's motion-safe: prefix — that
+// variant only covers utilities Tailwind itself generates, and silently
+// no-ops on a hand-written class name like this one, so nothing would
+// ever actually animate. Gated for reduced motion directly in the media
+// query instead.
+const dialogueStyles = `
+  @keyframes dialogueReveal {
+    0% { opacity: 0; transform: translateY(6px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .dialogue-reveal { animation: dialogueReveal 0.4s ease-out both; }
+  }
+`;
+
 export default function AiDialogue() {
   const [step, setStep] = useState(0);
   const isComplete = step >= DIALOGUE.length;
 
   return (
     <div className="border border-paper-line rounded p-6 bg-paper-line/5">
+      <style>{dialogueStyles}</style>
       <div className="mb-6">
         {/* Characters — normal flow, side by side, so nothing below can overlap them */}
         <div className="flex items-start justify-between mb-4">
@@ -86,18 +107,30 @@ export default function AiDialogue() {
           {step < DIALOGUE.length && (
             <div
               key={step}
-              className={`motion-safe:animate-layer-reveal w-full flex ${
+              className={`dialogue-reveal w-full flex ${
                 DIALOGUE[step].character === "learner" ? "justify-start" : "justify-end"
               }`}
             >
-              <div
-                className={`rounded-lg p-3 text-sm leading-relaxed max-w-xs ${
-                  DIALOGUE[step].character === "learner"
-                    ? "bg-accent2/15 border border-accent2/50 text-ink-soft"
-                    : "bg-accent-ink/15 border border-accent-ink/50 text-ink-soft"
-                }`}
-              >
-                {DIALOGUE[step].text}
+              <div className="max-w-xs">
+                <div
+                  className={`rounded-lg p-3 text-sm leading-relaxed ${
+                    DIALOGUE[step].character === "learner"
+                      ? "bg-accent2/15 border border-accent2/50 text-ink-soft"
+                      : "bg-accent-ink/15 border border-accent-ink/50 text-ink-soft"
+                  }`}
+                >
+                  {DIALOGUE[step].text}
+                </div>
+                {DIALOGUE[step].reaction && (
+                  <p
+                    className={`dialogue-reveal mt-1.5 text-xs italic text-ink-soft/80 ${
+                      DIALOGUE[step].character === "learner" ? "text-left" : "text-right"
+                    }`}
+                    style={{ animationDelay: "0.25s" }}
+                  >
+                    &ldquo;{DIALOGUE[step].reaction}&rdquo;
+                  </p>
+                )}
               </div>
             </div>
           )}

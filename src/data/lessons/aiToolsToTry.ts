@@ -8,7 +8,6 @@ import type { LessonSection, Lesson } from "./aiFluencyBasics";
 const sections: LessonSection[] = [
   {
     heading: "Ollama — local & private",
-    kind: "steps",
     url: "https://ollama.com/download",
     body: [
       "Runs open models (Llama, Mistral, Gemma, Qwen, DeepSeek) entirely on your own machine — no account, no bill, and nothing you type ever leaves your laptop.",
@@ -18,7 +17,6 @@ const sections: LessonSection[] = [
   },
   {
     heading: "Hugging Face — exploring models",
-    kind: "steps",
     url: "https://huggingface.co",
     body: [
       "A hub with thousands of downloadable open models and live demo \"Spaces\" you can try without installing anything.",
@@ -28,7 +26,6 @@ const sections: LessonSection[] = [
   },
   {
     heading: "LM Studio — no command line",
-    kind: "steps",
     url: "https://lmstudio.ai",
     body: [
       "The same private, offline idea as Ollama, but with a normal app window instead of a terminal — everything happens by clicking, not typing commands.",
@@ -38,7 +35,6 @@ const sections: LessonSection[] = [
   },
   {
     heading: "Google AI Studio — fast prototyping",
-    kind: "steps",
     url: "https://aistudio.google.com",
     body: [
       "A generous daily quota on Google's Gemini Flash models, usable straight from your browser.",
@@ -48,7 +44,6 @@ const sections: LessonSection[] = [
   },
   {
     heading: "Groq — speed",
-    kind: "steps",
     url: "https://console.groq.com",
     body: [
       "An API tier serving open models at unusually high inference speed — the whole reason people reach for it.",
