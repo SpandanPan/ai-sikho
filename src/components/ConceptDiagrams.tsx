@@ -1,4 +1,11 @@
-// SVG diagrams for AI Fluency with dramatic animations and proper spacing
+// SVG diagrams for AI Fluency with dramatic animations and proper spacing.
+// Text/stroke colors use the site's rgb(var(--color-*)) tokens (see
+// globals.css) so every diagram stays legible in both light and dark
+// theme instead of hardcoding grays tuned for one background.
+
+const INK = "rgb(var(--color-ink))";
+const INK_SOFT = "rgb(var(--color-ink-soft))";
+const PAPER_LINE = "rgb(var(--color-paper-line))";
 
 const animationStyles = `
   @keyframes nestSlideIn {
@@ -69,47 +76,50 @@ export function AiNestingDiagram() {
   return (
     <div className="w-full">
       <style>{animationStyles}</style>
-      <svg viewBox="0 0 320 240" className="w-full h-auto border border-paper-line rounded p-4 bg-paper-line/5">
+      <svg viewBox="0 0 400 240" className="w-full h-auto border border-paper-line rounded p-4 bg-paper-line/5">
         {/* AI layer */}
         <g className="nest-layer">
-          <rect x="15" y="15" width="290" height="210" fill="none" stroke="#a0a0a0" strokeWidth="2.5" rx="8" />
-          <text x="35" y="38" fontSize="14" fontWeight="bold" fill="#666">
+          <rect x="15" y="15" width="250" height="210" fill="none" stroke="#a0a0a0" strokeWidth="2.5" rx="8" />
+          <text x="35" y="38" fontSize="14" fontWeight="bold" fill={INK}>
             🌐 Artificial Intelligence
           </text>
-          <text x="35" y="55" fontSize="11" fill="#999">
+          <text x="35" y="55" fontSize="11" fill={INK_SOFT}>
             Any system that does human-like tasks
           </text>
         </g>
 
         {/* ML layer */}
         <g className="nest-layer">
-          <rect x="35" y="75" width="250" height="140" fill="none" stroke="#e67e22" strokeWidth="2.5" rx="8" />
+          <rect x="35" y="75" width="210" height="140" fill="none" stroke="#e67e22" strokeWidth="2.5" rx="8" />
           <text x="55" y="98" fontSize="14" fontWeight="bold" fill="#e67e22">
             🧠 Machine Learning
           </text>
-          <text x="55" y="115" fontSize="11" fill="#999">
-            Learns patterns from examples instead of rules
+          <text x="55" y="115" fontSize="11" fill={INK_SOFT}>
+            Learns patterns from examples, not rules
           </text>
         </g>
 
         {/* Deep Learning layer */}
         <g className="nest-layer">
-          <rect x="55" y="130" width="210" height="70" fill="none" stroke="#3498db" strokeWidth="2.5" rx="8" />
+          <rect x="55" y="130" width="170" height="70" fill="none" stroke="#3498db" strokeWidth="2.5" rx="8" />
           <text x="75" y="153" fontSize="14" fontWeight="bold" fill="#3498db">
             ⚡ Deep Learning
           </text>
-          <text x="75" y="170" fontSize="11" fill="#999">
+          <text x="75" y="170" fontSize="11" fill={INK_SOFT}>
             Layered neural networks
           </text>
         </g>
 
-        {/* LLM indicator */}
+        {/* Connector from Deep Learning out to the LLM callout */}
+        <line x1="225" y1="165" x2="305" y2="165" stroke="#2ecc71" strokeWidth="2" strokeDasharray="3,3" />
+
+        {/* LLM callout, placed clear of every box above so nothing overlaps */}
         <g className="nest-layer">
-          <circle cx="260" cy="165" r="35" fill="#2ecc71" fillOpacity="0.25" stroke="#2ecc71" strokeWidth="2.5" />
-          <text x="260" y="168" textAnchor="middle" fontSize="13" fontWeight="bold" fill="#2ecc71">
+          <circle cx="345" cy="165" r="42" fill="#2ecc71" fillOpacity="0.18" stroke="#2ecc71" strokeWidth="2.5" />
+          <text x="345" y="163" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#2ecc71">
             LLMs
           </text>
-          <text x="260" y="185" textAnchor="middle" fontSize="9" fill="#2ecc71">
+          <text x="345" y="180" textAnchor="middle" fontSize="9" fill="#2ecc71">
             ChatGPT, Claude
           </text>
         </g>
@@ -123,8 +133,8 @@ export function AttentionDiagram() {
     <div className="w-full">
       <style>{animationStyles}</style>
       <svg viewBox="0 0 340 160" className="w-full h-auto border border-paper-line rounded p-4 bg-paper-line/5">
-        <text x="15" y="22" fontSize="12" fontWeight="bold" fill="#333">
-          How attention works: "The bank raised interest rates"
+        <text x="15" y="22" fontSize="12" fontWeight="bold" fill={INK}>
+          How attention works: &quot;The bank raised interest rates&quot;
         </text>
 
         {/* Words with better spacing */}
@@ -138,13 +148,13 @@ export function AttentionDiagram() {
                 y="50"
                 width="48"
                 height="38"
-                fill={isImportant ? "#e67e22" : "#bbb"}
+                fill={isImportant ? "#e67e22" : PAPER_LINE}
                 fillOpacity="0.25"
-                stroke={isImportant ? "#e67e22" : "#999"}
+                stroke={isImportant ? "#e67e22" : PAPER_LINE}
                 strokeWidth="1.5"
                 rx="4"
               />
-              <text x={x + 24} y="78" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#333">
+              <text x={x + 24} y="78" textAnchor="middle" fontSize="12" fontWeight="bold" fill={INK}>
                 {word}
               </text>
             </g>
@@ -155,8 +165,8 @@ export function AttentionDiagram() {
         <text x="15" y="125" fontSize="11" fontWeight="bold" fill="#e67e22">
           Key insight:
         </text>
-        <text x="15" y="140" fontSize="10" fill="#666">
-          Highlighted words matter most to understanding "bank" — the model weighs them heavily, not in order
+        <text x="15" y="140" fontSize="10" fill={INK_SOFT}>
+          Highlighted words matter most to understanding &quot;bank&quot; — not word order
         </text>
       </svg>
     </div>
@@ -167,22 +177,22 @@ export function DataGrowthDiagram() {
   return (
     <div className="w-full">
       <style>{animationStyles}</style>
-      <svg viewBox="0 0 340 180" className="w-full h-auto border border-paper-line rounded p-4 bg-paper-line/5">
-        {/* Title */}
-        <text x="15" y="22" fontSize="12" fontWeight="bold" fill="#333">
+      <svg viewBox="0 0 340 190" className="w-full h-auto border border-paper-line rounded p-4 bg-paper-line/5">
+        {/* Title, given its own clear band above the axes */}
+        <text x="15" y="22" fontSize="12" fontWeight="bold" fill={INK}>
           Data Available for Training AI (trillions of words)
         </text>
 
-        {/* Axes with better spacing */}
-        <line x1="50" y1="140" x2="320" y2="140" stroke="#333" strokeWidth="2" />
-        <line x1="50" y1="140" x2="50" y2="15" stroke="#333" strokeWidth="2" />
+        {/* Axes, starting below the title so nothing overlaps it */}
+        <line x1="50" y1="150" x2="320" y2="150" stroke={INK_SOFT} strokeWidth="2" />
+        <line x1="50" y1="150" x2="50" y2="35" stroke={INK_SOFT} strokeWidth="2" />
 
         {/* Y-axis label */}
-        <text x="15" y="80" textAnchor="middle" fontSize="11" fontWeight="bold" fill="#666" transform="rotate(-90 15 80)">
+        <text x="18" y="92" textAnchor="middle" fontSize="11" fontWeight="bold" fill={INK_SOFT} transform="rotate(-90 18 92)">
           Data Volume
         </text>
         {/* X-axis label */}
-        <text x="185" y="160" textAnchor="middle" fontSize="11" fontWeight="bold" fill="#666">
+        <text x="185" y="172" textAnchor="middle" fontSize="11" fontWeight="bold" fill={INK_SOFT}>
           Decade
         </text>
 
@@ -196,7 +206,7 @@ export function DataGrowthDiagram() {
           <g key={bar.decade} className="data-bar" style={{ "--height": `${bar.height}px` } as React.CSSProperties}>
             <rect
               x={bar.x - 22}
-              y={140 - bar.height}
+              y={150 - bar.height}
               width="44"
               height={bar.height}
               fill="#3498db"
@@ -205,7 +215,7 @@ export function DataGrowthDiagram() {
               strokeWidth="1.5"
               rx="2"
             />
-            <text x={bar.x} y="155" textAnchor="middle" fontSize="10" fontWeight="bold" fill="#333">
+            <text x={bar.x} y="165" textAnchor="middle" fontSize="10" fontWeight="bold" fill={INK}>
               {bar.decade}
             </text>
           </g>
@@ -220,8 +230,8 @@ export function TokenDiagram() {
     <div className="w-full">
       <style>{animationStyles}</style>
       <svg viewBox="0 0 340 140" className="w-full h-auto border border-paper-line rounded p-4 bg-paper-line/5">
-        <text x="15" y="22" fontSize="12" fontWeight="bold" fill="#333">
-          How models read: "Unbelievable" → 3 tokens (the unit of cost)
+        <text x="15" y="22" fontSize="12" fontWeight="bold" fill={INK}>
+          How models read: &quot;Unbelievable&quot; → 3 tokens
         </text>
 
         {/* Token boxes with proper spacing */}
@@ -248,8 +258,8 @@ export function TokenDiagram() {
         <text x="15" y="120" fontSize="11" fontWeight="bold" fill="#3498db">
           Why it matters:
         </text>
-        <text x="15" y="135" fontSize="10" fill="#666">
-          Models count by tokens, not words — so a 1000-word essay might be 1200 tokens. You pay/count by tokens.
+        <text x="15" y="135" fontSize="10" fill={INK_SOFT}>
+          Models count and charge by tokens, not words.
         </text>
       </svg>
     </div>
@@ -261,11 +271,11 @@ export function HallucinationDiagram() {
     <div className="w-full">
       <style>{animationStyles}</style>
       <svg viewBox="0 0 340 160" className="w-full h-auto border border-paper-line rounded p-4 bg-paper-line/5">
-        <text x="15" y="22" fontSize="12" fontWeight="bold" fill="#333">
-          The Hallucination Problem: Both sound equally confident
+        <text x="15" y="22" fontSize="12" fontWeight="bold" fill={INK}>
+          The Hallucination Problem
         </text>
-        <text x="15" y="40" fontSize="10" fill="#999">
-          Question: "When was the Eiffel Tower built?"
+        <text x="15" y="40" fontSize="10" fill={INK_SOFT}>
+          Question: &quot;When was the Eiffel Tower built?&quot;
         </text>
 
         {/* Correct answer */}
@@ -290,12 +300,15 @@ export function HallucinationDiagram() {
           </text>
         </g>
 
-        {/* Better explanation */}
+        {/* Better explanation, wrapped across two lines so it never runs off the canvas */}
         <text x="15" y="135" fontSize="11" fontWeight="bold" fill="#e74c3c">
           Key lesson:
         </text>
-        <text x="15" y="150" fontSize="10" fill="#666">
-          Never trust specific facts (dates, numbers, names) without checking. Both answers sound equally sure.
+        <text x="15" y="149" fontSize="10" fill={INK_SOFT}>
+          Never trust specific facts without checking —
+        </text>
+        <text x="15" y="161" fontSize="10" fill={INK_SOFT}>
+          both answers sound equally sure.
         </text>
       </svg>
     </div>
@@ -306,32 +319,32 @@ export function TransformerDiagram() {
   return (
     <div className="w-full">
       <style>{animationStyles}</style>
-      <svg viewBox="0 0 360 220" className="w-full h-auto border border-paper-line rounded p-4 bg-paper-line/5">
-        <text x="15" y="22" fontSize="12" fontWeight="bold" fill="#333">
+      <svg viewBox="0 0 360 235" className="w-full h-auto border border-paper-line rounded p-4 bg-paper-line/5">
+        <text x="15" y="22" fontSize="12" fontWeight="bold" fill={INK}>
           Before vs After: The Transformer Breakthrough (2017)
         </text>
 
         {/* Before: sequential */}
         <g>
-          <text x="75" y="50" textAnchor="middle" fontSize="11" fontWeight="bold" fill="#666">
+          <text x="75" y="50" textAnchor="middle" fontSize="11" fontWeight="bold" fill={INK_SOFT}>
             OLD: Word-by-word
           </text>
-          <circle cx="45" cy="90" r="8" fill="#bbb" stroke="#999" strokeWidth="1.5" />
-          <circle cx="75" cy="90" r="8" fill="#bbb" stroke="#999" strokeWidth="1.5" />
-          <circle cx="105" cy="90" r="8" fill="#bbb" stroke="#999" strokeWidth="1.5" />
-          <line x1="55" y1="90" x2="65" y2="90" stroke="#999" strokeWidth="1.5" />
-          <line x1="85" y1="90" x2="95" y2="90" stroke="#999" strokeWidth="1.5" />
+          <circle cx="45" cy="90" r="8" fill={PAPER_LINE} stroke={INK_SOFT} strokeWidth="1.5" />
+          <circle cx="75" cy="90" r="8" fill={PAPER_LINE} stroke={INK_SOFT} strokeWidth="1.5" />
+          <circle cx="105" cy="90" r="8" fill={PAPER_LINE} stroke={INK_SOFT} strokeWidth="1.5" />
+          <line x1="55" y1="90" x2="65" y2="90" stroke={INK_SOFT} strokeWidth="1.5" />
+          <line x1="85" y1="90" x2="95" y2="90" stroke={INK_SOFT} strokeWidth="1.5" />
 
-          <text x="75" y="125" textAnchor="middle" fontSize="9" fill="#666">
+          <text x="75" y="125" textAnchor="middle" fontSize="9" fill={INK_SOFT}>
             Slow ×
           </text>
-          <text x="75" y="140" textAnchor="middle" fontSize="9" fill="#666">
+          <text x="75" y="140" textAnchor="middle" fontSize="9" fill={INK_SOFT}>
             Forgot earlier words
           </text>
         </g>
 
         {/* Divider */}
-        <line x1="180" y1="40" x2="180" y2="160" stroke="#paper-line" strokeWidth="2" strokeDasharray="4,4" />
+        <line x1="180" y1="40" x2="180" y2="160" stroke={PAPER_LINE} strokeWidth="2" strokeDasharray="4,4" />
 
         {/* After: attention */}
         <g>
@@ -355,12 +368,15 @@ export function TransformerDiagram() {
           </text>
         </g>
 
-        {/* Impact */}
+        {/* Impact, wrapped across two lines so it stays inside the canvas */}
         <text x="15" y="180" fontSize="11" fontWeight="bold" fill="#3498db">
           💡 Impact:
         </text>
-        <text x="15" y="198" fontSize="10" fill="#666">
-          Transformers could finally use billions of examples. Every modern AI (GPT, BERT, Claude) uses this idea.
+        <text x="15" y="198" fontSize="10" fill={INK_SOFT}>
+          Transformers could finally use billions of examples —
+        </text>
+        <text x="15" y="212" fontSize="10" fill={INK_SOFT}>
+          every modern AI (GPT, BERT, Claude) uses this idea.
         </text>
       </svg>
     </div>

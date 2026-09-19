@@ -26,7 +26,7 @@ const LANDSCAPE_LAYERS = [
 
 export default function LessonAnimation({ kind }: { kind: LessonAnimationKind }) {
   return (
-    <div className="w-full h-20 border border-paper-line rounded bg-paper-line/10 flex items-center justify-center overflow-hidden px-3">
+    <div className="w-full min-h-20 border border-paper-line rounded bg-paper-line/10 flex items-center justify-center px-3 py-2">
       {kind === "landscape" && (
         <div className="flex items-center gap-1.5">
           {LANDSCAPE_LAYERS.map((layer, i) => (
@@ -88,11 +88,14 @@ export default function LessonAnimation({ kind }: { kind: LessonAnimationKind })
       )}
 
       {kind === "draft" && (
-        <div className="relative w-full max-w-[220px] h-10">
-          <p className="motion-safe:animate-crossfade-out absolute inset-0 font-mono text-[11px] text-ink-soft flex items-center justify-center text-center">
+        <div className="flex flex-col items-center gap-1 w-full text-center">
+          <p className="font-mono text-[10px] text-ink-soft leading-snug">
             &ldquo;q3 numbers up, need update 2 team by fri&rdquo;
           </p>
-          <p className="motion-safe:animate-crossfade-in absolute inset-0 font-mono text-[11px] text-accent-ink flex items-center justify-center text-center">
+          <span className="text-ink-soft text-xs" aria-hidden>
+            ↓
+          </span>
+          <p className="motion-safe:animate-layer-reveal font-mono text-[10px] font-semibold text-accent-ink leading-snug">
             &ldquo;Hi team — Q3 numbers are up. Update by Friday.&rdquo;
           </p>
         </div>
@@ -146,34 +149,34 @@ export default function LessonAnimation({ kind }: { kind: LessonAnimationKind })
       )}
 
       {kind === "nextstep" && (
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-col gap-1.5 w-full">
           {["Check facts", "Know its limits", "Try it today"].map((label, i) => (
-            <div key={label} className="flex flex-col items-center gap-1">
+            <div key={label} className="flex items-center gap-1.5">
               <span
-                className="motion-safe:animate-check-tick w-4 h-4 rounded-full bg-accent2 text-paper text-[10px] flex items-center justify-center"
+                className="motion-safe:animate-check-tick w-4 h-4 flex-none rounded-full bg-accent2 text-paper text-[10px] flex items-center justify-center"
                 style={{ animationDelay: `${i * 0.4}s` }}
                 aria-hidden
               >
                 ✓
               </span>
-              <span className="font-mono text-[9.5px] text-ink-soft whitespace-nowrap">{label}</span>
+              <span className="font-mono text-[9.5px] text-ink-soft">{label}</span>
             </div>
           ))}
         </div>
       )}
 
       {kind === "steps" && (
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-col gap-1.5 w-full">
           {["Install", "Set up", "Use it"].map((label, i) => (
-            <div key={label} className="flex flex-col items-center gap-1">
+            <div key={label} className="flex items-center gap-1.5">
               <span
-                className="motion-safe:animate-check-tick w-4 h-4 rounded-full bg-accent-ink text-paper text-[10px] flex items-center justify-center"
+                className="motion-safe:animate-check-tick w-4 h-4 flex-none rounded-full bg-accent-ink text-paper text-[10px] flex items-center justify-center"
                 style={{ animationDelay: `${i * 0.4}s` }}
                 aria-hidden
               >
                 {i + 1}
               </span>
-              <span className="font-mono text-[9.5px] text-ink-soft whitespace-nowrap">{label}</span>
+              <span className="font-mono text-[9.5px] text-ink-soft">{label}</span>
             </div>
           ))}
         </div>

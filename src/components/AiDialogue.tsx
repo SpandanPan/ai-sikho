@@ -64,34 +64,34 @@ export default function AiDialogue() {
 
   return (
     <div className="border border-paper-line rounded p-6 bg-paper-line/5">
-      <div className="min-h-[200px] mb-6 relative">
-        {/* Learner character */}
-        <div className="absolute left-0 top-0 w-20 flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-b from-accent2 to-accent2/70 flex items-center justify-center text-2xl mb-2">
-            🎓
+      <div className="mb-6">
+        {/* Characters — normal flow, side by side, so nothing below can overlap them */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="w-20 flex flex-col items-center flex-none">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-b from-accent2 to-accent2/70 flex items-center justify-center text-2xl mb-2">
+              🎓
+            </div>
+            <span className="font-mono text-[10px] text-ink-soft">Learner</span>
           </div>
-          <span className="font-mono text-[10px] text-ink-soft">Learner</span>
-        </div>
-
-        {/* Guide character */}
-        <div className="absolute right-0 top-0 w-20 flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-b from-accent-ink to-accent-ink/70 flex items-center justify-center text-2xl mb-2">
-            🧠
+          <div className="w-20 flex flex-col items-center flex-none">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-b from-accent-ink to-accent-ink/70 flex items-center justify-center text-2xl mb-2">
+              🧠
+            </div>
+            <span className="font-mono text-[10px] text-ink-soft">Guide</span>
           </div>
-          <span className="font-mono text-[10px] text-ink-soft">Guide</span>
         </div>
 
         {/* Speech bubbles */}
-        <div className="mt-24 min-h-[120px]">
+        <div className="min-h-[100px] flex items-center">
           {step < DIALOGUE.length && (
             <div
               key={step}
-              className={`motion-safe:animate-layer-reveal ${
-                DIALOGUE[step].character === "learner" ? "mr-auto" : "ml-auto"
-              } max-w-xs`}
+              className={`motion-safe:animate-layer-reveal w-full flex ${
+                DIALOGUE[step].character === "learner" ? "justify-start" : "justify-end"
+              }`}
             >
               <div
-                className={`rounded-lg p-3 text-sm leading-relaxed ${
+                className={`rounded-lg p-3 text-sm leading-relaxed max-w-xs ${
                   DIALOGUE[step].character === "learner"
                     ? "bg-accent2/15 border border-accent2/50 text-ink-soft"
                     : "bg-accent-ink/15 border border-accent-ink/50 text-ink-soft"

@@ -123,19 +123,6 @@ body {
   animation: token-pop 3.6s ease-in-out infinite;
 }
 
-@keyframes crossfade-out {
-  0%, 42% { opacity: 1; }
-  50%, 92% { opacity: 0; }
-  100% { opacity: 1; }
-}
-@keyframes crossfade-in {
-  0%, 42% { opacity: 0; }
-  50%, 92% { opacity: 1; }
-  100% { opacity: 0; }
-}
-.animate-crossfade-out { animation: crossfade-out 5s ease-in-out infinite; }
-.animate-crossfade-in { animation: crossfade-in 5s ease-in-out infinite; }
-
 @keyframes confidence-glow {
   0%, 100% { box-shadow: 0 0 0 0 rgba(190,80,60,0); }
   50% { box-shadow: 0 0 0 3px rgba(190,80,60,0.25); }

@@ -91,7 +91,7 @@ export default function CourseLessonPage({ params }: { params: { slug: string } 
                   )}
                 </h2>
                 {s.kind && (
-                  <div className="w-full sm:w-40 flex-none">
+                  <div className="w-full sm:w-48 flex-none">
                     <LessonAnimation kind={s.kind} />
                   </div>
                 )}
