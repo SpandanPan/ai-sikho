@@ -39,12 +39,22 @@ export const levelInfo: Record<Level, { label: string; verb: string; tagline: st
 // The one recommendation the homepage and this page both point at for a
 // total newcomer — see StartHere.tsx's first card and LearnAiPath.tsx's
 // step 02. Kept as a single source of truth instead of hardcoded twice.
-export const startHereSlug = "ai-vs-ml-vs-dl";
+export const startHereSlug = "what-is-ai";
 
 export const articles: Article[] = [
   // -- Starter: true beginners, no prior AI vocabulary assumed --
   // Published pieces first — this is a library, not a catalogue of
   // promises, so what actually exists leads.
+  {
+    slug: "what-is-ai",
+    title: "What Is AI?",
+    summary: "The one-paragraph answer, before any of the jargon that usually comes with it.",
+    level: "starter",
+    status: "published",
+    readMinutes: 3,
+    topic: "AI Fundamentals",
+    relatedSlugs: ["ai-vs-ml-vs-dl"],
+  },
   {
     slug: "ai-vs-ml-vs-dl",
     title: "AI vs. Machine Learning vs. Deep Learning",
@@ -53,7 +63,7 @@ export const articles: Article[] = [
     status: "published",
     readMinutes: 6,
     topic: "AI Fundamentals",
-    relatedSlugs: ["what-is-an-llm", "ai-glossary"],
+    relatedSlugs: ["what-is-ai", "what-is-an-llm", "ai-glossary"],
   },
   {
     slug: "chatbot-or-agent",
@@ -88,7 +98,6 @@ export const articles: Article[] = [
 
   // The next 7 are stubs for the homepage's "Learn AI from zero" numbered
   // path (see LearnAiPath.tsx) — steps 01, 03, 04, 05, 08, 09, 10.
-  { slug: "what-is-ai", title: "What Is AI?", summary: "The one-paragraph answer, before any of the jargon that usually comes with it.", level: "starter", status: "coming-soon", topic: "AI Fundamentals" },
   { slug: "what-is-generative-ai", title: "What Is Generative AI?", summary: "The difference between AI that decides and AI that creates.", level: "starter", status: "coming-soon", topic: "Generative AI" },
   { slug: "what-is-an-llm", title: "What Is an LLM?", summary: "The three letters behind ChatGPT, Claude, and Gemini, explained plainly.", level: "starter", status: "coming-soon", topic: "LLMs" },
   { slug: "how-chatgpt-works", title: "How Does ChatGPT Actually Work?", summary: "What happens between you hitting enter and the words appearing on screen.", level: "starter", status: "coming-soon", topic: "LLMs" },

@@ -5,16 +5,18 @@ import { blocks as aiVsMlVsDlBlocks, heroImage as aiVsMlVsDlHero, type ArticleBl
 import { blocks as chatbotOrAgentBlocks, heroImage as chatbotOrAgentHero } from "@/data/articles/chatbotOrAgent";
 import { blocks as prompting101Blocks, heroImage as prompting101Hero } from "@/data/articles/prompting101";
 import { blocks as aiGlossaryBlocks } from "@/data/articles/aiGlossary";
+import { blocks as whatIsAiBlocks, heroImage as whatIsAiHero } from "@/data/articles/whatIsAi";
 
 // Content lookup by slug — only articles with status "published" in
 // src/data/articles.ts have an entry here. Same pattern as the courses
 // lessons lookup in src/app/courses/[slug]/page.tsx. `hero` is optional —
 // a short reference piece like the glossary doesn't need one.
-const articleContent: Record<string, { blocks: ArticleBlock[]; hero?: { src: string; alt: string; width: number; height: number } }> = {
+const articleContent: Record<string, { blocks: ArticleBlock[]; hero?: { src: string; alt: string; width: number; height: number; caption?: string } }> = {
   "ai-vs-ml-vs-dl": { blocks: aiVsMlVsDlBlocks, hero: aiVsMlVsDlHero },
   "chatbot-or-agent": { blocks: chatbotOrAgentBlocks, hero: chatbotOrAgentHero },
   "prompting-101": { blocks: prompting101Blocks, hero: prompting101Hero },
   "ai-glossary": { blocks: aiGlossaryBlocks },
+  "what-is-ai": { blocks: whatIsAiBlocks, hero: whatIsAiHero },
 };
 
 export function generateStaticParams() {
@@ -136,6 +138,9 @@ export default function ArticleDetailPage({ params }: { params: { slug: string }
               <div className="relative w-full rounded-lg overflow-hidden border border-paper-line">
                 <Image src={content.hero.src} alt={content.hero.alt} width={content.hero.width} height={content.hero.height} className="w-full h-auto" priority />
               </div>
+              {content.hero.caption && (
+                <figcaption className="mt-2 text-xs text-ink-soft text-center italic px-5 sm:px-0">{content.hero.caption}</figcaption>
+              )}
             </figure>
           )}
 
