@@ -130,21 +130,45 @@ export default function QuizPage() {
             )}
           </>
         ) : (
-          <div>
-            <div className="font-display text-4xl text-accent-ink mb-2">
-              {score} / {questions.length}
-            </div>
-            <h2 className="font-semibold mb-2">{feedbackFor(score, questions.length).headline}</h2>
-            <p className="text-sm text-ink-soft mb-5">{feedbackFor(score, questions.length).body}</p>
-            <div className="flex gap-3 flex-wrap">
-              <button onClick={retake} className="font-mono text-sm border border-paper-line rounded px-4 py-2">
-                Retake quiz
-              </button>
-              <a href="/" className="font-mono text-sm bg-ink text-paper rounded px-4 py-2">
-                Back to AI Sikho
-              </a>
-            </div>
-          </div>
+          (() => {
+            const result = feedbackFor(score, questions.length);
+            return (
+              <div>
+                <div className="font-display text-4xl text-accent-ink mb-2">
+                  {score} / {questions.length}
+                </div>
+                <p className="font-mono text-[10.5px] uppercase tracking-widest text-accent2 mb-1">Your AI starting point</p>
+                <h2 className="font-semibold mb-2">
+                  You are: <span className="text-accent-ink">{result.persona}</span>
+                </h2>
+                <p className="text-sm text-ink-soft mb-5">{result.body}</p>
+
+                <p className="font-mono text-[10.5px] uppercase tracking-widest text-ink-soft mb-2">Start with these 5 things</p>
+                <ol className="flex flex-col gap-1.5 mb-5">
+                  {result.starters.map((s, i) => (
+                    <li key={s.href}>
+                      <a href={s.href} className="text-sm text-ink-soft hover:text-accent-ink flex gap-2">
+                        <span className="font-mono text-accent2 flex-none">{i + 1}.</span>
+                        {s.title}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+
+                <div className="flex gap-3 flex-wrap items-center">
+                  <a href={result.nextStepHref} className="font-mono text-sm bg-ink text-paper rounded px-4 py-2.5">
+                    {result.nextStepLabel}
+                  </a>
+                  <button onClick={retake} className="font-mono text-sm border border-paper-line rounded px-4 py-2.5">
+                    Retake quiz
+                  </button>
+                  <a href="/" className="font-mono text-xs text-ink-soft hover:text-accent-ink underline">
+                    Back to AI Sikho
+                  </a>
+                </div>
+              </div>
+            );
+          })()
         )}
       </div>
     </main>

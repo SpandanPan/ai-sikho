@@ -11,7 +11,7 @@ import Logo from "./Logo";
 const links = [
   { href: "/quiz", label: "Quiz" },
   { href: "/articles", label: "Articles" },
-  { href: "/courses", label: "Courses" },
+  { href: "/courses", label: "Learn" },
   { href: "/about", label: "About" },
 ];
 
@@ -137,7 +137,7 @@ export default function Nav() {
             Articles
           </a>
           <a href="/courses" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
-            Courses
+            Learn
           </a>
           <MentoringDropdown />
           <a href="/about" className="font-mono text-xs text-ink-soft hover:text-accent-ink">

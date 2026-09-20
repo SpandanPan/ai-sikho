@@ -38,7 +38,7 @@ export default function Footer() {
           <div>
             <span className="font-display text-lg font-semibold">AI Sikho</span>
             <p className="text-sm text-ink-soft mt-2 max-w-[24ch]">
-              All things AI — explained, priced, and interview-ready.
+              AI, explained simply. Learn it, use it, and build with it.
             </p>
           </div>
           {columns.map((col) => (

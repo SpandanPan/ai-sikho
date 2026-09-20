@@ -109,7 +109,7 @@ export const articles: Article[] = [
     title: "The AI Glossary: 20 Terms You'll Actually Hear",
     summary: "Token, hallucination, fine-tuning, context window — translated once, in one place.",
     level: "starter",
-    status: "coming-soon",
+    status: "published",
   },
   {
     slug: "ai-in-your-day",

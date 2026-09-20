@@ -13,6 +13,7 @@ import AgentWorkflowDemo from "@/components/AgentWorkflowDemo";
 import IndicLanguageSection from "@/components/IndicLanguageSection";
 import StartHere from "@/components/StartHere";
 import LearnAiPath from "@/components/LearnAiPath";
+import AiForYourJob from "@/components/AiForYourJob";
 
 // Same order as the site's Mentoring nav dropdown (Nav.tsx) — mentoring
 // itself, plus its companion mock-feedback offer. "Go deep on one topic"
@@ -147,6 +148,9 @@ export default function Home() {
         <SoftGate>
           <PulseFeed orientation="horizontal" />
         </SoftGate>
+
+        {/* AI FOR YOUR JOB */}
+        <AiForYourJob />
 
         {/* CAREER / INTERVIEW */}
         <section id="career">
