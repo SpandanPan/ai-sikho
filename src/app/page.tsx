@@ -177,7 +177,7 @@ export default function Home() {
 
         {/* BUSINESS / WORK WITH ME */}
         <section id="work" className="border-b border-paper-line py-9">
-          <div className="border border-paper-line rounded p-6">
+          <div className="relative border border-accent/40 rounded-xl p-6 sm:p-7 overflow-hidden bg-gradient-to-br from-accent/5 via-transparent to-transparent">
             <WorkWithMe />
           </div>
         </section>

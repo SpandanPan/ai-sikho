@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { automationServices } from "@/data/automationServices";
+import { workExamples } from "@/data/workExamples";
 import { trackClick } from "@/lib/trackEvent";
 
 export default function WorkWithMe() {
@@ -48,11 +49,35 @@ export default function WorkWithMe() {
 
   return (
     <div>
-      <h2 className="font-display text-xl font-semibold mb-1">Running a business? Bring me the busywork.</h2>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-2 font-semibold">Running a business?</p>
+      <h2 className="font-display text-2xl font-semibold mb-1 text-balance">Bring me the busywork.</h2>
       <p className="text-sm text-ink-soft mb-6 max-w-lg">
         Have a repetitive process you&apos;d like to automate? Tell me what it is. I&apos;ll help you figure out
-        whether AI can actually solve it.
+        whether AI can actually solve it — no hype, no jargon.
       </p>
+
+      <div className="mb-7">
+        <p className="font-mono text-[10.5px] uppercase tracking-widest text-ink-soft mb-3">
+          What this can look like — illustrative examples, not real client work
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {workExamples.map((ex) => (
+            <div key={ex.problem} className="border border-paper-line rounded-lg p-3.5 bg-paper">
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="text-base" aria-hidden>
+                  {ex.icon}
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-accent2">{ex.category}</span>
+              </div>
+              <p className="text-xs text-ink-soft mb-2 leading-relaxed">{ex.problem}</p>
+              <p className="text-xs text-ink leading-relaxed">
+                <span className="text-accent-ink font-semibold">→ </span>
+                {ex.fix}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div className="grid gap-3 sm:grid-cols-2 mb-6">
         {automationServices.map((s) => (
@@ -60,10 +85,13 @@ export default function WorkWithMe() {
             key={s.slug}
             type="button"
             onClick={() => selectService(s.slug)}
-            className={`text-left border rounded p-4 transition-colors ${
-              selected === s.slug ? "border-accent bg-paper-raised" : "border-paper-line hover:border-accent"
+            className={`text-left border rounded-lg p-4 transition-all ${
+              selected === s.slug ? "border-accent bg-paper-raised shadow-sm" : "border-paper-line hover:border-accent hover:-translate-y-0.5"
             }`}
           >
+            <span className="text-xl mb-1.5 block" aria-hidden>
+              {s.icon}
+            </span>
             <h3 className="font-semibold text-sm mb-1">{s.title}</h3>
             <p className="text-xs text-ink-soft">{s.description}</p>
           </button>

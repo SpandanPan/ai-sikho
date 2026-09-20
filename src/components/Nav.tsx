@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import CartIcon from "./CartIcon";
 import Logo from "./Logo";
@@ -8,7 +9,12 @@ import Logo from "./Logo";
 // Trimmed to real pages only — the previous list also had #pulse/#free/#pack
 // homepage-anchor shortcuts, which just duplicated what's already the first
 // thing you see landing on "/". A nav should get you somewhere new.
+//
+// Desktop and mobile both render this same array now (via NavLink) instead
+// of each hardcoding its own <a> tags — that duplication is exactly what
+// let "Courses" get renamed to "Learn" on mobile but not desktop earlier.
 const links = [
+  { href: "/", label: "Home", exact: true },
   { href: "/quiz", label: "Quiz" },
   { href: "/articles", label: "Articles" },
   { href: "/courses", label: "Learn" },
@@ -34,6 +40,39 @@ const moreLinks = [
   { href: "/refund-policy", label: "Refunds" },
 ];
 
+function isPathActive(pathname: string | null, href: string, exact?: boolean) {
+  if (!pathname) return false;
+  return exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
+}
+
+function NavLink({
+  href,
+  label,
+  active,
+  mobile = false,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  active: boolean;
+  mobile?: boolean;
+  onClick?: () => void;
+}) {
+  const size = mobile ? "text-sm" : "text-xs";
+  return (
+    <a
+      href={href}
+      onClick={onClick}
+      aria-current={active ? "page" : undefined}
+      className={`font-mono ${size} transition-colors ${
+        active ? "text-accent-ink font-semibold" : "text-ink-soft hover:text-accent-ink"
+      }`}
+    >
+      {label}
+    </a>
+  );
+}
+
 function useOutsideClick(onOutside: () => void) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -46,7 +85,7 @@ function useOutsideClick(onOutside: () => void) {
   return ref;
 }
 
-function MentoringDropdown() {
+function MentoringDropdown({ active }: { active: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useOutsideClick(() => setOpen(false));
 
@@ -55,7 +94,10 @@ function MentoringDropdown() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="font-mono text-xs text-ink-soft hover:text-accent-ink inline-flex items-center gap-1"
+        aria-current={active ? "page" : undefined}
+        className={`font-mono text-xs inline-flex items-center gap-1 transition-colors ${
+          active ? "text-accent-ink font-semibold" : "text-ink-soft hover:text-accent-ink"
+        }`}
       >
         Mentoring
         <span className="text-[9px]" aria-hidden>
@@ -119,7 +161,9 @@ function MoreDropdown() {
 
 export default function Nav() {
   const { status } = useSession();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const mentoringActive = isPathActive(pathname, "/mentoring") || isPathActive(pathname, "/mock-feedback");
 
   return (
     <nav className="sticky top-0 z-40 bg-paper border-b border-paper-line">
@@ -130,19 +174,10 @@ export default function Nav() {
         </a>
 
         <div className="hidden lg:flex items-center gap-5 flex-wrap">
-          <a href="/quiz" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
-            Quiz
-          </a>
-          <a href="/articles" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
-            Articles
-          </a>
-          <a href="/courses" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
-            Learn
-          </a>
-          <MentoringDropdown />
-          <a href="/about" className="font-mono text-xs text-ink-soft hover:text-accent-ink">
-            About
-          </a>
+          {links.map((l) => (
+            <NavLink key={l.href} href={l.href} label={l.label} active={isPathActive(pathname, l.href, l.exact)} />
+          ))}
+          <MentoringDropdown active={mentoringActive} />
           <a href="/#work" className="font-mono text-xs bg-ink text-paper rounded px-3 py-1.5">
             Work With Us
           </a>
@@ -152,13 +187,9 @@ export default function Nav() {
           <MoreDropdown />
           <CartIcon />
           {status === "authenticated" ? (
-            <a href="/profile" className="hidden lg:inline font-mono text-xs text-ink-soft hover:text-accent-ink">
-              Profile
-            </a>
+            <NavLink href="/profile" label="Profile" active={isPathActive(pathname, "/profile")} />
           ) : (
-            <a href="/signin" className="hidden lg:inline font-mono text-xs text-ink-soft hover:text-accent-ink">
-              Sign in
-            </a>
+            <NavLink href="/signin" label="Sign in" active={isPathActive(pathname, "/signin")} />
           )}
           <button
             onClick={() => setOpen((v) => !v)}
@@ -174,30 +205,31 @@ export default function Nav() {
       {open && (
         <div className="lg:hidden border-t border-paper-line px-5 py-4 flex flex-col gap-3">
           {links.map((l) => (
-            <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
-              {l.label}
-            </a>
+            <NavLink
+              key={l.href}
+              href={l.href}
+              label={l.label}
+              active={isPathActive(pathname, l.href, l.exact)}
+              mobile
+              onClick={() => setOpen(false)}
+            />
           ))}
           <div className="flex flex-col gap-3 pl-3 border-l border-paper-line">
             {mentoringLinks.map((l) => (
-              <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
-                {l.label}
-                {l.locked && (
-                  <span className="ml-1" title="Paid" aria-label="Paid">
-                    🔒
-                  </span>
-                )}
-              </a>
+              <NavLink
+                key={l.href}
+                href={l.href}
+                label={l.locked ? `${l.label} 🔒` : l.label}
+                active={isPathActive(pathname, l.href)}
+                mobile
+                onClick={() => setOpen(false)}
+              />
             ))}
           </div>
           {status === "authenticated" ? (
-            <a href="/profile" onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
-              Profile
-            </a>
+            <NavLink href="/profile" label="Profile" active={isPathActive(pathname, "/profile")} mobile onClick={() => setOpen(false)} />
           ) : (
-            <a href="/signin" onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
-              Sign in
-            </a>
+            <NavLink href="/signin" label="Sign in" active={isPathActive(pathname, "/signin")} mobile onClick={() => setOpen(false)} />
           )}
           <a href="/#work" onClick={() => setOpen(false)} className="font-mono text-sm bg-ink text-paper rounded px-3 py-2 self-start">
             Work With Us
@@ -205,9 +237,7 @@ export default function Nav() {
           <div className="pt-3 border-t border-paper-line flex flex-col gap-3">
             <p className="font-mono text-[10px] uppercase tracking-widest text-ink-soft">More</p>
             {moreLinks.map((l) => (
-              <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="font-mono text-sm text-ink-soft hover:text-accent-ink">
-                {l.label}
-              </a>
+              <NavLink key={l.href} href={l.href} label={l.label} active={isPathActive(pathname, l.href)} mobile onClick={() => setOpen(false)} />
             ))}
           </div>
         </div>
