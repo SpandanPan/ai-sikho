@@ -3,7 +3,6 @@ import PulseFeed from "@/components/PulseFeed";
 import FunFactLoader from "@/components/FunFactLoader";
 import TrackedLink from "@/components/TrackedLink";
 import SoftGate from "@/components/SoftGate";
-import WorkWithMe from "@/components/WorkWithMe";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import MythFactStrip from "@/components/MythFactStrip";
 import InterviewPackSection from "@/components/InterviewPackSection";
@@ -172,13 +171,6 @@ export default function Home() {
                 <span className="font-mono text-xs text-accent-ink">{m.price} →</span>
               </a>
             ))}
-          </div>
-        </section>
-
-        {/* BUSINESS / WORK WITH ME */}
-        <section id="work" className="border-b border-paper-line py-9">
-          <div className="relative border border-accent/40 rounded-xl p-6 sm:p-7 overflow-hidden bg-gradient-to-br from-accent/5 via-transparent to-transparent">
-            <WorkWithMe />
           </div>
         </section>
 

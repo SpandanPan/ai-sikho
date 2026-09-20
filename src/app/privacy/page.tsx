@@ -5,7 +5,6 @@ export default function PrivacyPage() {
     <main className="mx-auto max-w-2xl px-5 py-12 text-sm leading-relaxed">
       <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-2">Privacy Policy</p>
       <h1 className="font-display text-2xl font-semibold mb-1">What we collect, and why.</h1>
-      <p className="text-ink-soft mb-8">Last updated: draft, not yet reviewed by a lawyer — see the note at the bottom.</p>
 
       <div className="flex flex-col gap-6">
         <section>
@@ -91,19 +90,6 @@ export default function PrivacyPage() {
             </a>. We aim to acknowledge within a few days and resolve within 30 days as a service
             commitment — this is our own stated target, not a claim about a specific number of days
             set by the DPDP Act itself.
-          </p>
-        </section>
-
-        <section className="border border-paper-line rounded p-4 text-xs text-ink-soft">
-          <p>
-            <b>Honest note:</b> this page accurately describes what the product actually does as of
-            today — it isn&apos;t template filler, and it was written with the DPDP Act&apos;s actual
-            requirements in mind (purpose-specific notice, Data Principal rights, a grievance
-            contact, children&apos;s data). It has still not been reviewed by a lawyer. In particular:
-            confirm the actual hosting region for cross-border transfer purposes, confirm whether
-            this business needs to register as a &quot;Significant Data Fiduciary&quot; at its real
-            scale, and put a real age-verification step in place before this reaches a school-age
-            audience. Have all of it checked by a lawyer before relying on it at real launch.
           </p>
         </section>
       </div>

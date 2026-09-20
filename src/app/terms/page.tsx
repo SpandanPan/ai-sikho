@@ -8,7 +8,6 @@ export default function TermsPage() {
     <main className="mx-auto max-w-2xl px-5 py-12 text-sm leading-relaxed">
       <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-2">Terms of Service</p>
       <h1 className="font-display text-2xl font-semibold mb-1">The plain-language rules.</h1>
-      <p className="text-ink-soft mb-8">Last updated: draft, not yet reviewed by a lawyer — see the note at the bottom.</p>
 
       <div className="flex flex-col gap-6">
         <section>
@@ -102,21 +101,6 @@ export default function TermsPage() {
         <section>
           <h2 className="font-semibold mb-2">Governing law</h2>
           <p className="text-ink-soft">These terms are governed by the laws of India.</p>
-        </section>
-
-        <section className="border border-paper-line rounded p-4 text-xs text-ink-soft">
-          <p>
-            <b>Honest note:</b> this page accurately describes the product&apos;s actual policies as of
-            today — it isn&apos;t template filler. It has not been reviewed by a lawyer. One specific
-            thing to resolve before real launch: the site owner has explicitly asked that no
-            personal names be shown publicly (see <code className="font-mono">AboutUs.tsx</code>),
-            but consumer law generally expects a real legal name and address for the operating
-            entity to be disclosed somewhere. If no business entity is registered yet, that
-            disclosure defaults to a personal name/address — worth resolving with a CA (e.g., by
-            registering an LLP or Pvt Ltd whose name isn&apos;t a personal one) rather than left
-            unresolved. <code className="font-mono">BUSINESS_LEGAL_NAME</code> above currently falls
-            back to the product name, which itself may not satisfy this requirement.
-          </p>
         </section>
       </div>
     </main>

@@ -5,7 +5,6 @@ export default function RefundPolicyPage() {
     <main className="mx-auto max-w-2xl px-5 py-12 text-sm leading-relaxed">
       <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-2">Refund Policy</p>
       <h1 className="font-display text-2xl font-semibold mb-1">All sales are final.</h1>
-      <p className="text-ink-soft mb-8">Last updated: draft, not yet reviewed by a lawyer — see the note at the bottom.</p>
 
       <div className="flex flex-col gap-6">
         <section>
@@ -39,17 +38,6 @@ export default function RefundPolicyPage() {
             with your purchase email/phone, what you bought, and what actually went wrong. Any
             refund we do issue goes back to your original payment method via Razorpay, typically
             within 5–7 business days of approval.
-          </p>
-        </section>
-
-        <section className="border border-paper-line rounded p-4 text-xs text-ink-soft">
-          <p>
-            <b>Honest note:</b> this reflects the product&apos;s actual, current policy — it isn&apos;t
-            template filler. It has not been reviewed by a lawyer. In particular, have a lawyer
-            confirm this holds up against India&apos;s consumer protection rules for digital goods and
-            services (the Consumer Protection Act and E-Commerce Rules) before relying on it at real
-            launch — a blanket &quot;no refunds&quot; clause does not override statutory consumer rights,
-            and this page tries to say that honestly rather than overclaim.
           </p>
         </section>
       </div>

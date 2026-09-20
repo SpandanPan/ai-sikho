@@ -11,7 +11,7 @@ const ROLES = [
   { role: "HR", start: "AI for recruiting", href: "/articles/how-ai-is-changing-jobs" },
   { role: "Developer", start: "Build with AI", href: "/courses" },
   { role: "Doctor", start: "AI in healthcare", href: "/articles/ai-in-your-day" },
-  { role: "Entrepreneur", start: "Automate workflows", href: "#work" },
+  { role: "Entrepreneur", start: "Automate workflows", href: "/work-with-us" },
 ];
 
 export default function AiForYourJob() {
