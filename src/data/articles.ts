@@ -73,7 +73,17 @@ export const articles: Article[] = [
     status: "published",
     readMinutes: 9,
     topic: "Generative AI",
-    relatedSlugs: ["ai-vs-ml-vs-dl", "prompting-101", "chatbot-or-agent"],
+    relatedSlugs: ["ai-vs-ml-vs-dl", "what-is-an-llm", "prompting-101"],
+  },
+  {
+    slug: "what-is-an-llm",
+    title: "What Is an LLM?",
+    summary: "The technology behind ChatGPT, Claude, Gemini — and much of today's Generative AI.",
+    level: "starter",
+    status: "published",
+    readMinutes: 8,
+    topic: "LLMs",
+    relatedSlugs: ["what-is-generative-ai", "ai-vs-ml-vs-dl", "prompting-101"],
   },
   {
     slug: "chatbot-or-agent",
@@ -108,7 +118,6 @@ export const articles: Article[] = [
 
   // The next 7 are stubs for the homepage's "Learn AI from zero" numbered
   // path (see LearnAiPath.tsx) — steps 01, 03, 04, 05, 08, 09, 10.
-  { slug: "what-is-an-llm", title: "What Is an LLM?", summary: "The three letters behind ChatGPT, Claude, and Gemini, explained plainly.", level: "starter", status: "coming-soon", topic: "LLMs" },
   { slug: "how-chatgpt-works", title: "How Does ChatGPT Actually Work?", summary: "What happens between you hitting enter and the words appearing on screen.", level: "starter", status: "coming-soon", topic: "LLMs" },
   { slug: "what-is-rag", title: "What Is RAG?", summary: "How an AI answers questions about documents it was never trained on.", level: "starter", status: "coming-soon", topic: "RAG" },
   { slug: "what-are-ai-agents", title: "What Are AI Agents?", summary: "The building blocks behind a system that can plan, use tools, and take action.", level: "starter", status: "coming-soon", topic: "Agents" },
