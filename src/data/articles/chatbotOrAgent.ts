@@ -3,8 +3,9 @@
 // file's header comment for why.
 
 import type { ArticleBlock } from "./aiVsMlVsDl";
+import { assetUrl } from "@/lib/assetUrl";
 
-export const heroImage = { src: "/articles/chatbot-or-agent/hero.png", alt: "Two robots at a desk: one labeled Chatbot with a speech bubble reading \"Here's the answer!\", the other labeled AI Agent wearing a cape, pointing at a checklist reading Plan steps, Search information, Use tools, Take actions, Adjust if needed, Complete the goal.", width: 1212, height: 530 };
+export const heroImage = { src: assetUrl("/articles/chatbot-or-agent/hero.png"), alt: "Two robots at a desk: one labeled Chatbot with a speech bubble reading \"Here's the answer!\", the other labeled AI Agent wearing a cape, pointing at a checklist reading Plan steps, Search information, Use tools, Take actions, Adjust if needed, Complete the goal.", width: 1212, height: 530 };
 
 export const blocks: ArticleBlock[] = [
   { type: "p", text: "You've probably interacted with both. You ask: \"What's the weather in Bangalore today?\" A system gives you an answer." },

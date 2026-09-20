@@ -12,8 +12,9 @@
 // a quick fix once actually seen.
 
 import type { ArticleBlock } from "./aiVsMlVsDl";
+import { assetUrl } from "@/lib/assetUrl";
 
-export const heroImage = { src: "/articles/prompting-101/hero.png", alt: "Illustration for Prompting 101: how to get good answers from AI.", width: 1212, height: 1298 };
+export const heroImage = { src: assetUrl("/articles/prompting-101/hero.png"), alt: "Illustration for Prompting 101: how to get good answers from AI.", width: 1212, height: 1298 };
 
 export const blocks: ArticleBlock[] = [
   { type: "p", text: "You ask an AI a question. You get an answer. Sometimes it's exactly what you wanted. Other times, you get three paragraphs of generic advice, a list you didn't ask for, or an answer that sounds confident but completely misses the point." },
@@ -29,7 +30,7 @@ export const blocks: ArticleBlock[] = [
   { type: "p", text: "Imagine walking into a restaurant and saying \"Give me something good.\" The waiter has a problem — good for whom? Maybe you're vegetarian, hate spicy food, allergic to peanuts, have ₹500, or are celebrating an anniversary. The waiter can't read your mind. AI can't either." },
   { type: "p", text: "This is why context matters. Instead of \"Suggest a laptop,\" try \"Suggest a laptop under ₹1 lakh for software development. I'll use it mainly for Python, Docker and occasional local AI inference. Battery life and portability matter because I travel frequently.\" Suddenly, the AI has constraints to work with." },
 
-  { type: "image", src: "/articles/prompting-101/img-1.jpeg", alt: "Illustration accompanying the section on giving AI context — a visual metaphor for a vague request versus a well-specified one." },
+  { type: "image", src: assetUrl("/articles/prompting-101/img-1.jpeg"), alt: "Illustration accompanying the section on giving AI context — a visual metaphor for a vague request versus a well-specified one." },
 
   { type: "h2", text: "3. The four ingredients of a good prompt" },
   { type: "p", text: "For most everyday tasks, you can think about four things: what do you want, what does the AI need to know, what constraints matter, and what should the answer look like. That's it — you don't need a 500-word prompt every time." },
@@ -53,7 +54,7 @@ export const blocks: ArticleBlock[] = [
   { type: "list", items: ["Money — \"Budget: ₹20,000.\"", "Time — \"I can spend 5 hours a week.\"", "Experience — \"I'm a complete beginner.\"", "Location — \"I'm based in Bangalore.\"", "Preferences — \"I prefer remote work.\"", "Deadline — \"I need something ready by Friday.\""] },
   { type: "callout", text: "Constraints turn \"Give me ideas\" into \"Solve this particular problem.\"" },
 
-  { type: "image", src: "/articles/prompting-101/img-2.jpeg", alt: "Illustration accompanying the section on constraints — a visual metaphor for how limits and preferences narrow a broad request into a focused one." },
+  { type: "image", src: assetUrl("/articles/prompting-101/img-2.jpeg"), alt: "Illustration accompanying the section on constraints — a visual metaphor for how limits and preferences narrow a broad request into a focused one." },
 
   { type: "h2", text: "8. Tell AI what \"good\" means" },
   { type: "p", text: "\"Recommend a car\" — what does good mean? Good mileage? Safety? Performance? Luxury? Reliability? Resale value? Off-road capability? Low maintenance? The AI has to guess." },
@@ -72,7 +73,7 @@ export const blocks: ArticleBlock[] = [
   { type: "p", text: "This is probably the biggest practical lesson. You don't need the perfect first prompt — conversation itself is a tool. Start with \"Explain RAG to me.\" Then \"That's too technical. Explain it using an example from a company.\" Then \"Now explain what happens technically behind the scenes.\" Then \"Give me a simple architecture diagram.\"" },
   { type: "callout", text: "You have effectively built a better answer through iteration. Think of prompting as a conversation rather than a command." },
 
-  { type: "image", src: "/articles/prompting-101/img-3.jpeg", alt: "Illustration accompanying the section on iterating with AI — a visual metaphor for refining an answer over several exchanges rather than one perfect prompt." },
+  { type: "image", src: assetUrl("/articles/prompting-101/img-3.jpeg"), alt: "Illustration accompanying the section on iterating with AI — a visual metaphor for refining an answer over several exchanges rather than one perfect prompt." },
 
   { type: "h2", text: "12. Follow-up questions are not a failure" },
   { type: "p", text: "Suppose the AI gives you an answer and you say \"This is too generic.\" That's useful feedback. You can say \"Make it specific to someone with 10 years of AI experience,\" or \"Focus only on options available in India,\" or \"You gave me 20 options. Narrow this down to five and explain the trade-offs,\" or \"Don't repeat the background. Just answer the question.\"" },
@@ -99,7 +100,7 @@ export const blocks: ArticleBlock[] = [
   { type: "p", text: "Suppose you want AI to rewrite something. Don't just say \"Make this professional\" — professional can mean many things. Instead: \"Rewrite this in a concise, confident tone. Keep it friendly and avoid corporate jargon. Here's an example of the style I like: [example].\"" },
   { type: "p", text: "Examples give the model something concrete to imitate — sometimes called few-shot prompting, though you don't need to remember the terminology. Just remember: if you want a particular style, show the AI an example." },
 
-  { type: "image", src: "/articles/prompting-101/img-4.jpeg", alt: "Illustration accompanying the section on structuring a complex prompt into goal, context, constraints, and output." },
+  { type: "image", src: assetUrl("/articles/prompting-101/img-4.jpeg"), alt: "Illustration accompanying the section on structuring a complex prompt into goal, context, constraints, and output." },
 
   { type: "h2", text: "18. Use a structure when the task is complicated" },
   { type: "p", text: "For complex requests, a simple structure works remarkably well: Goal (what I want), Context (what you need to know), Constraints (what you must work within), Output (what I want the answer to look like), Quality bar (what makes the answer useful)." },
@@ -122,7 +123,7 @@ export const blocks: ArticleBlock[] = [
   { type: "p", text: "Coding — Weak: \"Fix my Python code.\" Better: \"This Python function is taking 15 seconds to process 100,000 records. Identify the bottleneck, explain why it's slow, and suggest an optimized version. Don't change the function's output.\"" },
   { type: "p", text: "Decision-making — Weak: \"Should I buy this car?\" Better: \"I'm considering this car mainly for city driving but I take 5–6 highway trips a year. My priorities are safety, driving experience and long-term reliability. Analyze the major advantages and drawbacks for my use case and tell me what questions I should ask the dealer before deciding.\"" },
 
-  { type: "image", src: "/articles/prompting-101/img-5.jpeg", alt: "Illustration accompanying the weak-versus-better prompt examples — a visual metaphor comparing a vague request to a specific, well-scoped one." },
+  { type: "image", src: assetUrl("/articles/prompting-101/img-5.jpeg"), alt: "Illustration accompanying the weak-versus-better prompt examples — a visual metaphor comparing a vague request to a specific, well-scoped one." },
 
   { type: "h2", text: "22. What if the AI gives you a wrong answer?" },
   { type: "p", text: "This is where prompting has a limit. A beautifully written prompt doesn't guarantee a correct answer. AI systems can misunderstand your question, make factual errors, use outdated information, misinterpret data, or produce plausible-sounding nonsense." },
@@ -143,7 +144,7 @@ export const blocks: ArticleBlock[] = [
     "Iterate — What should change after seeing the first answer? \"Make it simpler.\" \"Go deeper.\" \"Give me alternatives.\" \"Challenge this.\" \"Focus on X.\"",
   ] },
 
-  { type: "image", src: "/articles/prompting-101/img-6.jpeg", alt: "Illustration accompanying the Prompting 101 cheat sheet — a visual summary of goal, context, constraints, output, and iteration." },
+  { type: "image", src: assetUrl("/articles/prompting-101/img-6.jpeg"), alt: "Illustration accompanying the Prompting 101 cheat sheet — a visual summary of goal, context, constraints, output, and iteration." },
 
   { type: "h2", text: "25. The simplest prompt formula" },
   { type: "p", text: "If you remember nothing else, remember this: \"I want [GOAL]. Here's [CONTEXT]. My constraints are [CONSTRAINTS]. Give me [OUTPUT].\"" },

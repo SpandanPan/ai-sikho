@@ -95,7 +95,7 @@ function MoreDropdown() {
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close more menu" : "Open more menu"}
         aria-expanded={open}
-        className="font-mono text-sm text-ink-soft hover:text-accent-ink px-1.5 py-1 rounded hover:bg-paper-line/30"
+        className="font-mono text-2xl leading-none text-ink-soft hover:text-accent-ink px-2 py-1.5 rounded hover:bg-paper-line/30"
       >
         ≡
       </button>

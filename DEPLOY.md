@@ -122,13 +122,46 @@ Before calling this actually live:
       don't fully trust (shared VPS, screen-shared session, etc.) — it's
       a bearer token, whoever has it has full access to your Ollama box
 
+## Image storage (optional — do this when repo size actually bothers you)
+
+Article/homepage images currently ship as files under `public/` committed
+to the repo. That's fine to launch with, but it doesn't scale — every
+image added grows the repo forever (git never shrinks on its own), and
+`public/` files are served from Vercel's origin, not a CDN. Every image
+reference in the codebase already goes through `assetUrl()`
+(`src/lib/assetUrl.ts`) instead of a hardcoded path, specifically so this
+migration is an env var + one script run, not a find-and-replace.
+
+1. In the Supabase dashboard: **Storage → New bucket**, name it `assets`,
+   check **Public bucket** (these are article illustrations, not private
+   data — no reason to gate reads behind auth).
+2. Get a service role key: **Project Settings → API → service_role**
+   (not the `anon` key — this needs write access to create objects).
+3. Run the upload, locally, once:
+   ```bash
+   SUPABASE_URL="https://<project-ref>.supabase.co" \
+   SUPABASE_SERVICE_ROLE_KEY="<service-role-key>" \
+   npm run upload-assets
+   ```
+   It walks `public/articles/` and `public/home/`, uploads every image to
+   the bucket at the same relative path, and prints the
+   `NEXT_PUBLIC_ASSET_BASE_URL` value to set next. Re-running it later
+   (new images added) is safe — it overwrites by path, doesn't duplicate.
+4. Set `NEXT_PUBLIC_ASSET_BASE_URL` in Vercel's env vars to the URL the
+   script printed, and redeploy. Every `assetUrl()` call now resolves to
+   the CDN instead of `public/`.
+5. **Only once you've verified the deployed site actually renders those
+   images from the new URL** — `git rm` the files under `public/articles/`
+   and `public/home/` and commit. Don't do this before verifying; if the
+   env var is wrong or unset, this would 404 every image with nothing to
+   fall back to.
+
+Local dev is unaffected either way — `NEXT_PUBLIC_ASSET_BASE_URL` unset
+means `assetUrl()` returns the same local path it always did, so nothing
+here needs to be set up just to run `npm run dev`.
+
 ## Not covered here (deliberately out of scope for this pass)
 
-- **Image storage** — `public/articles/*` currently ships article images
-  as files committed to the repo (~8MB and growing). That works fine for
-  launch but isn't the long-term answer (repo bloat, no CDN). Moving
-  these to Supabase Storage or Vercel Blob is a real but separate piece
-  of work — ask for it directly when you want it scoped.
 - **OTP delivery, Zoom meetings, GST invoicing** — each has its own
   "NOT wired up yet" note in `.env.example` with what's needed to turn it
   on. None of them block a launch; they degrade to a logged/manual

@@ -8,9 +8,10 @@
 // deliberately generic for the same reason.
 
 import type { ArticleBlock } from "./aiVsMlVsDl";
+import { assetUrl } from "@/lib/assetUrl";
 
 export const heroImage = {
-  src: "/articles/what-is-ai/hero.png",
+  src: assetUrl("/articles/what-is-ai/hero.png"),
   alt: "Illustration for What Is AI? — a curiosity-driven, beginner-friendly visual, not a technical diagram.",
   width: 1222,
   height: 1287,

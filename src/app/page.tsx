@@ -14,6 +14,7 @@ import IndicLanguageSection from "@/components/IndicLanguageSection";
 import StartHere from "@/components/StartHere";
 import LearnAiPath from "@/components/LearnAiPath";
 import AiForYourJob from "@/components/AiForYourJob";
+import { assetUrl } from "@/lib/assetUrl";
 
 // Same order as the site's Mentoring nav dropdown (Nav.tsx) — mentoring
 // itself, plus its companion mock-feedback offer. "Go deep on one topic"
@@ -106,7 +107,7 @@ export default function Home() {
 
           <div className="relative hidden lg:block">
             <Image
-              src="/home/hero-illustration.png"
+              src={assetUrl("/home/hero-illustration.png")}
               alt="A diverse group learning AI together around a laptop, with a glowing lightbulb reading 'AI for a brighter tomorrow' above them."
               width={793}
               height={505}

@@ -11,6 +11,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "fetch-news": "tsx scripts/fetch-news.ts",
+    "upload-assets": "tsx scripts/upload-images-to-supabase.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

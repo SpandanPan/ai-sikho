@@ -3,6 +3,8 @@
 // src/app/articles/[slug]/page.tsx can apply the site's own typography
 // and theme tokens consistently — same approach as src/data/lessons/.
 
+import { assetUrl } from "@/lib/assetUrl";
+
 export type ArticleBlock =
   | { type: "p"; text: string }
   | { type: "h2"; text: string }
@@ -12,7 +14,7 @@ export type ArticleBlock =
   | { type: "callout"; text: string }
   | { type: "image"; src: string; alt: string; caption?: string };
 
-export const heroImage = { src: "/articles/ai-vs-ml-vs-dl/hero.png", alt: "AI vs. Machine Learning vs. Deep Learning, shown as one mountain seen from three altitudes — AI at the base, Machine Learning partway up, Deep Learning at the summit.", width: 1024, height: 1536 };
+export const heroImage = { src: assetUrl("/articles/ai-vs-ml-vs-dl/hero.png"), alt: "AI vs. Machine Learning vs. Deep Learning, shown as one mountain seen from three altitudes — AI at the base, Machine Learning partway up, Deep Learning at the summit.", width: 1024, height: 1536 };
 
 export const blocks: ArticleBlock[] = [
   { type: "p", text: "If you have spent any time reading about technology, you have probably encountered these three terms: Artificial Intelligence (AI), Machine Learning (ML), Deep Learning (DL)." },
@@ -29,7 +31,7 @@ export const blocks: ArticleBlock[] = [
   { type: "diagram", text: "If temperature > 38°C\nAND cough = yes\nAND oxygen level < 95%\n→ Flag patient for further examination." },
   { type: "p", text: "There is no learning involved. A human created the rules. Yet the system is attempting to perform a task associated with human decision-making. That's still AI in the broad sense." },
 
-  { type: "image", src: "/articles/ai-vs-ml-vs-dl/comparison-table.jpeg", alt: "Three-column comparison of Artificial Intelligence, Machine Learning, and Deep Learning, each with a definition, usage, and example algorithms.", caption: "The three terms side by side — definition, usage, and typical algorithms for each." },
+  { type: "image", src: assetUrl("/articles/ai-vs-ml-vs-dl/comparison-table.jpeg"), alt: "Three-column comparison of Artificial Intelligence, Machine Learning, and Deep Learning, each with a definition, usage, and example algorithms.", caption: "The three terms side by side — definition, usage, and typical algorithms for each." },
 
   { type: "h2", text: "2. Then came Machine Learning" },
   { type: "p", text: "Traditional computer programs work something like this: Rules + Data → Answer. Humans tell the computer exactly what to do." },
@@ -44,7 +46,7 @@ export const blocks: ArticleBlock[] = [
   { type: "diagram", text: "ARTIFICIAL INTELLIGENCE\n│\n├── Rule-based systems\n│\n├── Search & planning\n│\n├── Expert systems\n│\n├── Machine Learning\n│   │\n│   ├── Decision trees\n│   ├── Linear models\n│   ├── Random forests\n│   ├── Support Vector Machines\n│   └── Neural networks\n│\n└── Other approaches" },
   { type: "callout", text: "All Machine Learning is AI, but not all AI is Machine Learning. This distinction is one of the most important things to understand." },
 
-  { type: "image", src: "/articles/ai-vs-ml-vs-dl/nested-simple.jpeg", alt: "Three concentric ellipses labeled Artificial Intelligence, Machine Learning, and Deep Learning, each fully containing the next." },
+  { type: "image", src: assetUrl("/articles/ai-vs-ml-vs-dl/nested-simple.jpeg"), alt: "Three concentric ellipses labeled Artificial Intelligence, Machine Learning, and Deep Learning, each fully containing the next." },
 
   { type: "h2", text: "4. Where does Deep Learning enter the picture?" },
   { type: "p", text: "Now we go one level deeper. Deep Learning is a subset of Machine Learning. It uses a particular type of mathematical model called a neural network — the name comes from the fact that these systems were loosely inspired by the way biological brains process information." },
@@ -52,7 +54,7 @@ export const blocks: ArticleBlock[] = [
   { type: "diagram", text: "Input\n  ↓\nLayer 1\n  ↓\nLayer 2\n  ↓\nLayer 3\n  ↓\nOutput" },
   { type: "p", text: "Because there can be many layers between the input and output, we call these systems deep neural networks. Hence: Deep Learning." },
 
-  { type: "image", src: "/articles/ai-vs-ml-vs-dl/nested-icons.jpeg", alt: "Nested circles labeled Artificial Intelligence, Machine Learning, and Deep Learning, illustrated with a robot, gears, and a circuit-board head icon." },
+  { type: "image", src: assetUrl("/articles/ai-vs-ml-vs-dl/nested-icons.jpeg"), alt: "Nested circles labeled Artificial Intelligence, Machine Learning, and Deep Learning, illustrated with a robot, gears, and a circuit-board head icon." },
 
   { type: "h2", text: "5. Why does Deep Learning matter?" },
   { type: "p", text: "Let's return to our spam example. A traditional Machine Learning model might require humans to decide which characteristics of an email are important — number of links, number of capital letters, presence of certain words, sender reputation, email length. These are called features. A human might engineer these features and then train a Machine Learning model using them." },
@@ -64,7 +66,7 @@ export const blocks: ArticleBlock[] = [
 
   { type: "h2", text: "6. The famous nested relationship" },
   { type: "p", text: "Now we can put everything together." },
-  { type: "image", src: "/articles/ai-vs-ml-vs-dl/nested-detailed.jpeg", alt: "Detailed nested-circle diagram of AI, Machine Learning, and Deep Learning with callouts: mimics human intelligence, learns from data, neural networks.", caption: "This is a conceptual diagram represented as proportions for visualization — not a measurement of the AI field. The chart is illustrative, not a claim about the actual percentage of AI that falls into each category." },
+  { type: "image", src: assetUrl("/articles/ai-vs-ml-vs-dl/nested-detailed.jpeg"), alt: "Detailed nested-circle diagram of AI, Machine Learning, and Deep Learning with callouts: mimics human intelligence, learns from data, neural networks.", caption: "This is a conceptual diagram represented as proportions for visualization — not a measurement of the AI field. The chart is illustrative, not a claim about the actual percentage of AI that falls into each category." },
   { type: "p", text: "The conceptual relationship is better expressed this way:" },
   { type: "diagram", text: "┌───────────────────────────────────────────┐\n│                                           │\n│        ARTIFICIAL INTELLIGENCE            │\n│                                           │\n│     ┌───────────────────────────────┐     │\n│     │       MACHINE LEARNING        │     │\n│     │                               │     │\n│     │    ┌───────────────────┐      │     │\n│     │    │   DEEP LEARNING   │      │     │\n│     │    │                   │      │     │\n│     │    └───────────────────┘      │     │\n│     │                               │     │\n│     └───────────────────────────────┘     │\n│                                           │\n└───────────────────────────────────────────┘" },
   { type: "callout", text: "Deep Learning ⊂ Machine Learning ⊂ Artificial Intelligence — that single line explains most of the confusion." },
@@ -142,7 +144,7 @@ export const blocks: ArticleBlock[] = [
   { type: "list", items: ["Artificial Intelligence — the broad goal of making machines perform tasks associated with intelligence.", "Machine Learning — a way of achieving AI by allowing machines to learn patterns from data.", "Deep Learning — a branch of Machine Learning based primarily on multi-layer neural networks.", "Generative AI — AI systems designed to generate new content such as text, images, audio, video or code."] },
   { type: "p", text: "And the relationship is: AI is the big umbrella. Machine Learning is one major section underneath it. Deep Learning is a section inside Machine Learning. Many modern Generative AI systems are built using Deep Learning." },
 
-  { type: "image", src: "/articles/ai-vs-ml-vs-dl/core-concepts.jpeg", alt: "Dark-themed infographic titled 'AI vs. ML vs. DL: The Core Concepts', showing AI, Machine Learning, and Deep Learning as three overlapping circles around a neural-network icon." },
+  { type: "image", src: assetUrl("/articles/ai-vs-ml-vs-dl/core-concepts.jpeg"), alt: "Dark-themed infographic titled 'AI vs. ML vs. DL: The Core Concepts', showing AI, Machine Learning, and Deep Learning as three overlapping circles around a neural-network icon." },
 
   { type: "h2", text: "21. The bigger picture" },
   { type: "p", text: "The evolution can almost be viewed as a journey:" },
