@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { articles } from "@/data/articles";
+import { articles, levelInfo } from "@/data/articles";
 import { blocks as aiVsMlVsDlBlocks, heroImage as aiVsMlVsDlHero, type ArticleBlock } from "@/data/articles/aiVsMlVsDl";
 import { blocks as chatbotOrAgentBlocks, heroImage as chatbotOrAgentHero } from "@/data/articles/chatbotOrAgent";
 import { blocks as prompting101Blocks, heroImage as prompting101Hero } from "@/data/articles/prompting101";
@@ -105,9 +105,21 @@ export default function ArticleDetailPage({ params }: { params: { slug: string }
         ← All articles
       </a>
 
-      <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-2 font-semibold">
-        {meta.level === "starter" ? "Starter" : meta.level === "builder" ? "Builder" : "Architect"}
-      </p>
+      <div className="flex items-center gap-2 mb-2 flex-wrap">
+        <p className="font-mono text-xs uppercase tracking-widest text-accent2 font-semibold">{levelInfo[meta.level].label}</p>
+        {meta.readMinutes && (
+          <>
+            <span className="text-ink-soft text-xs" aria-hidden>·</span>
+            <p className="font-mono text-xs text-ink-soft">{meta.readMinutes} min</p>
+          </>
+        )}
+        {meta.topic && (
+          <>
+            <span className="text-ink-soft text-xs" aria-hidden>·</span>
+            <p className="font-mono text-xs text-ink-soft">{meta.topic}</p>
+          </>
+        )}
+      </div>
       <h1 className="font-display text-3xl sm:text-4xl font-semibold mb-4 text-balance leading-tight">{meta.title}</h1>
       <p className="text-ink-soft text-lg leading-relaxed mb-8">{meta.summary}</p>
 
@@ -132,6 +144,31 @@ export default function ArticleDetailPage({ params }: { params: { slug: string }
               <Block key={i} block={block} />
             ))}
           </article>
+
+          {meta.relatedSlugs && meta.relatedSlugs.length > 0 && (
+            <div className="mt-12 pt-8 border-t border-paper-line">
+              <p className="font-mono text-xs uppercase tracking-widest text-accent2 mb-3">Related reading</p>
+              <div className="flex flex-col gap-2">
+                {meta.relatedSlugs.map((slug) => {
+                  const related = articles.find((a) => a.slug === slug);
+                  if (!related) return null;
+                  return (
+                    <a
+                      key={slug}
+                      href={`/articles/${slug}`}
+                      className="border border-paper-line rounded p-3.5 hover:border-accent-ink transition-colors flex items-center justify-between gap-3"
+                    >
+                      <div>
+                        <h3 className="font-semibold text-sm">{related.title}</h3>
+                        <p className="text-xs text-ink-soft mt-0.5">{related.summary}</p>
+                      </div>
+                      <span className="font-mono text-[10.5px] uppercase text-accent-ink whitespace-nowrap flex-none">Read →</span>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </>
       )}
     </main>
