@@ -83,7 +83,17 @@ export const articles: Article[] = [
     status: "published",
     readMinutes: 8,
     topic: "LLMs",
-    relatedSlugs: ["what-is-generative-ai", "ai-vs-ml-vs-dl", "prompting-101"],
+    relatedSlugs: ["what-is-generative-ai", "how-chatgpt-works", "prompting-101"],
+  },
+  {
+    slug: "how-chatgpt-works",
+    title: "How Do ChatGPT, Gemini & Claude Actually Work?",
+    summary: "You type a question, an answer appears a few seconds later. Here's what's actually happening in between.",
+    level: "starter",
+    status: "published",
+    readMinutes: 7,
+    topic: "LLMs",
+    relatedSlugs: ["what-is-an-llm", "what-is-generative-ai"],
   },
   {
     slug: "chatbot-or-agent",
@@ -118,7 +128,6 @@ export const articles: Article[] = [
 
   // The next 7 are stubs for the homepage's "Learn AI from zero" numbered
   // path (see LearnAiPath.tsx) — steps 01, 03, 04, 05, 08, 09, 10.
-  { slug: "how-chatgpt-works", title: "How Does ChatGPT Actually Work?", summary: "What happens between you hitting enter and the words appearing on screen.", level: "starter", status: "coming-soon", topic: "LLMs" },
   { slug: "what-is-rag", title: "What Is RAG?", summary: "How an AI answers questions about documents it was never trained on.", level: "starter", status: "coming-soon", topic: "RAG" },
   { slug: "what-are-ai-agents", title: "What Are AI Agents?", summary: "The building blocks behind a system that can plan, use tools, and take action.", level: "starter", status: "coming-soon", topic: "Agents" },
   { slug: "how-ai-is-changing-jobs", title: "How AI Is Changing Jobs", summary: "What's actually shifting in day-to-day work, beyond the headlines.", level: "starter", status: "coming-soon", topic: "Careers" },
