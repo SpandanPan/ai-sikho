@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { generateOtp, hashOtp, isValidIdentifier, normalizeIdentifier, otpExpiryDate } from "@/lib/otp";
+import { generateOtp, hashOtp, isEmail, isValidIdentifier, normalizeIdentifier, otpExpiryDate } from "@/lib/otp";
 import { checkIdentifierRateLimit, checkIpRateLimit, WINDOW_MINUTES } from "@/lib/rateLimit";
+import { buildOtpEmail, isEmailConfigured, sendEmail } from "@/lib/email";
 
-// TODO before public launch: actually send the code — MSG91/Twilio for
-// phone numbers, a transactional email provider (Resend, etc.) for emails.
-// Until one is wired up, the code is only logged server-side; devCode is
-// only ever returned to the client outside production, as a dev convenience.
+// Email OTP is wired up for real (via Resend, once RESEND_API_KEY is set —
+// see .env.example/DEPLOY.md). Phone/SMS (MSG91/Twilio) is NOT — a phone
+// identifier in production fails honestly below instead of claiming
+// "sent" with nothing actually delivered. devCode is only ever returned
+// to the client outside production, as a dev convenience.
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   const raw = body?.identifier;
@@ -16,6 +18,18 @@ export async function POST(req: Request) {
   }
 
   const identifier = normalizeIdentifier(raw);
+  const identifierIsEmail = isEmail(identifier);
+
+  // No SMS provider exists yet (see AGENT_COSTS.md/DEPLOY.md) — rather
+  // than burn a rate-limit slot and a DB row generating a code that can
+  // never reach the user, fail before any of that in production. Local
+  // dev still works via devCode below, same as it always has.
+  if (!identifierIsEmail && process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      { error: "Phone sign-in isn't available yet — please use your email instead." },
+      { status: 400 }
+    );
+  }
   // x-forwarded-for can carry a comma-separated chain (client, proxy, proxy…)
   // — the first entry is the original client.
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
@@ -65,6 +79,16 @@ export async function POST(req: Request) {
   });
 
   console.log(`[OTP] ${identifier} -> ${code}`);
+
+  if (identifierIsEmail) {
+    const result = await sendEmail(buildOtpEmail({ to: identifier, code }));
+    // Only a genuine send failure is a hard error — RESEND_API_KEY simply
+    // being unset (isEmailConfigured() false) is expected in local dev and
+    // already logged by sendEmail itself; devCode below covers that case.
+    if (!result.sent && isEmailConfigured()) {
+      return NextResponse.json({ error: "Couldn't send the code — try again in a moment." }, { status: 502 });
+    }
+  }
 
   return NextResponse.json({
     sent: true,

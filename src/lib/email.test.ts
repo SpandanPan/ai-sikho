@@ -1,5 +1,5 @@
 import { describe, expect, it, afterEach } from "vitest";
-import { EMAIL_ADDRESSES, buildReceiptEmail, buildCourseWelcomeEmail, buildSupportAckEmail } from "./email";
+import { EMAIL_ADDRESSES, buildReceiptEmail, buildCourseWelcomeEmail, buildSupportAckEmail, buildOtpEmail } from "./email";
 
 describe("EMAIL_ADDRESSES", () => {
   const original = process.env.EMAIL_DOMAIN;
@@ -8,12 +8,28 @@ describe("EMAIL_ADDRESSES", () => {
     else process.env.EMAIL_DOMAIN = original;
   });
 
-  it("uses three distinct, purpose-separated local parts on the same domain", () => {
+  it("uses four distinct, purpose-separated local parts on the same domain", () => {
     expect(EMAIL_ADDRESSES.receipts).not.toBe(EMAIL_ADDRESSES.courses);
     expect(EMAIL_ADDRESSES.courses).not.toBe(EMAIL_ADDRESSES.support);
+    expect(EMAIL_ADDRESSES.support).not.toBe(EMAIL_ADDRESSES.auth);
     const domain = EMAIL_ADDRESSES.receipts.split("@")[1];
     expect(EMAIL_ADDRESSES.courses.endsWith(`@${domain}`)).toBe(true);
     expect(EMAIL_ADDRESSES.support.endsWith(`@${domain}`)).toBe(true);
+    expect(EMAIL_ADDRESSES.auth.endsWith(`@${domain}`)).toBe(true);
+  });
+});
+
+describe("buildOtpEmail", () => {
+  it("sends from the auth address and includes the code in both subject and body", () => {
+    const email = buildOtpEmail({ to: "a@b.com", code: "482913" });
+    expect(email.from).toBe(EMAIL_ADDRESSES.auth);
+    expect(email.subject).toContain("482913");
+    expect(email.html).toContain("482913");
+  });
+
+  it("mentions the 10-minute expiry so the recipient knows the code goes stale", () => {
+    const email = buildOtpEmail({ to: "a@b.com", code: "111111" });
+    expect(email.html).toMatch(/10 minutes/i);
   });
 });
 

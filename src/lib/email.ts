@@ -14,6 +14,7 @@ export const EMAIL_ADDRESSES = {
   receipts: `receipts@${domain}`,
   courses: `courses@${domain}`, // "welcome to the course" and similar enrollment messages
   support: `support@${domain}`,
+  auth: `auth@${domain}`, // sign-in codes — the most time-sensitive send of all (10-minute expiry), gets its own identity for the same deliverability reason as the other three
 };
 
 export function isEmailConfigured(): boolean {
@@ -68,6 +69,17 @@ export function buildCourseWelcomeEmail(opts: { to: string; courseTitle: string;
     subject: `Welcome to ${opts.courseTitle}`,
     html: `<p>You're in — <b>${opts.courseTitle}</b> is ready whenever you are.</p>
 <p><a href="${opts.courseUrl}">Start the course →</a></p>`,
+  };
+}
+
+export function buildOtpEmail(opts: { to: string; code: string }): EmailMessage {
+  return {
+    from: EMAIL_ADDRESSES.auth,
+    to: opts.to,
+    subject: `Your AI Sikho sign-in code: ${opts.code}`,
+    html: `<p>Your sign-in code is:</p>
+<p style="font-size:28px;font-weight:700;letter-spacing:6px;">${opts.code}</p>
+<p>This code expires in 10 minutes. If you didn't request this, you can safely ignore this email.</p>`,
   };
 }
 
