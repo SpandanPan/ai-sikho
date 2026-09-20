@@ -1,3 +1,5 @@
+import { ollamaAuthHeaders } from "./ollamaAuth";
+
 // Two distinct tasks get two distinct models internally — translation and
 // open-ended Q&A are different jobs and one model doesn't do both well.
 // Which model runs which job is an internal implementation detail, not
@@ -28,7 +30,7 @@ export async function translateText(text: string, targetLanguage: IndicLanguage)
 
   const res = await fetch(`${baseUrl.replace(/\/$/, "")}/v1/chat/completions`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...ollamaAuthHeaders() },
     body: JSON.stringify({
       model: TRANSLATE_MODEL,
       messages: [{ role: "user", content: `Translate to ${targetLanguage}: ${text}` }],
@@ -54,7 +56,7 @@ export async function answerInLanguage(question: string, targetLanguage: IndicLa
 
   const res = await fetch(`${baseUrl.replace(/\/$/, "")}/v1/chat/completions`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...ollamaAuthHeaders() },
     body: JSON.stringify({
       model: CHAT_MODEL,
       messages: [

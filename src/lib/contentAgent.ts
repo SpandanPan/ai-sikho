@@ -30,6 +30,7 @@
 // API contract, not actually run. Test whichever you use before trusting
 // its output.
 import { MODEL_PRICING_USD_PER_1M, type Provider } from "./agentPricing";
+import { ollamaAuthHeaders } from "./ollamaAuth";
 
 export type GenerationType = "QUIZ" | "ARTICLE" | "ROADMAP";
 
@@ -131,7 +132,7 @@ async function callOllama(system: string, user: string): Promise<{ text: string;
 
   const res = await fetch(`${baseUrl.replace(/\/$/, "")}/v1/chat/completions`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...ollamaAuthHeaders() },
     body: JSON.stringify({
       model: MODEL_PRICING_USD_PER_1M.ollama.model,
       messages: [

@@ -1,0 +1,36 @@
+# Caddy config for the Ollama VPS — token-gated reverse proxy + automatic
+# HTTPS. This is the ONLY thing that should be reachable from the public
+# internet on this box; Ollama itself stays bound to 127.0.0.1 (see
+# ollama.env) and is never exposed directly.
+#
+# Requires two environment variables when Caddy starts (systemd reads
+# these from /etc/caddy/caddy.env — see setup-vps.sh):
+#   OLLAMA_PUBLIC_DOMAIN  — the domain/subdomain pointed at this VPS's IP
+#                            (e.g. ollama.yourdomain.com), so Caddy can
+#                            get a Let's Encrypt cert for it automatically.
+#   OLLAMA_AUTH_TOKEN     — must match the app's OLLAMA_AUTH_TOKEN env var
+#                            exactly (see .env.example and DEPLOY.md).
+#
+# A request without the exact bearer token gets a 401 and never reaches
+# Ollama. This is the fix for "an open Ollama endpoint is a common way
+# people accidentally let others use their compute for free."
+
+{$OLLAMA_PUBLIC_DOMAIN} {
+	@authorized {
+		header Authorization "Bearer {$OLLAMA_AUTH_TOKEN}"
+	}
+
+	handle @authorized {
+		reverse_proxy 127.0.0.1:11434 {
+			# Ollama can take a while on a small VPS with no GPU — don't let
+			# Caddy time out a slow-but-successful generation.
+			transport http {
+				read_timeout 300s
+			}
+		}
+	}
+
+	handle {
+		respond "Unauthorized" 401
+	}
+}

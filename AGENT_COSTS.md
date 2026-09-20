@@ -137,13 +137,18 @@ bundled into this Next.js app. `OLLAMA_BASE_URL` has to be a URL the
   be `localhost` — Vercel's serverless functions run in Vercel's cloud,
   not on your laptop, and cannot reach it. Before deploying any of these
   live-traffic agents to production, Ollama needs to be reachable at a
-  real public address: either a small always-on VPS (cheap — a few
-  dollars/month, e.g. Hetzner/DigitalOcean) or a tunnel (Cloudflare
-  Tunnel, free) from your own machine, kept running. **This is real,
-  unresolved deployment work, not yet done** — everything above was
-  verified against `localhost` in local dev, which is honest about what
-  was actually tested, but is not the same as working from your real,
-  deployed domain. Do this before relying on any of these in production.
+  real public address: a small always-on VPS (cheap — a few
+  dollars/month, e.g. Hetzner/DigitalOcean).
+
+  **The plumbing for this now exists** — `DEPLOY.md` + `deploy/` (a
+  provisioning script, a token-gated Caddy reverse proxy, and a systemd
+  override pinning Ollama to `127.0.0.1` so it's never reachable except
+  through that proxy). **Not yet executed against a real VPS** — everything
+  in the table above was verified against `localhost` in local dev, which
+  is honest about what was actually tested. Follow `DEPLOY.md`'s go-live
+  checklist (curl the deployed endpoint from outside your own network,
+  trigger the free grading flow on the deployed site, not localhost)
+  before trusting any of this against real traffic.
 
 Model weights themselves live in Ollama's own store
 (`~/.ollama/models`), **not inside this repo** — a 9.6GB model file has no
