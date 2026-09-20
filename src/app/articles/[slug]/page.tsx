@@ -6,6 +6,7 @@ import { blocks as chatbotOrAgentBlocks, heroImage as chatbotOrAgentHero } from 
 import { blocks as prompting101Blocks, heroImage as prompting101Hero } from "@/data/articles/prompting101";
 import { blocks as aiGlossaryBlocks } from "@/data/articles/aiGlossary";
 import { blocks as whatIsAiBlocks, heroImage as whatIsAiHero } from "@/data/articles/whatIsAi";
+import { blocks as whatIsGenerativeAiBlocks, heroImage as whatIsGenerativeAiHero } from "@/data/articles/whatIsGenerativeAi";
 
 // Content lookup by slug — only articles with status "published" in
 // src/data/articles.ts have an entry here. Same pattern as the courses
@@ -17,6 +18,7 @@ const articleContent: Record<string, { blocks: ArticleBlock[]; hero?: { src: str
   "prompting-101": { blocks: prompting101Blocks, hero: prompting101Hero },
   "ai-glossary": { blocks: aiGlossaryBlocks },
   "what-is-ai": { blocks: whatIsAiBlocks, hero: whatIsAiHero },
+  "what-is-generative-ai": { blocks: whatIsGenerativeAiBlocks, hero: whatIsGenerativeAiHero },
 };
 
 export function generateStaticParams() {

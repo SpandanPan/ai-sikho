@@ -63,7 +63,17 @@ export const articles: Article[] = [
     status: "published",
     readMinutes: 6,
     topic: "AI Fundamentals",
-    relatedSlugs: ["what-is-ai", "what-is-an-llm", "ai-glossary"],
+    relatedSlugs: ["what-is-ai", "what-is-generative-ai", "ai-glossary"],
+  },
+  {
+    slug: "what-is-generative-ai",
+    title: "What Is Generative AI?",
+    summary: "The AI that doesn't just recognize things — it creates them.",
+    level: "starter",
+    status: "published",
+    readMinutes: 9,
+    topic: "Generative AI",
+    relatedSlugs: ["ai-vs-ml-vs-dl", "prompting-101", "chatbot-or-agent"],
   },
   {
     slug: "chatbot-or-agent",
@@ -98,7 +108,6 @@ export const articles: Article[] = [
 
   // The next 7 are stubs for the homepage's "Learn AI from zero" numbered
   // path (see LearnAiPath.tsx) — steps 01, 03, 04, 05, 08, 09, 10.
-  { slug: "what-is-generative-ai", title: "What Is Generative AI?", summary: "The difference between AI that decides and AI that creates.", level: "starter", status: "coming-soon", topic: "Generative AI" },
   { slug: "what-is-an-llm", title: "What Is an LLM?", summary: "The three letters behind ChatGPT, Claude, and Gemini, explained plainly.", level: "starter", status: "coming-soon", topic: "LLMs" },
   { slug: "how-chatgpt-works", title: "How Does ChatGPT Actually Work?", summary: "What happens between you hitting enter and the words appearing on screen.", level: "starter", status: "coming-soon", topic: "LLMs" },
   { slug: "what-is-rag", title: "What Is RAG?", summary: "How an AI answers questions about documents it was never trained on.", level: "starter", status: "coming-soon", topic: "RAG" },
